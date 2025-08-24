@@ -1,0 +1,30 @@
+# Gradleのキャッシュディレクトリ（プロジェクト固有）
+.gradle/
+
+# Gradle成果物
+build/
+
+# IDEA系の設定
+.idea
+*.iml
+
+# OS・その他一時ファイル
+*.log
+.DS_Store
+
+# VSCode
+.vscode
+
+# Kotlin成果物
+.kotlin/
+
+# Local
+gradle-*/
+kotlinc/
+*.jar
+
+# DB
+*.sqlite3
+
+# Gradle Wrapperのjarファイルは除外しない（明示的に含める）
+!gradle/wrapper/gradle-wrapper.jar
