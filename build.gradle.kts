@@ -14,7 +14,3 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_21 // Java Versionを指定
 }
-
-repositories {
-    mavenCentral()
-}

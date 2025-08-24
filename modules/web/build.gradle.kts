@@ -11,6 +11,11 @@ plugins {
     id("io.spring.dependency-management") // from Gradle Plugin Portal
 }
 
+// Repository設定
+repositories {
+    mavenCentral()
+}
+
 // Spring Boot Webアプリに必要な依存関係を追加
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // SpringbootWebフレームワーク
