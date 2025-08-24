@@ -18,7 +18,7 @@ COPY modules/web ./modules/web/
 # Build the application
 RUN chmod +x ./gradlew
 RUN ./gradlew build
-# RUN ./gradlew bootJar
+RUN ./gradlew bootJar
 
 # # Stage 2: Create the final production image
 # FROM eclipse-temurin:21-jre-jammy
