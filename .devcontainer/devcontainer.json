@@ -1,0 +1,25 @@
+{
+	"name": "Kotlin & Spring Boot DevContainer",
+	"build": {
+		"dockerfile": "../kotlin_container/Dockerfile",
+		"context": ".."
+	},
+	"workspaceFolder": "/workspaces/KabuKanri_App",
+	"forwardPorts": [8080],
+	"remoteUser": "vscode",
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash"
+			},
+			"extensions": [
+				"fwcd.kotlin",
+				"vscjava.vscode-spring-boot",
+				"vscjava.vscode-java-pack"
+			]
+		}
+	}
+}
