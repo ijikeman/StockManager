@@ -6,3 +6,6 @@
  */
 
 rootProject.name = "StockManager"
+
+// import submodule
+include(":modules:web")

@@ -12,26 +12,27 @@ COPY settings.gradle.kts .
 COPY build.gradle.kts .
 
 # Copy the source code
-COPY src ./src
+RUN mkdir -p modules/web
+COPY modules/web ./modules/web/
 
 # Build the application
 RUN chmod +x ./gradlew
 RUN ./gradlew bootJar
 
-# Stage 2: Create the final production image
-FROM eclipse-temurin:21-jre-jammy
+# # Stage 2: Create the final production image
+# FROM eclipse-temurin:21-jre-jammy
 
-WORKDIR /app
+# WORKDIR /app
 
-# Create a non-root user
-RUN useradd -m -s /bin/bash appuser
-USER appuser
+# # Create a non-root user
+# RUN useradd -m -s /bin/bash appuser
+# USER appuser
 
-# Copy the executable JAR from the builder stage
-COPY --from=builder /workspace/build/libs/*.jar ./application.jar
+# # Copy the executable JAR from the builder stage
+# COPY --from=builder /workspace/build/libs/*.jar ./application.jar
 
-# Expose the application port
-EXPOSE 8080
+# # Expose the application port
+# EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "./application.jar"]
+# # Run the application
+# ENTRYPOINT ["java", "-jar", "./application.jar"]

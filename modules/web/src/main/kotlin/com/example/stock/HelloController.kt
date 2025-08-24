@@ -1,4 +1,4 @@
-package com.example.demo
+package com.example.stock
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.stereotype.Controller // @RestController から @Controller に変更

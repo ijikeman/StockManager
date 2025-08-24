@@ -5,23 +5,17 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.14.2/samples
  */
 plugins {
-    kotlin("jvm") version "2.0.10" apply false // Kotlin version
-    kotlin("plugin.spring") version "2.0.10" apply false // Kotlin version
-    id("org.springframework.boot") version "3.5.5" apply false
-    id("io.spring.dependency-management") version "1.1.7" apply false // from Gradle Plugin Portal
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21 // Java Versionを指定
-}
-
-repositories {
-    mavenCentral()
+    kotlin("jvm") // Kotlin version
+    kotlin("plugin.spring") // Kotlin version
+    id("org.springframework.boot")
+    id("io.spring.dependency-management") // from Gradle Plugin Portal
 }
 
 // Spring Boot Webアプリに必要な依存関係を追加
+/*
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // SpringbootWebフレームワーク
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf") // Template Engine
     implementation("org.springframework.boot:spring-boot-devtools")
 }
+*/
