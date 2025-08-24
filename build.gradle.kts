@@ -18,10 +18,3 @@ java {
 repositories {
     mavenCentral()
 }
-
-// Spring Boot Webアプリに必要な依存関係を追加
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web") // SpringbootWebフレームワーク
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf") // Template Engine
-    implementation("org.springframework.boot:spring-boot-devtools")
-}
