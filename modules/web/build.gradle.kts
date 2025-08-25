@@ -25,4 +25,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // SpringbootWebフレームワーク
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf") // Template Engine
     implementation("org.springframework.boot:spring-boot-devtools")
+
+    // Database Settings
+    implementation("org.springframework.boot:spring-boot-starter-jdbc") // Spring JDBC Template/JdbcClientに必要
+    // 開発環境用: H2データベースドライバ
+    runtimeOnly("com.h2database:h2")
 }

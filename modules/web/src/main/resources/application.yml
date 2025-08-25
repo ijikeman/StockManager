@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db;MODE=MYSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+#spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+# スキーマファイル、データファイルを指定
+  sql:
+    init:
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      mode: always # schema.sql, data.sqlを毎回実行する
+    #   mode: never # schema.sql, data.sqlを実行しない # compose.ymlでenvironment: SPRING_SQL_INIT_MODE=neverにしてOverrideすることができる
+      encoding: UTF-8 # h2データベースへのデータが文字化けする為対応
+
+# H2 Console Settings
+  h2:
+    console:
+      enabled: true
+      path: /h2 # h2 ConsoleのURLを:8080/h2/にする
+      settings:
+        web-allow-others: true # h2 Console接続時の'webAllowOthers'を有効にする
+
+# Thymeleaf cache settings
+  thymeleaf:
+    cache: false
+
+# Whitelabel Error Pageを無効にする
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
