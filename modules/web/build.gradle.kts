@@ -7,8 +7,8 @@
 plugins {
     kotlin("jvm") // Kotlin version
     kotlin("plugin.spring") // Kotlin version
-    id("org.springframework.boot")
-    id("io.spring.dependency-management") // from Gradle Plugin Portal
+    id("org.springframework.boot") // implementation springframework.bootを使用しているため
+    id("io.spring.dependency-management")  // 親子モジュールで必要
 }
 
 java {
@@ -19,11 +19,17 @@ java {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // SpringbootWebフレームワーク
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf") // Template Engine
-    implementation("org.springframework.boot:spring-boot-devtools")
 
+    // 開発環境のみdevtoolを有効に
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    // データベース設定
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa") // webでも使う(DB(H2)が有効にならないので追加する必要あり)
     // 開発環境用: H2データベースドライバ
     runtimeOnly("com.h2database:h2")
-    implementation(project(":modules:stock")) // stockを有効にする
+
+     // webからsubmodule stockの機能を利用する為、読み込む
+    implementation(project(":modules:stock"))
 }
 
 // マルチモジュール構成の為、class mainを指定する必要がある

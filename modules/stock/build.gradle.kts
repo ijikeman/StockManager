@@ -7,8 +7,8 @@
 plugins {
     kotlin("jvm") // Kotlin version
     kotlin("plugin.spring") // Kotlin version
-    id("io.spring.dependency-management") // from Gradle Plugin Portal
     kotlin("plugin.jpa") // デフォルトコンストラクタを設定することを回避する
+    id("io.spring.dependency-management") // 親子モジュールで必要
     id("org.springframework.boot") // implementationでspringframework.bootを使っている為、指定
 }
 
