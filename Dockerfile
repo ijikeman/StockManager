@@ -1,21 +1,11 @@
 # Stage 1: Build the application
-#FROM eclipse-temurin:21-jre-jammy AS builder
+# FROM eclipse-temurin:21-jre-jammy AS builder
 FROM eclipse-temurin:17.0.16_8-jdk-jammy AS builder
 
 WORKDIR /workspace
 
-# Copy the Gradle wrapper
-COPY gradlew .
-COPY gradle ./gradle
-
-# Copy the build configuration files
-COPY settings.gradle.kts .
-COPY build.gradle.kts .
-
-# Copy the source code
-RUN mkdir -p modules/
-COPY modules/web ./modules/web
-COPY modules/stock ./modules/stock
+# Copy the entire project
+COPY . .
 
 # Build the application
 RUN chmod +x ./gradlew
@@ -31,7 +21,7 @@ RUN useradd -m -s /bin/bash appuser
 USER appuser
 
 # Copy the executable JAR from the builder stage
-COPY --from=builder /workspace/build/libs/*.jar ./application.jar
+COPY --from=builder /workspace/modules/web/build/libs/*.jar ./application.jar
 
 # Expose the application port
 EXPOSE 8080
