@@ -14,6 +14,7 @@ COPY modules ./modules
 
 # Build the application
 RUN chmod +x ./gradlew
+# mainのクラスでBuildする
 RUN ./gradlew :modules:web:bootJar
 
 # Stage 2: Create the final production image

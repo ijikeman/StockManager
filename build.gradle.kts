@@ -5,9 +5,9 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/8.14.2/samples
  */
 plugins {
-    kotlin("jvm") version "2.0.10" apply false // Kotlin version
-    kotlin("plugin.spring") version "2.0.10" apply false // Kotlin version
-    kotlin("plugin.jpa") version "2.0.10" apply false
+    kotlin("jvm") version "2.0.10" apply false // Kotlin version この３つは合わせる必要あり
+    kotlin("plugin.spring") version "2.0.10" apply false // Kotlin version この３つは合わせる必要あり
+    kotlin("plugin.jpa") version "2.0.10" apply false // Kotlin version この３つは合わせる必要あり
     id("org.springframework.boot") version "3.5.5" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false // from Gradle Plugin Portal
 }
