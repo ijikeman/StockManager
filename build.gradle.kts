@@ -7,6 +7,14 @@
 plugins {
     kotlin("jvm") version "2.0.10" apply false // Kotlin version
     kotlin("plugin.spring") version "2.0.10" apply false // Kotlin version
+    kotlin("plugin.jpa") version "2.0.10" apply false
     id("org.springframework.boot") version "3.5.5" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false // from Gradle Plugin Portal
+}
+
+subprojects {
+    // Repository設定
+    repositories {
+        mavenCentral()
+    }
 }

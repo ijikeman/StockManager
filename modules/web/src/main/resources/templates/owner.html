@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="jp" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <title>所有者リスト</title>
+    </head>
+    <body>
+        <h1>所有者登録</h1>
+        <!-- owner登録フォーム表示 -->
+        <form th:action="@{/owner}" method="post">
+            Name: <input type="text" name="name" placeholder="名前"/>
+            <input type="submit" value="登録" />
+        </form>
+
+        <hr/>
+
+        <h2>所有者一覧</h2>
+        <div th:if="${!owner.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名前</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="owner : ${owner}">
+                        <td th:text="${owner.id}">1</td>
+                        <td th:text="${owner.name}">テスト太郎</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${owner.isEmpty()}">
+            <p>所有者はまだ登録されていません。</p>
+        </div>
+    </body>
+</html>

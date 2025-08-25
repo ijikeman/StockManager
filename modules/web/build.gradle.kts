@@ -11,11 +11,6 @@ plugins {
     id("io.spring.dependency-management") // from Gradle Plugin Portal
 }
 
-// Repository設定
-repositories {
-    mavenCentral()
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_17 // Java Versionを指定
 }
@@ -26,8 +21,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf") // Template Engine
     implementation("org.springframework.boot:spring-boot-devtools")
 
-    // Database Settings
-    implementation("org.springframework.boot:spring-boot-starter-jdbc") // Spring JDBC Template/JdbcClientに必要
     // 開発環境用: H2データベースドライバ
     runtimeOnly("com.h2database:h2")
+    implementation(project(":modules:stock")) // stockを有効にする
+}
+
+// マルチモジュール構成の為、class mainを指定する必要がある
+tasks.bootRun {
+    mainClass.set("com.example.ApplicationKt") 
 }

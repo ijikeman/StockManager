@@ -4,8 +4,9 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password: 
-
-#spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate.ddl-auto: none # スキーマファイルを優先し、data.sqlを実行
 
 # スキーマファイル、データファイルを指定
   sql:
@@ -30,7 +31,7 @@ spring:
 
 # Whitelabel Error Pageを無効にする
 server:
-  port: 8080
   error:
     whitelabel:
       enabled: false
+  port: 8080

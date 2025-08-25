@@ -9,3 +9,4 @@ rootProject.name = "StockManager"
 
 // import submodule
 include(":modules:web")
+include(":modules:stock")

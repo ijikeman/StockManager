@@ -13,16 +13,16 @@ COPY settings.gradle.kts .
 COPY build.gradle.kts .
 
 # Copy the source code
-RUN mkdir -p modules/web
-COPY modules/web ./modules/web/
+RUN mkdir -p modules/
+COPY modules/web ./modules/web
+COPY modules/stock ./modules/stock
 
 # Build the application
 RUN chmod +x ./gradlew
-RUN ./gradlew build
-RUN ./gradlew bootJar
+RUN ./gradlew :modules:web:bootJar
 
 # Stage 2: Create the final production image
-#FROM eclipse-temurin:21-jre-jammy
+# FROM eclipse-temurin:21-jre-jammy
 FROM eclipse-temurin:17.0.16_8-jdk-jammy
 WORKDIR /app
 
