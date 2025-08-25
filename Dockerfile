@@ -5,7 +5,12 @@ FROM eclipse-temurin:17.0.16_8-jdk-jammy AS builder
 WORKDIR /workspace
 
 # Copy the entire project
-COPY . .
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradlew .
+COPY gradlew.bat .
+COPY gradle ./gradle
+COPY modules ./modules
 
 # Build the application
 RUN chmod +x ./gradlew
