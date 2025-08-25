@@ -3,9 +3,9 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 ENV VERSION_GRADLE=8.14.2
 ENV VERSION_KOTLIN=2.0.10
 
-# Install java-21
+# Install java
 RUN apt update && \
-apt install openjdk-21-jdk -y
+apt install openjdk-17-jdk -y
 
 # 作業ディレクトリ
 WORKDIR /workspace
