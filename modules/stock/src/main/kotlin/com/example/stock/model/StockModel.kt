@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Column
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
 
 @Entity
@@ -16,6 +17,7 @@ data class Stock(
     val id: Int = 0,
 
     @NotBlank(message = "銘柄コードは必須です")
+    @field:Pattern(regexp = "^[0-9a-zA-Z]+$", message = "名前は数字あるいはアルファベットのみで構成される必要があります")
     @Column(name = "code", nullable = false)
     val code: String = "", // 銘柄コード
 
