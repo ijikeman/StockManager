@@ -17,4 +17,14 @@ subprojects {
     repositories {
         mavenCentral()
     }
+
+    // 親プロジェクト側でライブラリのバージョン管理
+    // プラグインを適用
+    apply(plugin = "io.spring.dependency-management")   
+    // 依存関係管理の設定
+    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+        dependencies {
+            dependency("org.junit.jupiter:junit-jupiter:5.12.2")
+        }
+    }
 }
