@@ -27,8 +27,14 @@ dependencies {
 
     // テストの為
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-testImplementation(platform("org.junit:junit-bom:5.12.2"))
-testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+sourceSets {
+    test {
+        kotlin.srcDirs("src/test/kotlin")
+    }
 }
 
 tasks.test {
