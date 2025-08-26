@@ -25,12 +25,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation") // バリデーション
 
-    // テストの為
+    // テスト実行の為、記載が必要(JUnitが内包されている)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    // testImplementation(platform("org.junit:junit-bom:5.12.2"))
-    // testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+// JUNit5を使用する為、記載が必要
 tasks.withType<Test> {
     useJUnitPlatform()
 }
