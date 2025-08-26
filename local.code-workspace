@@ -6,6 +6,5 @@
 	],
 	"settings": {
 		"ansible.python.interpreterPath": "/usr/bin/python3",
-		"java.compile.nullAnalysis.mode": "automatic"
 	}
 }

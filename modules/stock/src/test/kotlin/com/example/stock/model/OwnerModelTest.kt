@@ -1,37 +1,55 @@
 package com.example.stock.model
 
-import org.junit.jupiter.api.Assertions.* // springboot.frameworkに含まれている？
-import org.junit.jupiter.api.Test
 import jakarta.validation.Validation
 import jakarta.validation.Validator
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-class OwnerModelTest {
-    private val validator: Validator = Validation.buildDefaultValidatorFactory().validator
+class OwnerTest {
 
-    // --- 正常系
-    @Test
-    fun `Owner正常系`() {
-        val owner = Owner(1, "JohnDoe")
-        val violations = validator.validate(owner)
-        assertTrue(violations.isEmpty())
-        assertEquals(owner.name, "JohnDoe")
-    }
+    private lateinit var validator: Validator
 
-    // --- 異常系
-    @Test
-    fun `Owner異常系 -name NotBlank-`() {
-        val owner = Owner(2, "")
-        val violations = validator.validate(owner)
-        assertFalse(violations.isEmpty())
-        assertEquals("名前は必須です", violations.first().message)
+    @BeforeEach
+    fun setUp() {
+        val factory = Validation.buildDefaultValidatorFactory()
+        validator = factory.validator
     }
 
     @Test
-    fun `Owner異常系 -name input validation-`() {
-        val owner = Owner(2, "John Doe")
+    fun `valid owner should have no violations`() {
+        val owner = Owner(name = "Keiji")
         val violations = validator.validate(owner)
-        assertFalse(violations.isEmpty())
-        // "名前はアルファベットのみで構成される必要があります"のエラーメッセージが返ってくること
-        assertEquals("名前はアルファベットのみで構成される必要があります", violations.first().message)
+        assertEquals(0, violations.size)
+    }
+
+    @Test
+    fun `owner with blank name should have two violations`() {
+        val owner = Owner(name = "")
+        val violations = validator.validate(owner)
+        assertEquals(2, violations.size)
+        val messages = violations.map { it.message }
+        assertTrue(messages.contains("名前は必須です"))
+        assertTrue(messages.contains("名前はアルファベットのみで構成される必要があります"))
+    }
+
+    @Test
+    fun `owner with non-alphabetic name should have violation`() {
+        val owner = Owner(name = "Keiji123")
+        val violations = validator.validate(owner)
+        assertEquals(1, violations.size)
+        val violation = violations.iterator().next()
+        assertEquals("名前はアルファベットのみで構成される必要があります", violation.message)
+    }
+
+    @Test
+    fun `owner with blank space name should have two violations`() {
+        val owner = Owner(name = " ")
+        val violations = validator.validate(owner)
+        assertEquals(2, violations.size)
+        val messages = violations.map { it.message }
+        assertTrue(messages.contains("名前は必須です"))
+        assertTrue(messages.contains("名前はアルファベットのみで構成される必要があります"))
     }
 }
