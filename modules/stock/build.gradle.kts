@@ -27,6 +27,8 @@ dependencies {
 
     // テスト実行の為、記載が必要(JUnitが内包されている)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // サブモジュールで単体テストする為、こちらにも記載している
+    testRuntimeOnly("com.h2database:h2")
 }
 
 // JUNit5を使用する為、記載が必要
