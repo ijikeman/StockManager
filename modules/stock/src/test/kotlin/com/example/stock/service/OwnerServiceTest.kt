@@ -30,7 +30,7 @@ class OwnerServiceTest {
         // given: 前提条件の設定
         // モックのownerRepositoryがfindAll()メソッドを呼ばれた場合に、あらかじめ用意したownersリストを返すように設定
         val owners = listOf(Owner(id = 1, name = "owner1"), Owner(id = 2, name = "owner2"))
-        mockitoWhen(ownerRepository.findAll()).thenReturn(owners)
+        mockitoWhen(ownerRepository.findAll()).thenReturn(owners) // owerRepository.findAll()を読んだときはownersを返す
 
         // when: テスト対象のメソッドを実行
         val result = ownerService.findAll()
