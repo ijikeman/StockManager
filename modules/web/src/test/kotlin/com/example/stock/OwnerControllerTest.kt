@@ -47,7 +47,7 @@ class OwnerControllerTest {
 
     /**
      * 所有者登録処理の正常系テスト。
-     * POST /owner に有効なパラメータを送信した際に、/owner にリダイレクトされることを検証する。
+     * POST /owner に有効なパラメータを送信した際に、ステータスリダイレクト、/owner にリダイレクトされることを検証する。
      */
     @Test
     fun `ownerRegister should redirect to owner when valid`() {
@@ -88,7 +88,7 @@ class OwnerControllerTest {
 
     /**
      * 所有者更新処理の正常系テスト。
-     * POST /owner/update に有効なパラメータを送信した際に、/owner にリダイレクトされることを検証する。
+     * POST /owner/update に有効なパラメータを送信した際に、ステータスリダイレクト、/owner にリダイレクトされることを検証する。
      */
     @Test
     fun `ownerUpdate should redirect to owner when valid`() {
@@ -112,7 +112,7 @@ class OwnerControllerTest {
 
     /**
      * 所有者削除処理のテスト。
-     * POST /owner/delete/{id} にアクセスした際に、/owner にリダイレクトされることを検証する。
+     * POST /owner/delete/{id} にアクセスした際に、ステータスリダイレクト、/owner にリダイレクトされることを検証する。
      */
     @Test
     fun `ownerDelete should redirect to owner`() {
