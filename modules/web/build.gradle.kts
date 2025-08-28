@@ -30,9 +30,17 @@ dependencies {
 
      // webからsubmodule stockの機能を利用する為、読み込む
     implementation(project(":modules:stock"))
+
+    // テスト実行のため追加
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 // マルチモジュール構成の為、class mainを指定する必要がある
 tasks.bootRun {
     mainClass.set("com.example.ApplicationKt") 
+}
+
+// JUNit5を使用してテストを実行する為、記載が必要(記載していないと./build/reports/classes/にテスト結果が作られずテストが実行されない)
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
