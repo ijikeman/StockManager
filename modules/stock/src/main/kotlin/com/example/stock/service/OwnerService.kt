@@ -27,4 +27,9 @@ open class OwnerService(private val ownerRepository: OwnerRepository) {
     open fun save(owner: Owner): Owner {
         return ownerRepository.save(owner)
     }
+
+    // 削除する
+    open fun deleteById(id: Int) {
+        ownerRepository.deleteById(id)
+    }
 }

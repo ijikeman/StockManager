@@ -7,9 +7,11 @@
     <body>
         <h1>所有者登録</h1>
         <!-- owner登録フォーム表示 -->
-        <form th:action="@{/owner}" method="post">
-            Name: <input type="text" name="name" placeholder="名前"/>
+        <form th:action="@{/owner}" th:object="${ownerForm}" method="post">
+            Name: <input type="text" th:field="*{name}" placeholder="名前"/>
+            <!-- エラー表示 -->
             <input type="submit" value="登録" />
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></span>
         </form>
 
         <hr/>
@@ -21,12 +23,20 @@
                     <tr>
                         <th>ID</th>
                         <th>名前</th>
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="owner : ${owner}">
                         <td th:text="${owner.id}">1</td>
                         <td th:text="${owner.name}">テスト太郎</td>
+                        <td><a th:href="@{/owner/edit/{id}(id=${owner.id})}">Edit</a></td>
+                        <td>
+                            <form th:action="@{/owner/delete/{id}(id=${owner.id})}" method="post">
+                                <input type="submit" value="Delete" />
+                            </form>
+                        </td>
                     </tr>
                 </tbody>
             </table>
