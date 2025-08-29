@@ -11,6 +11,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.mockito.Mockito.`when` as mockitoWhen
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.hasProperty
+import org.hamcrest.Matchers.`is`
 
 /**
  * OwnerControllerの単体テストクラス。
@@ -21,6 +24,8 @@ import org.mockito.Mockito.`when` as mockitoWhen
 class OwnerControllerTest {
 
     @Autowired
+    // lateinit: 遅延初期化の宣言(クラスをインスタンス化する時点では、まだSpringコンテナによる注入が行われていない可能性がある為、nullチェックが必要。それを回避)
+    // クラスの初期化時にはnullだが、使用する前にはSpringによって自動的に初期化される
     private lateinit var mockMvc: MockMvc // HTTPリクエストをシミュレートするためのMockMvcオブジェクト
 
     @MockBean
@@ -35,14 +40,16 @@ class OwnerControllerTest {
     fun `ownerList should return owner view with owners`() {
         // given: 前提条件の設定
         val owners = listOf(Owner(id = 1, name = "Test Owner"))
+        // ownerService.findAllを呼び出した場合はowners(モックを返す)
         mockitoWhen(ownerService.findAll()).thenReturn(owners)
 
         // when & then: テスト実行と結果検証
-        mockMvc.perform(get("/owner"))
-            .andExpect(status().isOk)
-            .andExpect(view().name("owner"))
-            .andExpect(model().attributeExists("owner"))
+        mockMvc.perform(get("/owner")) // getメソッドで/ownerへアクセス
+            .andExpect(status().isOk) // Status: 200
+            .andExpect(view().name("owner")) // ownerモデルにnameが含まれている
+            .andExpect(model().attributeExists("owner")) // ownerモデルが存在する
             .andExpect(model().attribute("owner", owners))
+            .andExpect(model().attribute("owner", hasItem(hasProperty<Owner>("name", `is`("Test Owner"))))) // owner.nameは"Test Owner"である
     }
 
     /**
