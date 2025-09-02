@@ -18,7 +18,7 @@ class OwnerController(
     private val ownerService: OwnerService
 ) {
     // view OwnerList
-    @GetMapping("/owner")
+    @GetMapping("/api/owner")
     fun ownerList(model: Model): String {
         model.addAttribute("owner", ownerService.findAll())
         // add owner form
@@ -27,7 +27,7 @@ class OwnerController(
     }
 
     // add Owner
-    @PostMapping("/owner")
+    @PostMapping("/api/owner")
     fun ownerRegister(
         @Validated @ModelAttribute("ownerForm") owner: Owner,
         bindingResult: BindingResult,
@@ -38,10 +38,10 @@ class OwnerController(
             return "owner"
         }
         ownerService.save(owner)
-        return "redirect:/owner"
+        return "redirect:/api/owner"
     }
 
-    @GetMapping("/owner/edit/{id}")
+    @GetMapping("/api/owner/edit/{id}")
     fun ownerEdit(
         @PathVariable id: Int, // URLの一部に引数のidを割り当てる為、@PathVariableを定義
         model: Model
@@ -51,7 +51,7 @@ class OwnerController(
     }
 
     // update Owner
-    @PostMapping("/owner/update")
+    @PostMapping("/api/owner/update")
     fun ownerUpdate(
         @Validated @ModelAttribute owner: Owner,
         bindingResult: BindingResult
@@ -60,15 +60,15 @@ class OwnerController(
             return "owner_edit"
         }
         ownerService.save(owner)
-        return "redirect:/owner"
+        return "redirect:/api/owner"
     }
 
     // delete Owner
-    @PostMapping("/owner/delete/{id}")
+    @PostMapping("/api/owner/delete/{id}")
     fun ownerDelete(
         @PathVariable id: Int
     ): String {
         ownerService.deleteById(id)
-        return "redirect:/owner"
+        return "redirect:/api/owner"
     }
 }
