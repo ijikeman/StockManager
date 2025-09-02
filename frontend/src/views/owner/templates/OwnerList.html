@@ -19,14 +19,16 @@
   <table>
     <thead>
       <tr>
-        <th>ID</th>
+        <!-- IDは内部的に使うのみで表示しない場合はコメントアウト -->
+        <!-- <th>ID</th> -->
         <th>名前</th>
         <th>操作</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="owner in owners" :key="owner.id">
-        <td>{{ owner.id }}</td>
+        <!-- IDは内部的に使うのみで表示しない場合はコメントアウト -->
+        <!-- <td>{{ owner.id }}</td> -->
         <td>{{ owner.name }}</td>
         <td>
           <button @click="editOwner(owner)">編集</button>

@@ -28,13 +28,20 @@ export default {
     
     // 新規追加フォームを表示
     showAddForm() {
-      this.editingOwner = null;
+      // 新規作成用の空のオブジェクト（IDは含めない）
+      this.editingOwner = {
+        name: ''
+      };
       this.showAddEditForm = true;
     },
     
     // 編集フォームを表示
     editOwner(owner) {
-      this.editingOwner = { ...owner };
+      // 編集用のオーナー情報（IDを含む）
+      this.editingOwner = { 
+        id: owner.id,
+        name: owner.name 
+      };
       this.showAddEditForm = true;
     },
     

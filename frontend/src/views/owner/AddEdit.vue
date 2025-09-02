@@ -1,4 +1,3 @@
-
 <template src="./templates/OwnerAddEdit.html"></template>
 
 <script>
@@ -8,7 +7,7 @@ export default {
   props: {
     owner: {
       type: Object,
-      default: () => ({ id: null, name: '' })
+      required: true
     }
   },
   
@@ -17,7 +16,6 @@ export default {
   data() {
     return {
       formData: {
-        id: null,
         name: ''
       }
     };
@@ -25,7 +23,8 @@ export default {
   
   computed: {
     isEditing() {
-      return this.formData.id !== null;
+      // IDが存在し、かつnullでもundefinedでもない場合のみ編集モード
+      return this.owner && this.owner.id != null && this.owner.id !== undefined;
     }
   },
   
@@ -34,26 +33,29 @@ export default {
     async saveOwner() {
       try {
         if (this.isEditing) {
-          // 既存のオーナーを更新
-          await axios.put(`/api/owners/${this.formData.id}`, this.formData);
+          // 既存のオーナーを更新（IDを含める）
+          const updateData = {
+            id: this.owner.id,
+            name: this.formData.name
+          };
+          await axios.put(`/api/owners/${this.owner.id}`, updateData);
         } else {
-          // 新しいオーナーを追加
-          await axios.post('/api/owners', this.formData);
+          // 新しいオーナーを追加（IDは含めない）
+          const createData = {
+            name: this.formData.name
+          };
+          await axios.post('/api/owners', createData);
         }
         
         this.$emit('saved');
-        this.resetForm();
       } catch (error) {
         console.error('オーナーの保存中にエラーが発生しました:', error);
+        alert('保存に失敗しました。もう一度お試しください。');
       }
     },
     
-    // フォームをリセット
-    resetForm() {
-      this.formData = {
-        id: null,
-        name: ''
-      };
+    // キャンセル処理
+    cancel() {
       this.$emit('cancelled');
     }
   },
@@ -62,9 +64,15 @@ export default {
     owner: {
       handler(newOwner) {
         if (newOwner) {
-          this.formData = { ...newOwner };
+          // 編集時はnameのみをコピー（IDはpropsから直接参照）
+          this.formData = {
+            name: newOwner.name || ''
+          };
         } else {
-          this.resetForm();
+          // 新規作成時は空の状態に
+          this.formData = {
+            name: ''
+          };
         }
       },
       immediate: true
@@ -74,12 +82,17 @@ export default {
 </script>
 
 <style scoped>
-form {
-  margin-bottom: 20px;
+.form-container {
   padding: 16px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #f9f9f9;
+  margin-bottom: 20px;
+}
+
+.form-title {
+  margin-bottom: 16px;
+  color: #333;
 }
 
 input[type="text"] {
