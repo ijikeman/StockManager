@@ -19,9 +19,5 @@ data class Owner(
     @field:NotBlank(message = "名前は必須です")
     @field:Pattern(regexp = "^[a-zA-Z]+$", message = "名前はアルファベットのみで構成される必要があります")
     @Column(name = "name", nullable = false)
-    val name: String,
-
-    @field:NotBlank(message = "住所は必須です")
-    @Column(name = "address", nullable = false)
-    val address: String
+    val name: String
 )
