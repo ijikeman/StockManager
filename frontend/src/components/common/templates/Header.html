@@ -1,0 +1,21 @@
+<header class="header">
+  <div class="header-container">
+    <router-link to="/" class="logo">
+      管理システム
+    </router-link>
+    
+    <nav>
+      <ul class="nav-menu">
+        <li 
+          v-for="item in navItems" 
+          :key="item.path"
+          class="nav-item"
+          :class="{ active: $route.path.startsWith(item.path) }"
+          @click="navigateTo(item.path)"
+        >
+          {{ item.name }}
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,13 +1,19 @@
 <div>
   <h1>オーナー管理</h1>
 
-  <!-- オーナーを追加・編集するためのフォーム -->
-  <form @submit.prevent="saveOwner">
-    <input type="hidden" v-model="owner.id">
-    <input type="text" v-model="owner.name" placeholder="名前" required>
-    <button type="submit">保存</button>
-    <button type="button" @click="resetForm">キャンセル</button>
-  </form>
+  <!-- 新規追加ボタン -->
+  <button class="add-button" @click="showAddForm">
+    新規オーナー追加
+  </button>
+
+  <!-- 追加・編集フォーム -->
+  <div v-if="showAddEditForm" class="form-section">
+    <OwnerAddEdit
+      :owner="editingOwner"
+      @saved="onOwnerSaved"
+      @cancelled="hideForm"
+    />
+  </div>
 
   <!-- オーナーを表示するためのテーブル -->
   <table>

@@ -1,0 +1,16 @@
+<div>
+  <h3>{{ isEditing ? 'オーナー編集' : '新規オーナー追加' }}</h3>
+  
+  <!-- オーナーを追加・編集するためのフォーム -->
+  <form @submit.prevent="saveOwner">
+    <input type="hidden" v-model="formData.id">
+    <input 
+      type="text" 
+      v-model="formData.name" 
+      placeholder="名前" 
+      required
+    >
+    <button type="submit">保存</button>
+    <button type="button" @click="resetForm">キャンセル</button>
+  </form>
+</div>
