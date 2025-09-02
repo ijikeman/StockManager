@@ -3,6 +3,7 @@
 
 # Gradle成果物
 build/
+bin/
 
 # IDEA系の設定
 .idea
