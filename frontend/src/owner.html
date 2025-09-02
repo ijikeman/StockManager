@@ -5,7 +5,6 @@
   <form @submit.prevent="saveOwner">
     <input type="hidden" v-model="owner.id">
     <input type="text" v-model="owner.name" placeholder="名前" required>
-    <input type="text" v-model="owner.address" placeholder="住所" required>
     <button type="submit">保存</button>
     <button type="button" @click="resetForm">キャンセル</button>
   </form>
@@ -16,7 +15,6 @@
       <tr>
         <th>ID</th>
         <th>名前</th>
-        <th>住所</th>
         <th>操作</th>
       </tr>
     </thead>
@@ -24,7 +22,6 @@
       <tr v-for="owner in owners" :key="owner.id">
         <td>{{ owner.id }}</td>
         <td>{{ owner.name }}</td>
-        <td>{{ owner.address }}</td>
         <td>
           <button @click="editOwner(owner)">編集</button>
           <button @click="deleteOwner(owner.id)">削除</button>

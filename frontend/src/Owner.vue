@@ -12,8 +12,7 @@ export default {
       // 現在のオーナー情報を格納するオブジェクト
       owner: {
         id: null,
-        name: '',
-        address: ''
+        name: ''
       }
     };
   },
@@ -74,8 +73,7 @@ export default {
     resetForm() {
       this.owner = {
         id: null,
-        name: '',
-        address: ''
+        name: ''
       };
     }
   },
