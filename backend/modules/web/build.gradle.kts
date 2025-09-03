@@ -33,6 +33,7 @@ dependencies {
 
     // テスト実行のため追加
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
 }
 
 // マルチモジュール構成の為、class mainを指定する必要がある
