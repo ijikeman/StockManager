@@ -1,0 +1,26 @@
+<!-- ヘッダーのコンテナ -->
+<header class="header">
+  <!-- ヘッダーの内容を中央に配置するコンテナ -->
+  <div class="header-container">
+    <!-- ロゴとホームへのリンク -->
+    <router-link to="/" class="logo">
+      管理システム
+    </router-link>
+    
+    <!-- ナビゲーションメニュー -->
+    <nav>
+      <ul class="nav-menu">
+        <!-- ナビゲーションアイテムをループで表示 -->
+        <li 
+          v-for="item in navItems" 
+          :key="item.path"
+          class="nav-item"
+          :class="{ active: $route.path.startsWith(item.path) }"
+          @click="navigateTo(item.path)"
+        >
+          {{ item.name }}
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

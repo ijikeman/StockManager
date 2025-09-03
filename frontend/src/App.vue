@@ -1,29 +1,19 @@
-<template>
-  <div>
-    <nav>
-      <router-link to="/">Home</router-link>
-    </nav>
-    <router-view/>
-  </div>
-</template>
+<template src="./templates/App.html"></template>
 
 <script>
+// ヘッダーとフッターの共通コンポーネントをインポート
+import Header from './components/common/Header.vue';
+import Footer from './components/common/Footer.vue';
+
 export default {
-  name: 'App'
-}
+  // コンポーネント名を'App'に設定
+  name: 'App',
+  // 使用するコンポーネントを登録
+  components: {
+    Header,
+    Footer
+  }
+};
 </script>
 
-<style>
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+<style src="./App.css"></style>
