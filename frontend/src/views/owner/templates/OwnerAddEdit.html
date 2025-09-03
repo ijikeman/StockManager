@@ -1,7 +1,11 @@
+<!-- 追加・編集フォームのコンテナ -->
 <div class="form-container">
+  <!-- フォームのタイトル -->
   <h3 class="form-title">{{ isEditing ? 'オーナー編集' : '新規オーナー追加' }}</h3>
   
+  <!-- フォーム -->
   <form @submit.prevent="saveOwner" class="form-inline">
+    <!-- 名前入力フィールド -->
     <input 
       type="text" 
       v-model="formData.name" 
@@ -9,8 +13,11 @@
       required
       class="form-control"
     >
+    <!-- フォームアクション -->
     <div class="form-actions">
+      <!-- 保存ボタン -->
       <button type="submit" class="btn btn-success">保存</button>
+      <!-- キャンセルボタン -->
       <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
     </div>
   </form>

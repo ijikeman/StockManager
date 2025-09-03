@@ -1,10 +1,15 @@
+<!-- フッターのコンテナ -->
 <footer class="footer">
+  <!-- フッターの内容を中央に配置するコンテナ -->
   <div class="footer-container">
+    <!-- フッターの主要コンテンツ -->
     <div class="footer-content">
+      <!-- システム情報の表示 -->
       <div class="footer-info">
         <p>{{ systemInfo.name }} v{{ systemInfo.version }}</p>
       </div>
       
+      <!-- フッターリンク -->
       <nav>
         <ul class="footer-links">
           <li><a href="#" @click.prevent>ヘルプ</a></li>
@@ -14,6 +19,7 @@
       </nav>
     </div>
     
+    <!-- コピーライト情報 -->
     <div class="copyright">
       <p>&copy; {{ currentYear }} 管理システム. All rights reserved.</p>
     </div>

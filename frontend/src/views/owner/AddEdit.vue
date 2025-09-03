@@ -4,30 +4,41 @@
 import axios from 'axios';
 
 export default {
+  // コンポーネント名を'OwnerAddEdit'に設定
+  name: 'OwnerAddEdit',
+  // 親コンポーネントから受け取るプロパティ
   props: {
+    // 編集対象のオーナー情報
     owner: {
       type: Object,
       required: true
     }
   },
   
+  // 親コンポーネントに通知するイベント
   emits: ['saved', 'cancelled'],
   
+  // コンポーネントのデータ
   data() {
     return {
+      // フォームのデータ
       formData: {
         name: ''
       }
     };
   },
   
+  // 算出プロパティ
   computed: {
+    // 編集モードかどうかを判定
     isEditing() {
       return this.owner && this.owner.id != null && this.owner.id !== undefined;
     }
   },
   
+  // メソッド
   methods: {
+    // オーナー情報を保存
     async saveOwner() {
       try {
         if (this.isEditing) {
