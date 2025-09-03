@@ -28,7 +28,6 @@ export default {
     
     // 新規追加フォームを表示
     showAddForm() {
-      // 新規作成用の空のオブジェクト（IDは含めない）
       this.editingOwner = {
         name: ''
       };
@@ -37,7 +36,6 @@ export default {
     
     // 編集フォームを表示
     editOwner(owner) {
-      // 編集用のオーナー情報（IDを含む）
       this.editingOwner = { 
         id: owner.id,
         name: owner.name 
@@ -78,33 +76,4 @@ export default {
 };
 </script>
 
-<style scoped>
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-th {
-  background-color: #f2f2f2;
-}
-
-.add-button {
-  margin-bottom: 20px;
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.form-section {
-  margin-bottom: 20px;
-}
-</style>
+<!-- スタイルは共通CSSを使用するため削除 -->

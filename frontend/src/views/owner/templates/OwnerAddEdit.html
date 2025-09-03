@@ -1,16 +1,17 @@
 <div class="form-container">
   <h3 class="form-title">{{ isEditing ? 'オーナー編集' : '新規オーナー追加' }}</h3>
   
-  <!-- オーナーを追加・編集するためのフォーム -->
-  <form @submit.prevent="saveOwner">
-    <!-- IDフィールドは削除（auto incrementのため不要） -->
+  <form @submit.prevent="saveOwner" class="form-inline">
     <input 
       type="text" 
       v-model="formData.name" 
       placeholder="名前" 
       required
+      class="form-control"
     >
-    <button type="submit">保存</button>
-    <button type="button" @click="cancel">キャンセル</button>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
   </form>
 </div>
