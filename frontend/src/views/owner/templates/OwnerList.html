@@ -1,9 +1,13 @@
+<!-- オーナー管理ページのコンテナ -->
 <div>
+  <!-- ページヘッダー -->
   <div class="page-header">
     <h1 class="page-title">オーナー管理</h1>
   </div>
 
+  <!-- ページアクション -->
   <div class="page-actions">
+    <!-- 新規オーナー追加ボタン -->
     <button class="btn btn-primary" @click="showAddForm">
       新規オーナー追加
     </button>
@@ -20,17 +24,22 @@
 
   <!-- オーナーを表示するためのテーブル -->
   <table class="common-table">
+    <!-- テーブルヘッダー -->
     <thead>
       <tr>
         <th>名前</th>
         <th>操作</th>
       </tr>
     </thead>
+    <!-- テーブルボディ -->
     <tbody>
+      <!-- オーナー情報をループで表示 -->
       <tr v-for="owner in owners" :key="owner.id">
         <td>{{ owner.name }}</td>
         <td>
+          <!-- 編集ボタン -->
           <button class="btn btn-secondary btn-sm" @click="editOwner(owner)">編集</button>
+          <!-- 削除ボタン -->
           <button class="btn btn-danger btn-sm" @click="deleteOwner(owner.id)">削除</button>
         </td>
       </tr>

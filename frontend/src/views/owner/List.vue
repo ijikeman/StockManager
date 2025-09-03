@@ -5,16 +5,24 @@ import axios from 'axios';
 import OwnerAddEdit from './AddEdit.vue';
 
 export default {
+  // コンポーネント名を'OwnerList'に設定
+  name: 'OwnerList',
+  // 使用するコンポーネントを登録
   components: {
     OwnerAddEdit
   },
+  // コンポーネントのデータ
   data() {
     return {
+      // オーナーのリスト
       owners: [],
+      // 追加・編集フォームの表示状態
       showAddEditForm: false,
+      // 編集中のオーナー情報
       editingOwner: null
     };
   },
+  // メソッド
   methods: {
     // APIからオーナーのリストを取得
     async fetchOwners() {

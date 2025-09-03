@@ -1,4 +1,5 @@
 <template>
+  <!-- ホーム画面のコンテナ -->
   <div>
     <!-- メッセージを表示 -->
     <h1>{{ message }}</h1>
@@ -10,6 +11,8 @@
 import axios from 'axios';
 
 export default {
+  // コンポーネント名を'Home'に設定
+  name: 'Home',
   // コンポーネントのデータ
   data() {
     return {
@@ -47,9 +50,4 @@ export default {
 };
 </script>
 
-<style>
-/* ボタンのスタイル */
-button {
-  margin-right: 10px;
-}
-</style>
+<style src="./Home.css"></style>
