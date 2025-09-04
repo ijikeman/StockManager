@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import OwnerList from '../views/owner/List.vue';
-// 将来的にStockListも追加予定
+import StockList from '../views/stock/List.vue';
 
 const routes = [
   {
@@ -11,13 +11,12 @@ const routes = [
     path: '/owner',
     name: 'OwnerList',
     component: OwnerList
+  },
+  {
+    path: '/stock',
+    name: 'StockList',
+    component: StockList
   }
-  // 将来的に以下を追加
-  // {
-  //   path: '/stock',
-  //   name: 'StockList',
-  //   component: StockList
-  // }
 ];
 
 const router = createRouter({

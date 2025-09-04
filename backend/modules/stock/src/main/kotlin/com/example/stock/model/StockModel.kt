@@ -35,7 +35,7 @@ data class Stock(
     @Column(name = "dividend", nullable = false)
     val dividend: Double = 0.0,
 
-    // 業績発表日(String)
+    // 業績発表日
     @Column(name = "release_date", nullable = false)
-    val release_date:  String = ""
+    val release_date: String = ""
 )
