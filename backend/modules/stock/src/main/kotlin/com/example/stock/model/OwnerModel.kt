@@ -16,6 +16,7 @@ data class Owner(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
+    // ユーザ名
     @field:NotBlank(message = "名前は必須です")
     @field:Pattern(regexp = "^[a-zA-Z]+$", message = "名前はアルファベットのみで構成される必要があります")
     @Column(name = "name", nullable = false)
