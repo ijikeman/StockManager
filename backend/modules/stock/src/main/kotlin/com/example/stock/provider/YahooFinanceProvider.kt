@@ -69,7 +69,8 @@ class YahooFinanceProvider(
     }
 
     private fun extractPrice(jsonNode: JsonNode?): Double? {
-        return jsonNode?.at("/mainStocksPriceBoard/priceBoard/price")?.asDouble()
+        val priceText = jsonNode?.at("/mainStocksPriceBoard/priceBoard/price")?.asText()
+        return priceText?.replace(",", "")?.toDoubleOrNull()
     }
 
     private fun extractDividend(jsonNode: JsonNode?): Double? {
