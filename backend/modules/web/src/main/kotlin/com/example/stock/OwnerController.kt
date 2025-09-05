@@ -21,6 +21,7 @@ class OwnerController(
      */
     @GetMapping("/owners")
     fun getOwners(): List<Owner> {
+        // オーナーサービスを通じて全オーナー情報を取得し、返す
         return ownerService.findAll()
     }
 
@@ -31,7 +32,9 @@ class OwnerController(
      */
     @PostMapping("/owners")
     fun createOwner(@Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
+        // リクエストボディで受け取ったオーナー情報を保存
         val savedOwner = ownerService.save(owner)
+        // 保存されたオーナー情報とHTTPステータス201 (CREATED) を返す
         return ResponseEntity(savedOwner, HttpStatus.CREATED)
     }
 
@@ -43,8 +46,11 @@ class OwnerController(
      */
     @PutMapping("/owners/{id}")
     fun updateOwner(@PathVariable id: Int, @Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
+        // パス変数で受け取ったIDをオーナー情報に設定
         val ownerToUpdate = owner.copy(id = id)
+        // 更新されたオーナー情報を保存
         val updatedOwner = ownerService.save(ownerToUpdate)
+        // 更新されたオーナー情報とHTTPステータス200 (OK) を返す
         return ResponseEntity.ok(updatedOwner)
     }
 
@@ -55,7 +61,9 @@ class OwnerController(
      */
     @DeleteMapping("/owners/{id}")
     fun deleteOwner(@PathVariable id: Int): ResponseEntity<Void> {
+        // 指定されたIDのオーナー情報を削除
         ownerService.deleteById(id)
+        // HTTPステータス204 (No Content) を返す
         return ResponseEntity.noContent().build()
     }
 }

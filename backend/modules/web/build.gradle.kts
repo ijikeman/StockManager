@@ -33,6 +33,7 @@ dependencies {
 
     // テスト実行のため追加
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin")
 }
 
 // マルチモジュール構成の為、class mainを指定する必要がある
@@ -43,4 +44,10 @@ tasks.bootRun {
 // JUNit5を使用してテストを実行する為、記載が必要(記載していないと./build/reports/classes/にテスト結果が作られずテストが実行されない)
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
