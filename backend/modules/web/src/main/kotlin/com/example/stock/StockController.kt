@@ -4,6 +4,7 @@ import com.example.stock.model.Stock
 import com.example.stock.service.StockService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -27,5 +28,27 @@ class StockController(
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
+    }
+
+    /* Stockを登録する */
+    @PostMapping("/stocks")
+    fun createStock(@Validated @RequestBody stock: Stock): ResponseEntity<Stock> {
+        val savedStock = stockService.save(stock)
+        return ResponseEntity(savedStock, HttpStatus.CREATED)
+    }
+
+    /* 特定のStockを更新する */
+    @PutMapping("/stocks/{id}")
+    fun updateStock(@PathVariable id: Int, @Validated @RequestBody stock: Stock): ResponseEntity<Stock> {
+        val stockToUpdate = stock.copy(id = id)
+        val updatedStock = stockService.save(stockToUpdate)
+        return ResponseEntity.ok(updatedStock)
+    }
+
+    /* 特定のStockを削除する */
+    @DeleteMapping("/stocks/{id}")
+    fun deleteStock(@PathVariable id: Int): ResponseEntity<Void> {
+        stockService.deleteById(id)
+        return ResponseEntity.noContent().build()
     }
 }
