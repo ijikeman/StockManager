@@ -3,6 +3,8 @@ package com.example.stock.service
 import com.example.stock.model.Stock
 import com.example.stock.model.Sector
 import com.example.stock.repository.StockRepository
+import com.example.stock.provider.YahooFinanceProvider
+import com.example.stock.provider.StockInfo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -12,6 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 // MockitoのwhenがKotlinのwhenキーワードと衝突するため、`mockitoWhen`という別名でインポートする
 import org.mockito.Mockito.`when` as mockitoWhen
 import java.util.Optional
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 
 /**
  * StockServiceの単体テストクラス。
@@ -25,6 +30,9 @@ class StockServiceTest {
 
     @Mock // モック(偽のオブジェクト)を作成する。ここではDBとのやり取りをシミュレートする。
     private lateinit var stockRepository: StockRepository
+
+    @Mock
+    private lateinit var yahooFinanceProvider: YahooFinanceProvider
 
     private val sector = Sector(id = 1, name = "Test Sector")
 
@@ -110,5 +118,86 @@ class StockServiceTest {
         assertThat(result).isNotNull
         assertThat(result.id).isEqualTo(1)
         assertThat(result.code).isEqualTo("1301")
+    }
+
+    @Test
+    fun `updateStockPrice should update and return stock when found`() {
+        // given
+        val code = "1301"
+        val originalStock = Stock(id = 1, code = code, name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "2025-01-01", sector = sector)
+        val stockInfo = StockInfo(price = 1200.0, dividend = 12.0, earningsDate = LocalDate.of(2025, 1, 2))
+        val updatedStock = originalStock.copy(current_price = 1200.0, dividend = 12.0, release_date = "2025-01-02")
+
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
+        mockitoWhen(stockRepository.findByCode(code)).thenReturn(originalStock)
+        mockitoWhen(stockRepository.save(updatedStock)).thenReturn(updatedStock)
+
+        // when
+        val result = stockService.updateStockPrice(code)
+
+        // then
+        assertThat(result).isNotNull
+        assertThat(result?.current_price).isEqualTo(1200.0)
+        assertThat(result?.dividend).isEqualTo(12.0)
+        assertThat(result?.release_date).isEqualTo("2025-01-02")
+    }
+
+    @Test
+    fun `updateStockPrice should return null when stock not in db`() {
+        // given
+        val code = "1301"
+        val stockInfo = StockInfo(price = 1200.0, dividend = 12.0, earningsDate = LocalDate.of(2025, 1, 2))
+
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
+        mockitoWhen(stockRepository.findByCode(code)).thenReturn(null)
+
+        // when
+        val result = stockService.updateStockPrice(code)
+
+        // then
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `updateStockPrice should return null when provider fails`() {
+        // given
+        val code = "1301"
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(null)
+
+        // when
+        val result = stockService.updateStockPrice(code)
+
+        // then
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun `updateAllStockPrices should update all stocks`() {
+        // given
+        val stock1 = Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, dividend = 10.0, release_date = "2025-01-01", sector = sector)
+        val stock2 = Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, dividend = 20.0, release_date = "2025-02-02", sector = sector)
+        val stocks = listOf(stock1, stock2)
+
+        val stockInfo1 = StockInfo(price = 1100.0, dividend = 11.0, earningsDate = LocalDate.of(2025, 1, 11))
+        val stockInfo2 = StockInfo(price = 2200.0, dividend = 22.0, earningsDate = LocalDate.of(2025, 2, 12))
+
+        val updatedStock1 = stock1.copy(current_price = 1100.0, dividend = 11.0, release_date = "2025-01-11")
+        val updatedStock2 = stock2.copy(current_price = 2200.0, dividend = 22.0, release_date = "2025-02-12")
+
+        mockitoWhen(stockRepository.findAll()).thenReturn(stocks)
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo("1301")).thenReturn(stockInfo1)
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo("1302")).thenReturn(stockInfo2)
+        mockitoWhen(stockRepository.findByCode("1301")).thenReturn(stock1)
+        mockitoWhen(stockRepository.findByCode("1302")).thenReturn(stock2)
+        mockitoWhen(stockRepository.save(updatedStock1)).thenReturn(updatedStock1)
+        mockitoWhen(stockRepository.save(updatedStock2)).thenReturn(updatedStock2)
+
+        // when
+        val result = stockService.updateAllStockPrices()
+
+        // then
+        assertThat(result).hasSize(2)
+        assertThat(result[0].current_price).isEqualTo(1100.0)
+        assertThat(result[1].current_price).isEqualTo(2200.0)
     }
 }
