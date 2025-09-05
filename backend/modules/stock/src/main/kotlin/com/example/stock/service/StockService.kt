@@ -39,4 +39,15 @@ class StockService(private val stockRepository: StockRepository) {
     fun findById(id: Int): Stock? {
         return stockRepository.findById(id).orElse(null)
     }
+
+    
+    // 追加する
+    open fun save(stock: Stock): Stock {
+        return stockRepository.save(stock)
+    }
+
+    // 削除する
+    open fun deleteById(id: Int) {
+        stockRepository.deleteById(id)
+    }
 }
