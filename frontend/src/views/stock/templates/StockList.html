@@ -12,6 +12,7 @@
       <tr>
         <th>コード</th>
         <th>名前</th>
+        <th>セクター</th>
       </tr>
     </thead>
     <!-- テーブルボディ -->
@@ -20,6 +21,7 @@
       <tr v-for="stock in stocks" :key="stock.id">
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
+        <td>{{ stock.sector.name }}</td>
       </tr>
     </tbody>
   </table>

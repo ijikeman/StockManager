@@ -4,6 +4,12 @@ CREATE TABLE IF NOT EXISTS owner (
     name VARCHAR(255) NOT NULL
 );
 
+-- sectorテーブル
+CREATE TABLE IF NOT EXISTS sector (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
+
 -- stockテーブル
 CREATE TABLE IF NOT EXISTS stock (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -14,10 +20,4 @@ CREATE TABLE IF NOT EXISTS stock (
     release_date VARCHAR(255) NOT NULL,
     sector_id INT,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
-);
-
--- sectorテーブル
-CREATE TABLE IF NOT EXISTS sector (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL
 );
