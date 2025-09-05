@@ -1,0 +1,31 @@
+<div class="form-container">
+  <h3 class="form-title">{{ isEditing ? '在庫編集' : '新規在庫追加' }}</h3>
+
+  <form @submit.prevent="saveStock" class="form-inline">
+    <input
+      type="text"
+      v-model="formData.code"
+      placeholder="コード"
+      required
+      class="form-control"
+    >
+    <input
+      type="text"
+      v-model="formData.name"
+      placeholder="名前"
+      required
+      class="form-control"
+    >
+    <select v-model="formData.sectorId" required class="form-control">
+      <option :value="null" disabled>セクターを選択</option>
+      <option v-for="sector in sectors" :key="sector.id" :value="sector.id">
+        {{ sector.name }}
+      </option>
+    </select>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>
