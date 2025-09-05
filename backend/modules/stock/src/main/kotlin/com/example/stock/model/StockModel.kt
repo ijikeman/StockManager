@@ -35,8 +35,7 @@ data class Stock(
     @Column(name = "dividend", nullable = false)
     val dividend: Double = 0.0,
 
-    // 業績発表日(YYYYMMDD)
-    @field:Pattern(regexp = "^[0-9]{8}$", message = "日付はYYYYMMDDの形式で入力してください")
+    // 業績発表日
     @Column(name = "release_date", nullable = false)
     val release_date: String = ""
 )

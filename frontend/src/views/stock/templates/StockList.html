@@ -1,0 +1,26 @@
+<!-- 在庫管理ページのコンテナ -->
+<div>
+  <!-- ページヘッダー -->
+  <div class="page-header">
+    <h1 class="page-title">在庫管理</h1>
+  </div>
+
+  <!-- 在庫を表示するためのテーブル -->
+  <table class="common-table">
+    <!-- テーブルヘッダー -->
+    <thead>
+      <tr>
+        <th>コード</th>
+        <th>名前</th>
+      </tr>
+    </thead>
+    <!-- テーブルボディ -->
+    <tbody>
+      <!-- 在庫情報をループで表示 -->
+      <tr v-for="stock in stocks" :key="stock.id">
+        <td>{{ stock.code }}</td>
+        <td>{{ stock.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

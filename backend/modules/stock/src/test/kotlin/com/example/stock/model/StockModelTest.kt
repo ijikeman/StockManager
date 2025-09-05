@@ -58,21 +58,4 @@ class StockTest {
         assertEquals(1, violations.size)
         assertEquals("銘柄名は必須です", violations.first().message)
     }
-
-    // 異常系: release_date
-    @Test
-    fun `stock with invalid release_date format should have violation`() {
-        val stock = Stock(code = "1234", name = "Test", release_date = "2025/01/01")
-        val violations = validator.validate(stock)
-        assertEquals(1, violations.size)
-        assertEquals("日付はYYYYMMDDの形式で入力してください", violations.first().message)
-    }
-
-    @Test
-    fun `stock with short release_date should have violation`() {
-        val stock = Stock(code = "1234", name = "Test", release_date = "2025")
-        val violations = validator.validate(stock)
-        assertEquals(1, violations.size)
-        assertEquals("日付はYYYYMMDDの形式で入力してください", violations.first().message)
-    }
 }
