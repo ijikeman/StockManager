@@ -5,3 +5,7 @@ INSERT INTO owner(name) VALUES
 -- stock
 INSERT INTO stock(code, name, current_price, dividend, release_date) VALUES
 ('3923', 'abc', 2600.0, 0.50, '202503');
+
+-- sector
+INSERT INTO sector(name) VALUES
+('不動産');

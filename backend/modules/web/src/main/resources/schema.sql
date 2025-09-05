@@ -13,3 +13,9 @@ CREATE TABLE IF NOT EXISTS stock (
     dividend DECIMAL(10, 2) NOT NULL,
     release_date VARCHAR(255) NOT NULL
 );
+
+-- sectorテーブル
+CREATE TABLE IF NOT EXISTS sector (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);

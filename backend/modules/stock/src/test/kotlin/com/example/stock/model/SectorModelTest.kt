@@ -21,7 +21,7 @@ class SectorTest {
     @Test
     fun `valid sector should have no violations`() {
         val sector = Sector(name = "不動産")
-        val violations = validator.validate(owner)
+        val violations = validator.validate(sector)
         assertEquals(0, violations.size)
     }
 
@@ -30,9 +30,9 @@ class SectorTest {
     @Test
     fun `With blank name should have two violations`() {
         val sector = Sector(name = "")
-        val violations = validator.validate(owner)
+        val violations = validator.validate(sector)
         assertEquals(1, violations.size) // 違反の数が1である
         val messages = violations.map { it.message }
-        assertTrue(messages.contains("名前は必須です"))
+        assertTrue(messages.contains("セクター名は必須です"))
     }
 }
