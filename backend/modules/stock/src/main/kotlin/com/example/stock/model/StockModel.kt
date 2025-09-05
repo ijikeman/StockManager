@@ -8,6 +8,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Column
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.JoinColumn
 
 @Entity
 @Table(name = "stock")
@@ -37,5 +39,9 @@ data class Stock(
 
     // 業績発表日
     @Column(name = "release_date", nullable = false)
-    val release_date: String = ""
+    val release_date: String = "",
+
+    @ManyToOne
+    @JoinColumn(name = "sector_id")
+    var sector: Sector? = null
 )

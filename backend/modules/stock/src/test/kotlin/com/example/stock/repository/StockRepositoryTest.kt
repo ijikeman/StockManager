@@ -1,6 +1,7 @@
 package com.example.stock.repository
 
 import com.example.stock.model.Stock
+import com.example.stock.model.Sector
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -22,7 +23,10 @@ class StockRepositoryTest {
     @Test
     fun `findById should return stock when stock exists`() {
         // given
-        val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
+        val sector = Sector(name = "test sector")
+        val persistedSector = entityManager.persist(sector)
+        val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = persistedSector)
+        // persistした結果、自動採番されたIDを含むインスタンスが返る
         val persistedStock = entityManager.persist(stock)
         entityManager.flush()
 
@@ -38,7 +42,9 @@ class StockRepositoryTest {
     @Test
     fun `findByCode should return stock when stock exists`() {
         // given
-        val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
+        val sector = Sector(name = "test sector")
+        val persistedSector = entityManager.persist(sector)
+        val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = persistedSector)
         entityManager.persist(stock)
         entityManager.flush()
 
@@ -54,7 +60,9 @@ class StockRepositoryTest {
     @Test
     fun `save should persist stock`() {
         // given
-        val stock = Stock(code = "9998", name = "new stock", current_price = 2000.0, dividend = 20.0, release_date = "20250102")
+        val sector = Sector(name = "test sector")
+        val persistedSector = entityManager.persist(sector)
+        val stock = Stock(code = "9998", name = "new stock", current_price = 2000.0, dividend = 20.0, release_date = "20250102", sector = persistedSector)
 
         // when
         val savedStock = stockRepository.save(stock)

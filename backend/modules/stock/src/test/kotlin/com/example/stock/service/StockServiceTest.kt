@@ -1,6 +1,7 @@
 package com.example.stock.service
 
 import com.example.stock.model.Stock
+import com.example.stock.model.Sector
 import com.example.stock.repository.StockRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -25,11 +26,13 @@ class StockServiceTest {
     @Mock // モック(偽のオブジェクト)を作成する。ここではDBとのやり取りをシミュレートする。
     private lateinit var stockRepository: StockRepository
 
+    private val sector = Sector(id = 1, name = "Test Sector")
+
     @Test
     fun `findAll should return all stocks`() {
         // given: 前提条件の設定
         // モックのstockRepositoryがfindAll()メソッドを呼ばれた場合に、あらかじめ用意したstocksリストを返すように設定
-        val stocks = listOf(Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, dividend = 10.0, release_date = "20250101"), Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, dividend = 20.0, release_date = "20250202"))
+        val stocks = listOf(Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = sector), Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, dividend = 20.0, release_date = "20250202", sector = sector))
         mockitoWhen(stockRepository.findAll()).thenReturn(stocks) // stockRepository.findAll()を読んだときはstocksを返す
 
         // when: テスト対象のメソッドを実行
@@ -44,7 +47,7 @@ class StockServiceTest {
     @Test
     fun `findByCode should return stock when found`() {
         // given: "1301"というコードで検索されたら、特定のstockオブジェクトを返すように設定
-        val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
+        val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = sector)
         mockitoWhen(stockRepository.findByCode("1301")).thenReturn(stock)
 
         // when: 実際に"1301"で検索を実行
@@ -70,7 +73,7 @@ class StockServiceTest {
     @Test
     fun `findById should return stock when found`() {
         // given: IDが1で検索されたら、Optionalに包まれたstockオブジェクトを返すように設定
-        val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
+        val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = sector)
         mockitoWhen(stockRepository.findById(1)).thenReturn(Optional.of(stock))
 
         // when: 実際にID=1で検索を実行
@@ -96,8 +99,8 @@ class StockServiceTest {
     @Test
     fun `save should return saved stock`() {
         // given: 特定のstockオブジェクトを保存しようとしたら、IDが採番されたstockオブジェクトを返すように設定
-        val stockToSave = Stock(code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
-        val savedStock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101")
+        val stockToSave = Stock(code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = sector)
+        val savedStock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, release_date = "20250101", sector = sector)
         mockitoWhen(stockRepository.save(stockToSave)).thenReturn(savedStock)
 
         // when: 実際に保存処理を実行
