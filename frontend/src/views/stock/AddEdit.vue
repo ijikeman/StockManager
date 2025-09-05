@@ -54,7 +54,7 @@ export default {
         };
       } catch (error) {
         console.error('在庫の取得中にエラーが発生しました:', error);
-        this.$router.push('/stocks'); // エラー時はリストにリダイレクト
+        this.$router.push('/stock'); // エラー時はリストにリダイレクト
       }
     },
     async saveStock() {
@@ -74,14 +74,14 @@ export default {
           await axios.post('/api/stocks', stockData);
         }
 
-        this.$router.push('/stocks');
+        this.$router.push('/stock');
       } catch (error) {
         console.error('在庫の保存中にエラーが発生しました:', error);
         alert('保存に失敗しました。もう一度お試しください。');
       }
     },
     cancel() {
-      this.$router.push('/stocks');
+      this.$router.push('/stock');
     }
   },
   created() {

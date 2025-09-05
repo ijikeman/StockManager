@@ -14,7 +14,7 @@ const routes = [
     component: OwnerList
   },
   {
-    path: '/stocks',
+    path: '/stock',
     name: 'StockList',
     component: StockList
   },

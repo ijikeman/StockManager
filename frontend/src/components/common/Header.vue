@@ -10,7 +10,7 @@ export default {
       // ナビゲーションアイテムの配列
       navItems: [
         { name: 'オーナー管理', path: '/owner' },
-        { name: '銘柄管理', path: '/stocks' }
+        { name: '銘柄管理', path: '/stock' }
       ]
     };
   },
