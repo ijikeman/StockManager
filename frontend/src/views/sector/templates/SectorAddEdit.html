@@ -1,0 +1,18 @@
+<div class="form-container">
+  <h3 class="form-title">{{ pageTitle }}</h3>
+
+  <form @submit.prevent="saveSector" class="form-inline">
+    <input
+      type="text"
+      v-model="formData.name"
+      placeholder="名前"
+      required
+      class="form-control"
+    >
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>

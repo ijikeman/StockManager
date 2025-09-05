@@ -2,11 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import OwnerList from '../views/owner/List.vue';
 import StockList from '../views/stock/List.vue';
 import StockAddEdit from '../views/stock/AddEdit.vue';
+import SectorList from '../views/sector/List.vue';
+import SectorAddEdit from '../views/sector/AddEdit.vue';
 
 const routes = [
   {
     path: '/',
-    redirect: '/owner'
+    redirect: '/sectors'
   },
   {
     path: '/owner',
@@ -27,6 +29,22 @@ const routes = [
     path: '/stock/edit/:id',
     name: 'StockEdit',
     component: StockAddEdit,
+    props: true
+  },
+  {
+    path: '/sectors',
+    name: 'SectorList',
+    component: SectorList
+  },
+  {
+    path: '/sector/add',
+    name: 'SectorAdd',
+    component: SectorAddEdit
+  },
+  {
+    path: '/sector/edit/:id',
+    name: 'SectorEdit',
+    component: SectorAddEdit,
     props: true
   }
 ];
