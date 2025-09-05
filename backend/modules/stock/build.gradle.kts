@@ -25,6 +25,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-validation") // バリデーション
 
+    // JSON処理
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // HTML解析
+    implementation("org.jsoup:jsoup") // 親プロジェクトでバージョン管理する場合
+
     // テスト実行の為、記載が必要(JUnitが内包されている)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // サブモジュールで単体テストする為、こちらにも記載している

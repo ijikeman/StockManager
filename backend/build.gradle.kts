@@ -25,6 +25,8 @@ subprojects {
     configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
         dependencies {
             dependency("org.mockito.kotlin:mockito-kotlin:5.2.1")
+            dependency("org.jsoup:jsoup:1.17.2")
+            dependency("io.mockk:mockk:1.13.8")
         }
     }
 }
