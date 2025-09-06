@@ -92,4 +92,24 @@ export default [
       return null; // 見つからない場合はnullを返す
     },
   },
+  // 銘柄の株価を更新するAPIエンドポイント
+  {
+    url: '/api/stocks/:code/update',
+    method: 'post',
+    response: ({ url }) => {
+      const code = url.split('/')[3]; // URLから銘柄コードを抽出
+      const stock = stocks.find(s => s.code === code);
+      if (stock) {
+        // 現在の価格をランダムに更新
+        stock.current_price = Mock.Random.float(100, 1000, 2, 2);
+        // 対応するセクター情報を取得
+        const sector = mockSectors.find(s => s.id === stock.sector_id);
+        return {
+          ...stock,
+          sector: sector || null,
+        };
+      }
+      return null; // 銘柄が見つからない場合はnullを返す
+    },
+  },
   ];
