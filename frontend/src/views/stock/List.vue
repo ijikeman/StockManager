@@ -49,7 +49,7 @@ export default {
       }
       try {
         await Promise.all(this.selectedStocks.map(code =>
-          axios.post(`/api/stocks/${code}/update`)
+          axios.post(`/api/stock/${code}/update`)
         ));
         alert('選択した銘柄の株価を更新しました。');
         this.fetchStocks(); // データを再取得して表示を更新
