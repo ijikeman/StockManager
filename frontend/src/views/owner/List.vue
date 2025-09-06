@@ -27,7 +27,7 @@ export default {
     // APIからオーナーのリストを取得
     async fetchOwners() {
       try {
-        const response = await axios.get('/api/owners');
+        const response = await axios.get('/api/owner');
         this.owners = response.data;
       } catch (error) {
         console.error('オーナーの取得中にエラーが発生しました:', error);
@@ -70,7 +70,7 @@ export default {
       }
       
       try {
-        await axios.delete(`/api/owners/${id}`);
+        await axios.delete(`/api/owner/${id}`);
         this.fetchOwners();
       } catch (error) {
         console.error('オーナーの削除中にエラーが発生しました:', error);
