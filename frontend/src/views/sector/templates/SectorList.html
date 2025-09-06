@@ -1,0 +1,39 @@
+<!-- セクター管理ページのコンテナ -->
+<div>
+  <!-- ページヘッダー -->
+  <div class="page-header">
+    <h1 class="page-title">セクター管理</h1>
+  </div>
+
+  <!-- ページアクション -->
+  <div class="page-actions">
+    <!-- 新規セクター追加ボタン -->
+    <button class="btn btn-primary" @click="goToAddPage">
+      新規セクター追加
+    </button>
+  </div>
+
+  <!-- セクターを表示するためのテーブル -->
+  <table class="common-table">
+    <!-- テーブルヘッダー -->
+    <thead>
+      <tr>
+        <th>名前</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <!-- テーブルボディ -->
+    <tbody>
+      <!-- セクター情報をループで表示 -->
+      <tr v-for="sector in sectors" :key="sector.id">
+        <td>{{ sector.name }}</td>
+        <td>
+          <!-- 編集ボタン -->
+          <button class="btn btn-secondary btn-sm" @click="goToEditPage(sector.id)">編集</button>
+          <!-- 削除ボタン -->
+          <button class="btn btn-danger btn-sm" @click="deleteSector(sector.id)">削除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

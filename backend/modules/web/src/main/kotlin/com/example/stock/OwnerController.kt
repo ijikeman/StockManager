@@ -19,10 +19,25 @@ class OwnerController(
      * すべてのオーナーのリストを取得します。
      * @return オーナーのリスト
      */
-    @GetMapping("/owners")
+    @GetMapping("/owner")
     fun getOwners(): List<Owner> {
         // オーナーサービスを通じて全オーナー情報を取得し、返す
         return ownerService.findAll()
+    }
+
+    /**
+     * IDを指定してオーナーを取得します。
+     * @param id 取得するオーナーのID
+     * @return 見つかったオーナー。見つからない場合は404 Not Found。
+     */
+    @GetMapping("/owner/{id}")
+    fun getOwner(@PathVariable id: Int): ResponseEntity<Owner> {
+        val owner = ownerService.findById(id)
+        return if (owner != null) {
+            ResponseEntity.ok(owner)
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 
     /**
@@ -30,7 +45,7 @@ class OwnerController(
      * @param owner 作成するオーナーの情報
      * @return 作成されたオーナーの情報
      */
-    @PostMapping("/owners")
+    @PostMapping("/owner")
     fun createOwner(@Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
         // リクエストボディで受け取ったオーナー情報を保存
         val savedOwner = ownerService.save(owner)
@@ -44,7 +59,7 @@ class OwnerController(
      * @param owner 更新後のオーナーの情報
      * @return 更新されたオーナーの情報
      */
-    @PutMapping("/owners/{id}")
+    @PutMapping("/owner/{id}")
     fun updateOwner(@PathVariable id: Int, @Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
         // パス変数で受け取ったIDをオーナー情報に設定
         val ownerToUpdate = owner.copy(id = id)
@@ -59,11 +74,11 @@ class OwnerController(
      * @param id 削除するオーナーのID
      * @return レスポンスエンティティ
      */
-    @DeleteMapping("/owners/{id}")
+    @DeleteMapping("/owner/{id}")
     fun deleteOwner(@PathVariable id: Int): ResponseEntity<Void> {
         // 指定されたIDのオーナー情報を削除
         ownerService.deleteById(id)
-        // HTTPステータス204 (No Content) を返す
+        // HTTPステータ-タス204 (No Content) を返す
         return ResponseEntity.noContent().build()
     }
 }
