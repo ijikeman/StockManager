@@ -5,14 +5,21 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 // @vitejs/plugin-vueからvueをインポート
 import vue from '@vitejs/plugin-vue'
+// vite-plugin-mockからviteMockServeをインポート
+import { viteMockServe } from 'vite-plugin-mock'
 
 // https://vitejs.dev/config/
 // 設定をエクスポート
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   // プラグインの設定
   plugins: [
     // vueプラグインを使用
     vue(),
+    // vite-plugin-mockプラグインを使用
+    viteMockServe({
+      mockPath: 'mock',
+      localEnabled: command === 'serve',
+    }),
   ],
   // パスの解決に関する設定
   resolve: {
@@ -21,20 +28,5 @@ export default defineConfig({
       // '@'を'./src'へのパスに設定
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
-  },
-  // 開発サーバーの設定
-  server: {
-    // プロキシの設定
-    proxy: {
-      // '/api'へのリクエストをプロキシする
-      '/api': {
-        // プロキシ先のターゲット
-        target: 'http://localhost:8080',
-        // オリジンを変更
-        changeOrigin: true,
-        // パスを書き換える
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
   }
-})
+}))
