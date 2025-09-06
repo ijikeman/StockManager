@@ -8,7 +8,7 @@ import SectorAddEdit from '../views/sector/AddEdit.vue';
 const routes = [
   {
     path: '/',
-    redirect: '/sectors'
+    redirect: '/sector'
   },
   {
     path: '/owner',
@@ -32,7 +32,7 @@ const routes = [
     props: true
   },
   {
-    path: '/sectors',
+    path: '/sector',
     name: 'SectorList',
     component: SectorList
   },

@@ -33,7 +33,7 @@ export default {
   methods: {
     async fetchSectors() {
       try {
-        const response = await axios.get('/api/sectors');
+        const response = await axios.get('/api/sector');
         this.sectors = response.data;
       } catch (error) {
         console.error('セクターの取得中にエラーが発生しました:', error);
@@ -45,7 +45,7 @@ export default {
         return;
       }
       try {
-        const response = await axios.get(`/api/stocks/${this.id}`);
+        const response = await axios.get(`/api/stock/${this.id}`);
         this.stock = response.data;
         this.formData = {
           code: this.stock.code,
@@ -69,9 +69,9 @@ export default {
         };
 
         if (this.isEditing) {
-          await axios.put(`/api/stocks/${this.id}`, { ...stockData, id: parseInt(this.id) });
+          await axios.put(`/api/stock/${this.id}`, { ...stockData, id: parseInt(this.id) });
         } else {
-          await axios.post('/api/stocks', stockData);
+          await axios.post('/api/stock', stockData);
         }
 
         this.$router.push('/stock');

@@ -54,14 +54,14 @@ export default {
           await axios.post('/api/sector', sectorData);
         }
 
-        this.$router.push('/sectors');
+        this.$router.push('/sector');
       } catch (error) {
         console.error('セクターの保存中にエラーが発生しました:', error);
         alert('保存に失敗しました。もう一度お試しください。');
       }
     },
     cancel() {
-      this.$router.push('/sectors');
+      this.$router.push('/sector');
     }
   },
   created() {

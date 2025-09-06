@@ -18,7 +18,7 @@ export default {
     // APIからセクターのリストを取得
     async fetchSectors() {
       try {
-        const response = await axios.get('/api/sectors');
+        const response = await axios.get('/api/sector');
         this.sectors = response.data;
       } catch (error) {
         console.error('セクターの取得中にエラーが発生しました:', error);
