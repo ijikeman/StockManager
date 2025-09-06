@@ -5,7 +5,7 @@ import Mock from 'mockjs';
 let sectors = Mock.mock({
   'list|3-5': [{
     'id|+1': 1,
-    'name|1': ['Technology', 'Finance', 'Healthcare', 'Energy', 'Consumer', 'Industrials', 'Utilities', 'Real Estate']
+    'name|1': ['Technology', 'Finance', 'Healthcare', 'Energy', 'Consumer']
   }]
 }).list;
 
