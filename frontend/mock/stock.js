@@ -14,7 +14,7 @@ let stocks = Mock.mock({
   // 5〜10個の在庫アイテムを生成
   'list|5-10': [{
     'id|+1': 1, // IDを1からインクリメント
-    'code': '@string(3, 5)', // 3文字の数字でコードを生成
+    'code': '@string("number", 3, 5)', // 3文字から5文字の数字でコードを生成
     'name': '@word(3, 5)', // 3〜5文字の単語で商品名を生成
     'current_price': '@float(100, 1000, 2, 2)', // 100〜1000の浮動小数点数で現在価格を生成（小数点以下2桁）
     'dividend': '@float(0, 10, 2, 2)', // 0〜10の浮動小数点数で配当を生成（小数点以下2桁）
@@ -29,7 +29,15 @@ export default [
     url: '/api/stock',
     method: 'get',
     response: () => {
-      return stocks;
+      // 各在庫にセクター情報を追加
+      const detailedStocks = stocks.map(stock => {
+        const sector = mockSectors.find(s => s.id === stock.sector_id);
+        return {
+          ...stock,
+          sector: sector || null, // セクターが見つからない場合はnull
+        };
+      });
+      return detailedStocks;
     },
   },
   // 指定されたIDの在庫を削除するAPIエンドポイント
@@ -49,7 +57,14 @@ export default [
     response: ({ url }) => {
       const id = parseInt(url.split('/').pop()); // URLからIDを抽出
       const stock = stocks.find(stock => stock.id === id); // IDに一致する在庫を検索
-      return stock;
+      if (stock) {
+        const sector = mockSectors.find(s => s.id === stock.sector_id);
+        return {
+          ...stock,
+          sector: sector || null,
+        };
+      }
+      return null; // 在庫が見つからない場合はnullを返す
     },
   },
   // 新しい在庫を追加するAPIエンドポイント
