@@ -4,23 +4,12 @@
 <title>Test Page</title>
 </head>
 <body>
-<script>
-window.__PRELOADED_STATE__ = {
-  "mainStocksPriceBoard": {
-    "priceBoard": {
-      "name": "テスト株式会社",
-      "price": 1234.5
-    }
-  },
-  "mainStocksDetail": {
-    "referenceIndex": {
-      "dps": "50.0"
-    }
-  },
-  "mainStocksPressReleaseSchedule": {
-    "pressReleaseScheduleMessage": "決算発表予定日 2025年10月31日"
-  }
-}
-</script>
+    <div data-testid="stock-name">テスト株式会社</div>
+    <div data-testid="stock-price">1,234.5</div>
+    <dl>
+        <dt>配当利回り（会社予想）</dt>
+        <dd>50.0%</dd>
+    </dl>
+    <p>直近の決算発表日は2025年10月31日でした。</p>
 </body>
 </html>
