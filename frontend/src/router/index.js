@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import OwnerList from '../views/owner/List.vue';
+import OwnerAddEdit from '../views/owner/AddEdit.vue';
 import StockList from '../views/stock/List.vue';
 import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
@@ -14,6 +15,17 @@ const routes = [
     path: '/owner',
     name: 'OwnerList',
     component: OwnerList
+  },
+  {
+    path: '/owner/add',
+    name: 'OwnerAdd',
+    component: OwnerAddEdit
+  },
+  {
+    path: '/owner/edit/:id',
+    name: 'OwnerEdit',
+    component: OwnerAddEdit,
+    props: true
   },
   {
     path: '/stock',
