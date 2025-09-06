@@ -46,12 +46,12 @@ export default {
             id: this.owner.id,
             name: this.formData.name
           };
-          await axios.put(`/api/owners/${this.owner.id}`, updateData);
+          await axios.put(`/api/owner/${this.owner.id}`, updateData);
         } else {
           const createData = {
             name: this.formData.name
           };
-          await axios.post('/api/owners', createData);
+          await axios.post('/api/owner', createData);
         }
         
         this.$emit('saved');
