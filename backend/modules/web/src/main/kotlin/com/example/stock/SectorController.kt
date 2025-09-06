@@ -19,7 +19,7 @@ class SectorController(
      * すべてのセクターのリストを取得します。
      * @return セクターのリスト
      */
-    @GetMapping("/sectors")
+    @GetMapping("/sector")
     fun getSectors(): List<Sector> {
         return sectorService.findAll()
     }
