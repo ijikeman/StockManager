@@ -69,4 +69,20 @@ class StockController(
         val updatedStocks = stockService.updateAllStockPrices()
         return ResponseEntity.ok(updatedStocks)
     }
+
+    /**
+     * 指定された株式コードの銘柄名を取得します。
+     *
+     * @param code 株式コード。
+     * @return 銘柄名。見つからない場合は404 Not Found。
+     */
+    @GetMapping("/stock/name/{code}")
+    fun getStockName(@PathVariable code: String): ResponseEntity<String> {
+        val stockName = stockService.fetchStockName(code)
+        return if (stockName != null) {
+            ResponseEntity.ok(stockName)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
 }

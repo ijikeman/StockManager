@@ -91,4 +91,14 @@ class StockService(
             updateStockPrice(stock.code)
         }
     }
+
+    /**
+     * 銘柄名を取得します。
+     *
+     * @param code 取得する株式のコード。
+     * @return 株式の名前。見つからない場合はnull。
+     */
+    fun fetchStockName(code: String): String? {
+        return yahooFinanceProvider.fetchStockName(code)
+    }
 }
