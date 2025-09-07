@@ -53,7 +53,7 @@ class StockController(
     }
 
     /* 特定のStockを更新する */
-    @PostMapping("/stocks/{code}/update")
+    @PostMapping("/stock/{code}/update")
     fun updateStockPrice(@PathVariable code: String): ResponseEntity<Stock> {
         val updatedStock = stockService.updateStockPrice(code)
         return if (updatedStock != null) {
@@ -64,7 +64,7 @@ class StockController(
     }
 
     /* 全てのStockを更新する */
-    @PostMapping("/stocks/update-all")
+    @PostMapping("/stock/update-all")
     fun updateAllStockPrices(): ResponseEntity<List<Stock>> {
         val updatedStocks = stockService.updateAllStockPrices()
         return ResponseEntity.ok(updatedStocks)
