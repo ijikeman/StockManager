@@ -82,6 +82,17 @@ export default {
     },
     cancel() {
       this.$router.push('/stock');
+    },
+    async fetchStockNameFromApi() {
+      if (!this.formData.code) return;
+      try {
+        const response = await axios.get(`/api/stock/name/${this.formData.code}`);
+        if (response.data) {
+          this.formData.name = response.data;
+        }
+      } catch (error) {
+        console.error('銘柄名の取得中にエラーが発生しました:', error);
+      }
     }
   },
   created() {
