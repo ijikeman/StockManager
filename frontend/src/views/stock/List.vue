@@ -59,6 +59,31 @@ export default {
         alert('株価の更新に失敗しました。');
       }
     },
+    exportCSV() {
+      if (this.stocks.length === 0) {
+        alert('出力するデータがありません。');
+        return;
+      }
+
+      const header = 'code,price\n';
+      const csvRows = this.stocks.map(stock => {
+        return `${stock.code},${stock.current_price}`;
+      });
+
+      const csvString = header + csvRows.join('\n');
+
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const blob = new Blob([bom, csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'stocks.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    },
     toggleSelectAll(event) {
       if (event.target.checked) {
         this.selectedStocks = this.stocks.map(stock => stock.code);
