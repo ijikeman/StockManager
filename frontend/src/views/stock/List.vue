@@ -11,6 +11,7 @@ export default {
     return {
       // 在庫のリスト
       stocks: [],
+      selectedStocks: [],
     };
   },
   // メソッド
@@ -39,6 +40,30 @@ export default {
           console.error('在庫の削除中にエラーが発生しました:', error);
           alert('削除に失敗しました。');
         }
+      }
+    },
+    async updateSelectedStocks() {
+      if (this.selectedStocks.length === 0) {
+        alert('更新する銘柄を選択してください。');
+        return;
+      }
+      try {
+        await Promise.all(this.selectedStocks.map(code =>
+          axios.post(`/api/stock/${code}/update`)
+        ));
+        alert('選択した銘柄の株価を更新しました。');
+        this.fetchStocks(); // データを再取得して表示を更新
+        this.selectedStocks = []; // 選択をクリア
+      } catch (error) {
+        console.error('株価の更新中にエラーが発生しました:', error);
+        alert('株価の更新に失敗しました。');
+      }
+    },
+    toggleSelectAll(event) {
+      if (event.target.checked) {
+        this.selectedStocks = this.stocks.map(stock => stock.code);
+      } else {
+        this.selectedStocks = [];
       }
     }
   },

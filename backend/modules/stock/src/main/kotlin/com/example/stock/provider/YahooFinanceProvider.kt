@@ -1,7 +1,5 @@
 package com.example.stock.provider
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -16,10 +14,7 @@ class YahooFinanceProvider(
 
     companion object {
         private const val BASE_URL = "https://finance.yahoo.co.jp/quote"
-        private const val PRELOADED_STATE_PREFIX = "window.__PRELOADED_STATE__ = "
     }
-
-    private val objectMapper = ObjectMapper()
 
     override fun fetchStockInfo(code: String): StockInfo? {
         // リクエスト間の遅延を挿入して、サーバーへの負荷を軽減します。
@@ -28,11 +23,10 @@ class YahooFinanceProvider(
         return try {
             val url = "$BASE_URL/$code.T"
             val doc = Jsoup.connect(url).get()
-            val preloadedState = getPreloadedState(doc)
 
-            val price = extractPrice(preloadedState)
-            val dividend = extractDividend(preloadedState)
-            val earningsDate = extractEarningsDate(preloadedState)
+            val price = extractPrice(doc)
+            val dividend = extractDividend(doc)
+            val earningsDate = extractEarningsDate(doc)
 
             StockInfo(price, dividend, earningsDate)
         } catch (e: Exception) {
@@ -48,39 +42,30 @@ class YahooFinanceProvider(
         return try {
             val url = "$BASE_URL/$code.T"
             val doc = Jsoup.connect(url).get()
-            val preloadedState = getPreloadedState(doc)
-            extractName(preloadedState)
+            extractName(doc)
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
 
-    private fun getPreloadedState(doc: org.jsoup.nodes.Document): JsonNode? {
-        val scriptElements = doc.getElementsByTag("script")
-        val script = scriptElements.find { it.html().trim().startsWith(PRELOADED_STATE_PREFIX) }
-            ?: return null
-        val jsonText = script.html().trim().removePrefix(PRELOADED_STATE_PREFIX)
-        return objectMapper.readTree(jsonText)
+    private fun extractName(doc: org.jsoup.nodes.Document): String? {
+        return doc.selectFirst("""div[data-testid="stock-name"]""")?.text()
     }
 
-    private fun extractName(jsonNode: JsonNode?): String? {
-        return jsonNode?.at("/mainStocksPriceBoard/priceBoard/name")?.asText()
+    private fun extractPrice(doc: org.jsoup.nodes.Document): Double? {
+        val priceText = doc.selectFirst("""span[class*="PriceBoard__price"]""")?.text()?.replace(",", "")
+        return priceText?.toDoubleOrNull()
     }
 
-    private fun extractPrice(jsonNode: JsonNode?): Double? {
-        return jsonNode?.at("/mainStocksPriceBoard/priceBoard/price")?.asDouble()
+    private fun extractDividend(doc: org.jsoup.nodes.Document): Double? {
+        val dividendElement = doc.select("dt").find { it.text().contains("1株配当") }
+        val valueText = dividendElement?.nextElementSibling()?.selectFirst("""span[class*="DataListItem__value"]""")?.text()
+        return valueText?.toDoubleOrNull()
     }
 
-    private fun extractDividend(jsonNode: JsonNode?): Double? {
-        // "dps" in referenceIndex seems to be "Dividend Per Share"
-        return jsonNode?.at("/mainStocksDetail/referenceIndex/dps")?.asText()?.toDoubleOrNull()
-    }
-
-    private fun extractEarningsDate(jsonNode: JsonNode?): LocalDate? {
-        val earningsText = jsonNode?.at("/mainStocksPressReleaseSchedule/pressReleaseScheduleMessage")?.asText()
-            ?: return null
-
+    private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
+        val earningsText = doc.select("p:contains(直近の決算発表日は)").text()
         val pattern = Pattern.compile("(\\d{4})年(\\d{1,2})月(\\d{1,2})日")
         val matcher = pattern.matcher(earningsText)
 

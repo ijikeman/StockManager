@@ -3,7 +3,10 @@
   <!-- ページヘッダー -->
   <div class="page-header">
     <h1 class="page-title">在庫管理</h1>
-    <button @click="goToAddStock" class="btn btn-primary">新規登録</button>
+    <div>
+      <button @click="updateSelectedStocks" class="btn btn-success">選択した銘柄の株価を更新</button>
+      <button @click="goToAddStock" class="btn btn-primary">新規登録</button>
+    </div>
   </div>
 
   <!-- 在庫を表示するためのテーブル -->
@@ -11,8 +14,10 @@
     <!-- テーブルヘッダー -->
     <thead>
       <tr>
+        <th><input type="checkbox" @change="toggleSelectAll"></th>
         <th>コード</th>
         <th>名前</th>
+        <th>現在の株価</th>
         <th>セクター</th>
         <th>アクション</th>
       </tr>
@@ -21,8 +26,10 @@
     <tbody>
       <!-- 在庫情報をループで表示 -->
       <tr v-for="stock in stocks" :key="stock.id">
+        <td><input type="checkbox" :value="stock.code" v-model="selectedStocks"></td>
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
+        <td>{{ stock.current_price }}</td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>

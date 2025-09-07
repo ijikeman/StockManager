@@ -51,4 +51,22 @@ class StockController(
         stockService.deleteById(id)
         return ResponseEntity.noContent().build()
     }
+
+    /* 特定のStockを更新する */
+    @PostMapping("/stock/{code}/update")
+    fun updateStockPrice(@PathVariable code: String): ResponseEntity<Stock> {
+        val updatedStock = stockService.updateStockPrice(code)
+        return if (updatedStock != null) {
+            ResponseEntity.ok(updatedStock)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    /* 全てのStockを更新する */
+    @PostMapping("/stock/update-all")
+    fun updateAllStockPrices(): ResponseEntity<List<Stock>> {
+        val updatedStocks = stockService.updateAllStockPrices()
+        return ResponseEntity.ok(updatedStocks)
+    }
 }

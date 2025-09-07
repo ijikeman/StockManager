@@ -1,0 +1,2 @@
+./gradlew :modules:web:bootRun
+

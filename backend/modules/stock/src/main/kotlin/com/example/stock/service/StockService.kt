@@ -2,15 +2,22 @@ package com.example.stock.service
 
 import com.example.stock.model.Stock
 import com.example.stock.repository.StockRepository
+import com.example.stock.provider.YahooFinanceProvider
 import org.springframework.stereotype.Service
+import java.time.format.DateTimeFormatter
 
 /**
  * 株式を管理するためのサービスクラスです。
  *
  * @property stockRepository 株式データにアクセスするためのリポジトリ。
+ * @property yahooFinanceProvider YahooFinanceから株価を取得するためのプロバイダー。
  */
 @Service
-class StockService(private val stockRepository: StockRepository) {
+class StockService(
+    private val stockRepository: StockRepository,
+    private val yahooFinanceProvider: YahooFinanceProvider
+    ) {
+
     /**
      * すべての株式のリストを返します。
      *
@@ -49,5 +56,39 @@ class StockService(private val stockRepository: StockRepository) {
     // 削除する
     open fun deleteById(id: Int) {
         stockRepository.deleteById(id)
+    }
+
+    /**
+     * 銘柄の株価を更新します。
+     *
+     * @param code 更新する株式のコード。
+     * @return 更新された株式。見つからない場合はnull。
+     */
+    fun updateStockPrice(code: String): Stock? {
+        val stockInfo = yahooFinanceProvider.fetchStockInfo(code)
+        if (stockInfo != null) {
+            val stock = stockRepository.findByCode(code)
+            if (stock != null) {
+                val updatedStock = stock.copy(
+                    current_price = stockInfo.price ?: stock.current_price,
+                    dividend = stockInfo.dividend ?: stock.dividend,
+                    release_date = stockInfo.earningsDate?.toString() ?: stock.release_date
+                )
+                return stockRepository.save(updatedStock)
+            }
+        }
+        return null
+    }
+
+    /**
+     * すべての銘柄の株価を更新します。
+     *
+     * @return 更新された株式のリスト。
+     */
+    fun updateAllStockPrices(): List<Stock> {
+        val stocks = stockRepository.findAll()
+        return stocks.mapNotNull { stock ->
+            updateStockPrice(stock.code)
+        }
     }
 }
