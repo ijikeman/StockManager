@@ -50,7 +50,13 @@ class YahooFinanceProvider(
     }
 
     private fun extractName(doc: org.jsoup.nodes.Document): String? {
-        return doc.selectFirst("""div[data-testid="stock-name"]""")?.text()
+        val title = doc.title()
+        val stockName = title.split("【")[0]
+        return if (stockName.isNotEmpty()) {
+            stockName
+        } else {
+            null
+        }
     }
 
     private fun extractPrice(doc: org.jsoup.nodes.Document): Double? {
