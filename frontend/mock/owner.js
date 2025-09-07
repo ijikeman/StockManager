@@ -13,7 +13,7 @@ let owners = Mock.mock({
 export default [
   // 全てのオーナーを取得するAPIエンドポイント
   {
-    url: '/api/owners',
+    url: '/api/owner',
     method: 'get',
     response: () => {
       return owners;
@@ -21,7 +21,7 @@ export default [
   },
   // 指定されたIDのオーナーを削除するAPIエンドポイント
   {
-    url: '/api/owners/:id',
+    url: '/api/owner/:id',
     method: 'delete',
     response: ({ url }) => {
       const id = parseInt(url.split('/').pop()); // URLからIDを抽出
@@ -31,7 +31,7 @@ export default [
   },
   // 新しいオーナーを追加するAPIエンドポイント
   {
-    url: '/api/owners',
+    url: '/api/owner',
     method: 'post',
     response: ({ body }) => {
         // 新しいオーナーにランダムなIDを割り当てて追加
@@ -42,7 +42,7 @@ export default [
   },
   // 指定されたIDのオーナーを更新するAPIエンドポイント
   {
-      url: '/api/owners/:id',
+      url: '/api/owner/:id',
       method: 'put',
       response: ({ url, body }) => {
         const id = parseInt(url.split('/').pop()); // URLからIDを抽出

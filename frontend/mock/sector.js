@@ -58,4 +58,20 @@ export default [
       return { message: `Sector with ID ${id} not found.`, status: 404 }; // Or an appropriate error response
     },
   },
+  // 新しいセクターを追加するAPIエンドポイント
+  {
+    url: '/api/sector',
+    method: 'post',
+    response: ({ body }) => {
+      const newName = body.name;
+      const newId = sectors.length > 0 ? Math.max(...sectors.map(s => s.id)) + 1 : 1;
+      const newSector = {
+        id: newId,
+        name: newName,
+      };
+      sectors.push(newSector);
+      console.log('Added new sector:', newSector);
+      return newSector;
+    },
+  },
 ];
