@@ -18,6 +18,8 @@
         <th>コード</th>
         <th>名前</th>
         <th>現在の株価</th>
+        <th>配当金</th>
+        <th>業績発表日</th>
         <th>セクター</th>
         <th>アクション</th>
       </tr>
@@ -30,6 +32,8 @@
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
         <td>{{ stock.current_price }}</td>
+        <td>{{ stock.dividend }}</td>
+        <td>{{ stock.release_date }}</td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>
