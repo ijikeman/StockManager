@@ -54,13 +54,14 @@ class YahooFinanceProvider(
     }
 
     private fun extractPrice(doc: org.jsoup.nodes.Document): Double? {
-        val priceText = doc.selectFirst("""div[data-testid="stock-price"]""")?.text()?.replace(",", "")
+        val priceText = doc.selectFirst("""span[class*="PriceBoard__price"]""")?.text()?.replace(",", "")
         return priceText?.toDoubleOrNull()
     }
 
     private fun extractDividend(doc: org.jsoup.nodes.Document): Double? {
-        val dividendElement = doc.select("dt").find { it.text() == "配当利回り（会社予想）" }
-        return dividendElement?.nextElementSibling()?.text()?.removeSuffix("%")?.toDoubleOrNull()
+        val dividendElement = doc.select("dt").find { it.text().contains("1株配当") }
+        val valueText = dividendElement?.nextElementSibling()?.selectFirst("""span[class*="DataListItem__value"]""")?.text()
+        return valueText?.toDoubleOrNull()
     }
 
     private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
