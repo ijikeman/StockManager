@@ -21,3 +21,15 @@ CREATE TABLE IF NOT EXISTS stock (
     sector_id INT,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
 );
+
+-- holdingテーブル
+CREATE TABLE IF NOT EXISTS holding (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    owner_id INT,
+    stock_id INT,
+    quantity INT NOT NULL,
+    average_price DECIMAL(10, 2) NOT NULL,
+    updated_at DATE NULL,
+    FOREIGN KEY (owner_id) REFERENCES owner(id),
+    FOREIGN KEY (stock_id) REFERENCES stock(id)
+);

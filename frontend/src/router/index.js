@@ -5,11 +5,17 @@ import StockList from '../views/stock/List.vue';
 import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
+import HoldingList from '../views/holding/List.vue';
 
 const routes = [
   {
     path: '/',
     redirect: '/sector'
+  },
+  {
+    path: '/holding',
+    name: 'HoldingList',
+    component: HoldingList
   },
   {
     path: '/owner',
