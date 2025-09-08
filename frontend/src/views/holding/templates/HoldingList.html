@@ -1,0 +1,40 @@
+<!-- 保有銘柄管理ページのコンテナ -->
+<div>
+  <!-- ページヘッダー -->
+  <div class="page-header">
+    <h1 class="page-title">保有銘柄管理</h1>
+    <div>
+      <button @click="goToAddHolding" class="btn btn-primary">新規登録</button>
+    </div>
+  </div>
+
+  <!-- 保有銘柄を表示するためのテーブル -->
+  <table class="common-table">
+    <!-- テーブルヘッダー -->
+    <thead>
+      <tr>
+        <th>銘柄コード</th>
+        <th>銘柄名</th>
+        <th>所有者</th>
+        <th>数量</th>
+        <th>取得価格</th>
+        <th>アクション</th>
+      </tr>
+    </thead>
+    <!-- テーブルボディ -->
+    <tbody>
+      <!-- 保有銘柄情報をループで表示 -->
+      <tr v-for="holding in holdings" :key="holding.id">
+        <td>{{ holding.stock.code }}</td>
+        <td>{{ holding.stock.name }}</td>
+        <td>{{ holding.owner.name }}</td>
+        <td>{{ holding.quantity }}</td>
+        <td>{{ holding.acquisition_price }}</td>
+        <td>
+          <button @click="editHolding(holding.id)" class="btn btn-secondary">編集</button>
+          <button @click="deleteHolding(holding.id)" class="btn btn-danger">削除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
