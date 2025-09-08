@@ -18,7 +18,7 @@ export default {
     };
 
     return {
-      // 在庫のリスト
+      // 銘柄のリスト
       stocks: [],
       selectedStocks: [],
       csvDelimiter: ',',
@@ -28,13 +28,13 @@ export default {
   },
   // メソッド
   methods: {
-    // APIから在庫のリストを取得
+    // APIから銘柄のリストを取得
     async fetchStocks() {
       try {
         const response = await axios.get('/api/stock');
         this.stocks = response.data;
       } catch (error) {
-        console.error('在庫の取得中にエラーが発生しました:', error);
+        console.error('銘柄の取得中にエラーが発生しました:', error);
       }
     },
     goToAddStock() {
@@ -44,12 +44,12 @@ export default {
       this.$router.push(`/stock/edit/${id}`);
     },
     async deleteStock(id) {
-      if (confirm('本当にこの在庫を削除しますか？')) {
+      if (confirm('本当にこの銘柄を削除しますか？')) {
         try {
           await axios.delete(`/api/stock/${id}`);
           this.fetchStocks(); // リストを再読み込み
         } catch (error) {
-          console.error('在庫の削除中にエラーが発生しました:', error);
+          console.error('銘柄の削除中にエラーが発生しました:', error);
           alert('削除に失敗しました。');
         }
       }
