@@ -27,7 +27,7 @@ class StockTest {
             name = "トヨタ自動車",
             current_price = 9000.0,
             dividend = 150.0,
-            earnings_date = "2025-08-27",
+            earnings_date = java.time.LocalDate.of(2025, 8, 27),
             sector = sector
         )
         val violations = validator.validate(stock)
@@ -37,7 +37,7 @@ class StockTest {
     // 異常系: code
     @Test
     fun `stock with blank code should have two violations`() {
-        val stock = Stock(code = "", name = "Test", earnings_date = "2025-08-27", sector = sector)
+    val stock = Stock(code = "", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector)
         val violations = validator.validate(stock)
         assertEquals(2, violations.size)
         val messages = violations.map { it.message }
@@ -47,7 +47,7 @@ class StockTest {
 
     @Test
     fun `stock with invalid pattern code should have violation`() {
-        val stock = Stock(code = "123-", name = "Test", earnings_date = "2025-08-27", sector = sector)
+    val stock = Stock(code = "123-", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("名前は数字あるいはアルファベットのみで構成される必要があります", violations.first().message)
@@ -56,7 +56,7 @@ class StockTest {
     // 異常系: name
     @Test
     fun `stock with blank name should have violation`() {
-        val stock = Stock(code = "1234", name = "", earnings_date = "2025-08-27", sector = sector)
+    val stock = Stock(code = "1234", name = "", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("銘柄名は必須です", violations.first().message)
