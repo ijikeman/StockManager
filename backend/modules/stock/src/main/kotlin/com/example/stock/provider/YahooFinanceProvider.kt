@@ -26,9 +26,9 @@ class YahooFinanceProvider(
 
             val price = extractPrice(doc)
             val dividend = extractDividend(doc)
-            val earningsDate = extractEarningsDate(doc)
+            val earnings_date = extractEarningsDate(doc)
 
-            StockInfo(price, dividend, earningsDate)
+            StockInfo(price, dividend, earnings_date)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -72,9 +72,12 @@ class YahooFinanceProvider(
 
     private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
         val earningsText = doc.select("p:contains(直近の決算発表日は)").text()
+        if (earningsText.contains("未定")) {
+            return null
+        }
         val pattern = Pattern.compile("(\\d{4})年(\\d{1,2})月(\\d{1,2})日")
         val matcher = pattern.matcher(earningsText)
-
+        
         return if (matcher.find()) {
             val year = matcher.group(1).toInt()
             val month = matcher.group(2).toInt()

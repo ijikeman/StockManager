@@ -2,7 +2,7 @@
 <div>
   <!-- ページヘッダー -->
   <div class="page-header">
-    <h1 class="page-title">銘柄管理</h1>
+    <h1 class="page-title">在庫管理</h1>
     <div>
       <button @click="updateSelectedStocks" class="btn btn-success">選択した銘柄の株価を更新</button>
       <button @click="exportCSV" class="btn btn-info">CSV出力</button>
@@ -34,7 +34,7 @@
         <td>{{ stock.name }}</td>
         <td>{{ stock.current_price }}</td>
         <td>{{ stock.dividend }}</td>
-        <td>{{ stock.release_date }}</td>
+        <td>{{ stock.earnings_date }}</td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS stock (
     name VARCHAR(255) NOT NULL,
     current_price DECIMAL(10, 2) NOT NULL,
     dividend DECIMAL(10, 2) NOT NULL,
-    release_date VARCHAR(255) NOT NULL,
+    earnings_date DATE NULL,
     sector_id INT,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
 );

@@ -18,7 +18,7 @@ let stocks = Mock.mock({
     'name': '@word(3, 5)', // 3〜5文字の単語で商品名を生成
     'current_price': '@float(100, 1000, 2, 2)', // 100〜1000の浮動小数点数で現在価格を生成（小数点以下2桁）
     'dividend': '@float(0, 10, 2, 2)', // 0〜10の浮動小数点数で配当を生成（小数点以下2桁）
-    'release_date': '@date("yyyy-MM-dd")', // YYYY-MM-DD形式でリリース日を生成
+    'earnings_date': '@date("yyyy-MM-dd")', // YYYY-MM-DD形式でリリース日を生成
     'sector_id|1': mockSectors.map(s => s.id), // mockSectorsからランダムにIDを選択
   }]
 }).list;

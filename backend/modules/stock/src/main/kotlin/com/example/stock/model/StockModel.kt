@@ -38,8 +38,8 @@ data class Stock(
     val dividend: Double = 0.0,
 
     // 業績発表日
-    @Column(name = "release_date", nullable = false)
-    val release_date: String = "",
+    @Column(name = "earnings_date")
+    val earnings_date: java.time.LocalDate? = null,
 
     @ManyToOne
     @JoinColumn(name = "sector_id")
