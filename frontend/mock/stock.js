@@ -110,4 +110,13 @@ export default [
       return { success: false, message: 'Stock not found' };
     },
   },
+  // コードに基づいて銘柄名を取得するAPIエンドポイント
+  {
+    url: '/api/stock/name/:code',
+    method: 'get',
+    response: () => {
+      // ランダムな会社名を返す
+      return Mock.Random.company();
+    },
+  },
   ];
