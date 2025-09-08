@@ -22,12 +22,14 @@ class YahooFinanceProvider(
 
         return try {
             val url = "$BASE_URL/$code.T"
-            val doc = Jsoup.connect(url).get()
+            val doc = Jsoup.connect(url).get() // URLリクエストを行いデータを取得
 
+            // docから各データを取得
             val price = extractPrice(doc)
             val dividend = extractDividend(doc)
             val earnings_date = extractEarningsDate(doc)
 
+            // 取得したデータをStockInfoに格納しreturnする
             StockInfo(price, dividend, earnings_date)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -71,7 +73,7 @@ class YahooFinanceProvider(
     }
 
     private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
-        val earningsText = doc.select("p:contains(直近の決算発表日は)").text()
+        val earningsText = doc.select("p:contains(決算発表日は)").text()
         if (earningsText.contains("未定")) {
             return null
         }

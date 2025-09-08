@@ -65,7 +65,7 @@ class StockService(
      * @return 更新された株式。見つからない場合はnull。
      */
     fun updateStockPrice(code: String): Stock? {
-        val stockInfo = yahooFinanceProvider.fetchStockInfo(code)
+        val stockInfo = yahooFinanceProvider.fetchStockInfo(code) // YahooFinanceから最新データを取得
         if (stockInfo != null) {
             val stock = stockRepository.findByCode(code)
             if (stock != null) {
