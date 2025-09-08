@@ -115,8 +115,8 @@ export default [
     url: '/api/stock/name/:code',
     method: 'get',
     response: () => {
-      // ランダムな会社名を返す
-      return Mock.Random.company();
+      // ランダムなタイトルを返す（会社名の代わり）
+      return Mock.mock('@title');
     },
   },
   ];
