@@ -8,11 +8,22 @@ export default {
   name: 'StockList',
   // コンポーネントのデータ
   data() {
+    const csvColumns = {
+      code: { label: 'コード' },
+      name: { label: '名前' },
+      current_price: { label: '現在の株価' },
+      dividend: { label: '配当金' },
+      earnings_date: { label: '業績発表日' },
+      sector: { label: 'セクター', formatter: (value) => value.name },
+    };
+
     return {
       // 在庫のリスト
       stocks: [],
       selectedStocks: [],
       csvDelimiter: ',',
+      csvColumns,
+      selectedCsvColumns: Object.keys(csvColumns),
     };
   },
   // メソッド
@@ -65,11 +76,20 @@ export default {
         alert('出力するデータがありません。');
         return;
       }
+      if (this.selectedCsvColumns.length === 0) {
+        alert('出力する項目を1つ以上選択してください。');
+        return;
+      }
 
       const delimiter = this.csvDelimiter;
-      const header = `code${delimiter}price\n`;
+      const header = this.selectedCsvColumns.map(key => this.csvColumns[key].label).join(delimiter) + '\n';
+
       const csvRows = this.stocks.map(stock => {
-        return `${stock.code}${delimiter}${stock.current_price}`;
+        return this.selectedCsvColumns.map(key => {
+          const column = this.csvColumns[key];
+          const value = stock[key];
+          return column.formatter ? column.formatter(value) : value;
+        }).join(delimiter);
       });
 
       const csvString = header + csvRows.join('\n');
