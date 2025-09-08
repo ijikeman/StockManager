@@ -92,4 +92,22 @@ export default [
       return null; // 見つからない場合はnullを返す
     },
   },
+  // 選択した銘柄の株価を更新するAPIエンドポイント
+  {
+    url: '/api/stock/:code/update',
+    method: 'post',
+    response: ({ url }) => {
+      const code = url.split('/')[3]; // URLからコードを抽出
+      const stock = stocks.find(s => s.code === code);
+      if (stock) {
+        // 株価、配当、業績発表日をランダムに更新
+        stock.current_price = Mock.Random.float(100, 1000, 2, 2);
+        stock.dividend = Mock.Random.float(0, 10, 2, 2);
+        stock.earnings_date = Mock.mock('@date("yyyy-MM-dd")');
+        return stock;
+      }
+      // 在庫が見つからない場合はエラーを返す
+      return { success: false, message: 'Stock not found' };
+    },
+  },
   ];
