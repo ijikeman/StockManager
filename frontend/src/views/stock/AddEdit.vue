@@ -27,7 +27,7 @@ export default {
       return this.id != null;
     },
     pageTitle() {
-      return this.isEditing ? '在庫編集' : '新規在庫追加';
+      return this.isEditing ? '銘柄編集' : '新規銘柄追加';
     }
   },
   methods: {
@@ -53,7 +53,7 @@ export default {
           sectorId: this.stock.sector ? this.stock.sector.id : null
         };
       } catch (error) {
-        console.error('在庫の取得中にエラーが発生しました:', error);
+        console.error('銘柄の取得中にエラーが発生しました:', error);
         this.$router.push('/stock'); // エラー時はリストにリダイレクト
       }
     },
@@ -76,7 +76,7 @@ export default {
 
         this.$router.push('/stock');
       } catch (error) {
-        console.error('在庫の保存中にエラーが発生しました:', error);
+        console.error('銘柄の保存中にエラーが発生しました:', error);
         alert('保存に失敗しました。もう一度お試しください。');
       }
     },

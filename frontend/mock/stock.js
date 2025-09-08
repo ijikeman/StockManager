@@ -116,7 +116,7 @@ export default [
     method: 'get',
     response: () => {
       // ランダムなタイトルを返す（会社名の代わり）
-      return Mock.mock('@title');
+      return Mock.Random.title();
     },
   },
   ];

@@ -1,8 +1,8 @@
-<!-- 在庫管理ページのコンテナ -->
+<!-- 銘柄管理ページのコンテナ -->
 <div>
   <!-- ページヘッダー -->
   <div class="page-header">
-    <h1 class="page-title">在庫管理</h1>
+    <h1 class="page-title">銘柄管理</h1>
     <div>
       <button @click="updateSelectedStocks" class="btn btn-success">選択した銘柄の株価を更新</button>
       <button @click="exportCSV" class="btn btn-info">CSV出力</button>
@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <!-- 在庫を表示するためのテーブル -->
+  <!-- 銘柄を表示するためのテーブル -->
   <table class="common-table">
     <!-- テーブルヘッダー -->
     <thead>
@@ -27,7 +27,7 @@
     </thead>
     <!-- テーブルボディ -->
     <tbody>
-      <!-- 在庫情報をループで表示 -->
+      <!-- 銘柄情報をループで表示 -->
       <tr v-for="stock in stocks" :key="stock.id">
         <td><input type="checkbox" :value="stock.code" v-model="selectedStocks"></td>
         <td>{{ stock.code }}</td>
