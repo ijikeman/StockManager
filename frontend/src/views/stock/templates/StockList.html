@@ -5,6 +5,11 @@
     <h1 class="page-title">在庫管理</h1>
     <div>
       <button @click="updateSelectedStocks" class="btn btn-success">選択した銘柄の株価を更新</button>
+      <select v-model="csvDelimiter" class="form-control" style="width: auto; display: inline-block; margin-left: 10px;">
+        <option value=",">カンマ</option>
+        <option value=";">セミコロン</option>
+        <option value="\t">タブ</option>
+      </select>
       <button @click="exportCSV" class="btn btn-info">CSV出力</button>
       <button @click="goToAddStock" class="btn btn-primary">新規登録</button>
     </div>

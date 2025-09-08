@@ -12,6 +12,7 @@ export default {
       // 在庫のリスト
       stocks: [],
       selectedStocks: [],
+      csvDelimiter: ',',
     };
   },
   // メソッド
@@ -65,9 +66,10 @@ export default {
         return;
       }
 
-      const header = 'code,price\n';
+      const delimiter = this.csvDelimiter;
+      const header = `code${delimiter}price\n`;
       const csvRows = this.stocks.map(stock => {
-        return `${stock.code},${stock.current_price}`;
+        return `${stock.code}${delimiter}${stock.current_price}`;
       });
 
       const csvString = header + csvRows.join('\n');
