@@ -5,7 +5,23 @@
     <h1 class="page-title">在庫管理</h1>
     <div>
       <button @click="updateSelectedStocks" class="btn btn-success">選択した銘柄の株価を更新</button>
-      <button @click="exportCSV" class="btn btn-info">CSV出力</button>
+      <div class="csv-settings">
+        <div class="column-selection">
+          <span>出力項目:</span>
+          <label v-for="(column, key) in csvColumns" :key="key">
+            <input type="checkbox" :value="key" v-model="selectedCsvColumns"> {{ column.label }}
+          </label>
+        </div>
+        <div>
+          <span>区切り文字:</span>
+          <select v-model="csvDelimiter" class="form-control" style="width: auto; display: inline-block;">
+            <option value=",">カンマ</option>
+            <option value=";">セミコロン</option>
+            <option value="\t">タブ</option>
+          </select>
+          <button @click="exportCSV" class="btn btn-info">CSV出力</button>
+        </div>
+      </div>
       <button @click="goToAddStock" class="btn btn-primary">新規登録</button>
     </div>
   </div>
