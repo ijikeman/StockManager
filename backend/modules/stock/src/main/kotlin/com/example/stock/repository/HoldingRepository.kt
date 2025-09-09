@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface HoldingRepository : JpaRepository<Holding, Int> {
     // owner_idで検索
-    fun findByOwnerId(owner_id: Int): Holding?
+    fun findByOwnerId(owner_id: Int): List<Holding>
 }

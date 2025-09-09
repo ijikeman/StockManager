@@ -6,35 +6,29 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Column
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
+import java.time.LocalDate
 
 @Entity
-@Table(name = "transaction")
-data class Transaction(
+@Table(name = "income_history")
+data class IncomeHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    
+
     @ManyToOne
     @JoinColumn(name = "holding_id")
     val holding: Holding,
 
-    @field:NotBlank(message = "取引タイプは必須です")
-    @Column(name = "transaction_type", nullable = false)
-    val transaction_type: String = "",
+    @field:NotBlank(message = "収益タイプは必須です")
+    @Column(name = "income_type", nullable = false)
+    val income_type: String = "",
 
-    @Column(name = "volume", nullable = false)
-    val volume: Int = 0,
-
-    @Column(name = "price", nullable = false)
-    val price: Double = 0.0,
-
-    @Column(name = "tax", nullable = false)
-    val tax: Double = 0.0,
+    @Column(name = "amount", nullable = false)
+    val amount: Double = 0.0,
 
     @Column(name = "date", nullable = false)
-    val date: java.time.LocalDate? = null
+    val date: LocalDate? = null
 )
