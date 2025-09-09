@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS transaction (
     transaction_type VARCHAR(255) NOT NULL,
     volume INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
+    average_price_at_transaction DECIMAL(10, 2) NOT NULL,
     tax DECIMAL(10, 2) NOT NULL,
     date DATE NOT NULL,
     FOREIGN KEY (holding_id) REFERENCES holding(id)

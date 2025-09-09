@@ -32,6 +32,9 @@ data class Transaction(
     @Column(name = "price", nullable = false)
     val price: Double = 0.0,
 
+    @Column(name = "average_price_at_transaction", nullable = false)
+    val average_price_at_transaction: Double = 0.0,
+
     @Column(name = "tax", nullable = false)
     val tax: Double = 0.0,
 
