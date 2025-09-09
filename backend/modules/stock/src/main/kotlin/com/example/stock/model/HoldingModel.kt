@@ -36,6 +36,11 @@ data class Holding (
     @JoinColumn(name = "stock_id")
     val stock: Stock,
 
+    @field:NotBlank(message = "NISAは必須です")
+    @Column(name = "nisa", nullable = false)
+    @JoinColumn(name = "nisa")
+    val nisa: Boolean = false,
+
     @field:NotBlank(message = "数量は必須です")
     @field:Pattern(regexp = "^[0-9]+$", message = "数量は数字のみで構成される必要があります")
     @Column(name = "quantity", nullable = false)
