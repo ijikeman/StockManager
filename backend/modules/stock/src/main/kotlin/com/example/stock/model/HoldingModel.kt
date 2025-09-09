@@ -16,7 +16,7 @@ import jakarta.persistence.JoinColumn
         UUID id PK
         UUID owner_id FK "株式を保有するユーザーID"
         UUID stock_id FK "保有銘柄ID"
-        integer quantity "現在保有している株数"
+        integer current_volume "現在保有している株数"
         decimal average_price "購入にかかった平均取得単価"
         timestamp updated_at "最終更新日時"
     }
@@ -43,8 +43,8 @@ data class Holding (
 
     @field:NotBlank(message = "数量は必須です")
     @field:Pattern(regexp = "^[0-9]+$", message = "数量は数字のみで構成される必要があります")
-    @Column(name = "quantity", nullable = false)
-    val quantity: Int = 0,
+    @Column(name = "current_volume", nullable = false)
+    val current_volume: Int = 0,
 
     @field:NotBlank(message = "平均取得単価は必須です")
     @field:Pattern(regexp = "^[0-9]+$", message = "平均取得単価は数字のみで構成される必要があります")

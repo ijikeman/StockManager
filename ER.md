@@ -1,4 +1,4 @@
-このシナリオでは、**保有数量が途中で変動する**という点が重要です。前回の`position`テーブル設計では、1つのレコードが「購入から売却まで」を管理しているため、部分売却という事象に対応できません。
+このシナリオでは、**保有数量が途中で変動する**という点が重要です。前回の`holding`テーブル設計では、1つのレコードが「購入から売却まで」を管理しているため、部分売却という事象に対応できません。
 
 ## 損益計算の考え方
 
@@ -18,14 +18,14 @@
 
 ---
 
-この問題を解決するため、前回の提案である**`transactions`テーブル**と**`holding`テーブル**への分割が有効です。
+この問題を解決するため、前回の提案である**`transaction`テーブル**と**`holding`テーブル**への分割が有効です。
 
-### 1. `transactions`テーブル
+### 1. `transaction`テーブル
 
 すべての取引履歴（購入・売却）を、株数と単価で記録します。
 
 * `id` (PK)
-* `position_id` (FK): どの銘柄の取引か
+* `holding_id` (FK): どの銘柄の取引か
 * `transaction_type`: `buy` または `sell`
 * `volume`: 取引数量 (例: 200株、100株)
 * `price`: 取引単価
@@ -34,7 +34,7 @@
 
 **シナリオのデータ例:**
 
-| `id` | `position_id` | `transaction_type` | `volume` | `price` | `tax` | `date` |
+| `id` | `holding_id` | `transaction_type` | `volume` | `price` | `tax` | `date` |
 |---|---|---|---|---|---|---|
 | `t1` | `p1` | `buy` | 200 | `X`円 | `Y`円 | `buy_date` |
 | `t2` | `p1` | `sell` | 100 | `Z`円 | `W`円 | `sale_date` |
@@ -49,21 +49,21 @@
 * `current_volume`: 現在の保有数量 (この例では100株)
 * `average_cost`: 平均取得単価
 
-**このテーブルは、`transactions`テーブルのデータを集計して更新することで、常に最新の状態を保ちます。**
+**このテーブルは、`transaction`テーブルのデータを集計して更新することで、常に最新の状態を保ちます。**
 
 ### 3. `income_history`テーブル
 
 配当金や優待の履歴を管理します。
 
 * `id` (PK)
-* `position_id` (FK)
+* `holding_id` (FK)
 * `income_type`: `dividend` または `preferential`
 * `amount`: 受取金額
 * `date`: 受取日
 
 **シナリオのデータ例:**
 
-| `id` | `position_id` | `income_type` | `amount` | `date` |
+| `id` | `holding_id` | `income_type` | `amount` | `date` |
 |---|---|---|---|---|
 | `i1` | `p1` | `dividend` | `100`株 × `10`円 | `payment_date` |
 
@@ -75,7 +75,7 @@
 
 上記のテーブル構造を使うと、損益は以下のように計算できます。
 
-* **確定損益**: `transactions`テーブルから`sell`のレコードを取得し、売却単価と平均取得単価の差額から計算します。
+* **確定損益**: `transaction`テーブルから`sell`のレコードを取得し、売却単価と平均取得単価の差額から計算します。
     * `確定損益 = (売却単価 - 平均取得単価) × 売却数量 - 売却手数料`
 
 * **含み損益**: `holding`テーブルの**平均取得単価**と**現在の株価**の差額から計算します。
@@ -88,15 +88,14 @@
 ### 改良版
 ```mermaid
 erDiagram
-    transactions {
+    transaction {
         UUID id PK
-        UUID position_id FK "ポジションID"
+        UUID holding_id FK "ポジションID"
         ENUM transaction_type "取引タイプ (buy/sell)"
         decimal volume "取引数量"
         decimal price "取引単価"
         decimal tax "手数料"
         timestamp date "取引日"
-        UUID broker_id FK "証券会社ID"
     }
 
     holding {
@@ -104,13 +103,13 @@ erDiagram
         UUID owner_id FK "オーナーID"
         UUID stock_id FK "銘柄ID"
         boolean nisa "NISAかどうか"
-        decimal quantity "現在の保有数量"
+        decimal current_volume "現在の保有数量"
         decimal average_price "平均取得単価"
     }
 
-    incomes {
+    income {
         UUID id PK
-        UUID position_id FK "ポジションID"
+        UUID holding_id FK "ポジションID"
         ENUM income_type "収入タイプ (dividend/preferential)"
         decimal amount "金額"
         timestamp date "受取日"
@@ -135,6 +134,6 @@ erDiagram
 
     owner ||--o{ holding : "保有する"
     stock ||--o{ holding : "属する"
-    holding ||--o{ transactions : "取引履歴"
-    holding ||--o{ incomes : "収入履歴"
+    holding ||--o{ transaction : "取引履歴"
+    holding ||--o{ income : "収入履歴"
     sector ||--o{ stock : "属する"

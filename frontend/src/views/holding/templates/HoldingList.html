@@ -28,8 +28,8 @@
         <td>{{ holding.stock.code }}</td>
         <td>{{ holding.stock.name }}</td>
         <td>{{ holding.owner.name }}</td>
-        <td>{{ holding.quantity }}</td>
-        <td>{{ holding.acquisition_price }}</td>
+        <td>{{ holding.current_volume }}</td>
+        <td>{{ holding.current_price }}</td>
         <td>
           <button @click="editHolding(holding.id)" class="btn btn-secondary">編集</button>
           <button @click="deleteHolding(holding.id)" class="btn btn-danger">削除</button>
