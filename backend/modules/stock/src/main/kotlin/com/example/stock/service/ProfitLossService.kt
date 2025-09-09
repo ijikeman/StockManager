@@ -7,6 +7,13 @@ import com.example.stock.repository.IncomeHistoryRepository
 import com.example.stock.provider.FinanceProvider
 import org.springframework.stereotype.Service
 
+/**
+ * 損益サマリーを表すデータクラス。
+ * @property realizedPl 実現損益
+ * @property unrealizedPl 未実現損益
+ * @property dividendIncome 配当収益
+ * @property totalPl 合計損益
+ */
 data class ProfitLossSummary(
     val realizedPl: Double,
     val unrealizedPl: Double,
@@ -14,6 +21,9 @@ data class ProfitLossSummary(
     val totalPl: Double
 )
 
+/**
+ * 損益を計算するサービスクラス。
+ */
 @Service
 class ProfitLossService(
     private val holdingRepository: HoldingRepository,
@@ -22,6 +32,11 @@ class ProfitLossService(
     private val financeProvider: FinanceProvider
 ) {
 
+    /**
+     * 指定された所有者の合計損益を計算します。
+     * @param ownerId 所有者ID
+     * @return 損益サマリー
+     */
     fun calculateTotalProfitLoss(ownerId: Int): ProfitLossSummary {
         val holdings = holdingRepository.findByOwnerId(ownerId)
 
@@ -43,6 +58,11 @@ class ProfitLossService(
         )
     }
 
+    /**
+     * 指定された保有株の実現損益を計算します。
+     * @param holdingId 保有株ID
+     * @return 実現損益
+     */
     private fun calculateRealizedPlForHolding(holdingId: Int): Double {
         val sellTransactions = transactionRepository.findByHoldingId(holdingId)
             .filter { it.transaction_type.equals("sell", ignoreCase = true) }
@@ -54,9 +74,14 @@ class ProfitLossService(
         }
     }
 
+    /**
+     * 指定された保有株の未実現損益を計算します。
+     * @param holding 保有株
+     * @return 未実現損益
+     */
     private fun calculateUnrealizedPlForHolding(holding: Holding): Double {
         val stockInfo = financeProvider.fetchStockInfo(holding.stock.code)
-        val currentPrice = stockInfo?.currentPrice ?: holding.stock.current_price
+        val currentPrice = stockInfo?.price ?: holding.stock.current_price
 
         if (currentPrice == 0.0) {
             return 0.0 // Or handle as an error
@@ -65,6 +90,11 @@ class ProfitLossService(
         return (currentPrice - holding.average_price) * holding.current_volume
     }
 
+    /**
+     * 指定された保有株の配当収益を計算します。
+     * @param holdingId 保有株ID
+     * @return 配当収益
+     */
     private fun calculateDividendIncomeForHolding(holdingId: Int): Double {
         return incomeHistoryRepository.findByHoldingId(holdingId)
             .sumOf { it.amount }

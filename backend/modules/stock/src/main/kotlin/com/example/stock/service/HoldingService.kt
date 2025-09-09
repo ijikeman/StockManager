@@ -10,7 +10,7 @@ open class HoldingService(private val holdingRepository: HoldingRepository) {
         return holdingRepository.findAll()
     }
 
-    open fun findByOwnerId(owner_id: Int): Holding? {
+    open fun findByOwnerId(owner_id: Int): List<Holding> {
         return holdingRepository.findByOwnerId(owner_id)
     }
 
