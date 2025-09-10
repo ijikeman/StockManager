@@ -6,11 +6,23 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Column
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
 
+/**
+ * 取引履歴のエンティティ
+ * 株式の売買履歴を記録します。
+ *
+ * @property id 取引ID (主キー)
+ * @property holding この取引が関連する保有株式 ([Holding]エンティティへの参照)
+ * @property transaction_type 取引種別 ("buy" または "sell")
+ * @property volume 取引数量
+ * @property price 取引単価
+ * @property average_price_at_transaction 取引時点での平均取得単価 (売却時の損益計算に使用)
+ * @property tax 取引手数料
+ * @property date 取引日
+ */
 @Entity
 @Table(name = "transaction")
 data class Transaction(

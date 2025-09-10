@@ -20,6 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDate
 import java.util.Optional
 
+/**
+ * [ProfitLossService] の単体テストクラス
+ * Mockito を使用して、依存関係をモック化し、サービスクラスのロジックのみをテストします。
+ */
 @ExtendWith(MockitoExtension::class)
 class ProfitLossServiceTest {
 
@@ -38,9 +42,13 @@ class ProfitLossServiceTest {
     @Mock
     private lateinit var financeProvider: FinanceProvider
 
+    /**
+     * `calculateTotalProfitLoss` メソッドのテストケース
+     * - 確定損益、含み損益、配当金収益が正しく計算され、合計されることを確認します。
+     */
     @Test
     fun `calculateTotalProfitLoss should return correct summary`() {
-        // Arrange
+        // Arrange: テストデータの準備とモックの設定
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0, dividend = 0.0)
         val holding = Holding(id = 1, owner = owner, stock = stock, current_volume = 100, average_price = 1000.0, nisa = false)
@@ -51,7 +59,7 @@ class ProfitLossServiceTest {
             transaction_type = "sell",
             volume = 50,
             price = 1200.0,
-            average_price_at_transaction = 1000.0, // Use the holding's average price at the time
+            average_price_at_transaction = 1000.0, // 売却時の平均取得単価
             tax = 500.0,
             date = LocalDate.now()
         )
@@ -70,17 +78,17 @@ class ProfitLossServiceTest {
         `when`(incomeHistoryRepository.findByHoldingId(holding.id)).thenReturn(listOf(dividend))
         `when`(financeProvider.fetchStockInfo(stock.code)).thenReturn(StockInfo(price = 1500.0, dividend = 0.0, earnings_date = null))
 
-        // Act
+        // Act: テスト対象メソッドの実行
         val summary = profitLossService.calculateTotalProfitLoss(ownerId)
 
-        // Assert
-        // Realized P/L = (1200 - 1000) * 50 - 500 = 200 * 50 - 500 = 10000 - 500 = 9500
+        // Assert: 結果の検証
+        // 確定損益 = (1200 - 1000) * 50 - 500 = 9500
         assertEquals(9500.0, summary.realizedPl)
-        // Unrealized P/L = (1500 - 1000) * 100 = 500 * 100 = 50000
+        // 含み損益 = (1500 - 1000) * 100 = 50000
         assertEquals(50000.0, summary.unrealizedPl)
-        // Dividend Income = 10000
+        // 配当金収益 = 10000
         assertEquals(10000.0, summary.dividendIncome)
-        // Total P/L = 9500 + 50000 + 10000 = 69500
+        // 合計損益 = 9500 + 50000 + 10000 = 69500
         assertEquals(69500.0, summary.totalPl)
     }
 }

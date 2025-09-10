@@ -11,6 +11,16 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
 import java.time.LocalDate
 
+/**
+ * 収益履歴のエンティティ
+ * 配当金や株主優待など、売買以外の収益を記録します。
+ *
+ * @property id 収益履歴ID (主キー)
+ * @property holding この収益が関連する保有株式 ([Holding]エンティティへの参照)
+ * @property income_type 収益種別 ("dividend" や "preferential" など)
+ * @property amount 金額
+ * @property date 発生日
+ */
 @Entity
 @Table(name = "income_history")
 data class IncomeHistory(

@@ -1,15 +1,18 @@
+-- ユーザー情報を管理するテーブル
 -- ownerテーブル
 CREATE TABLE IF NOT EXISTS owner (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL
 );
 
+-- 銘柄のセクター情報を管理するテーブル
 -- sectorテーブル
 CREATE TABLE IF NOT EXISTS sector (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL
 );
 
+-- 株式銘柄の基本情報を管理するテーブル
 -- stockテーブル
 CREATE TABLE IF NOT EXISTS stock (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -22,6 +25,7 @@ CREATE TABLE IF NOT EXISTS stock (
     FOREIGN KEY (sector_id) REFERENCES sector(id)
 );
 
+-- ユーザーが保有している株式の情報を管理するテーブル
 -- holdingテーブル
 CREATE TABLE IF NOT EXISTS holding (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -35,6 +39,7 @@ CREATE TABLE IF NOT EXISTS holding (
     FOREIGN KEY (stock_id) REFERENCES stock(id)
 );
 
+-- 株式の取引履歴を管理するテーブル (売買)
 -- transactionテーブル
 CREATE TABLE IF NOT EXISTS transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -48,6 +53,7 @@ CREATE TABLE IF NOT EXISTS transaction (
     FOREIGN KEY (holding_id) REFERENCES holding(id)
 );
 
+-- 配当金や優待などの収益履歴を管理するテーブル
 -- income_historyテーブル
 CREATE TABLE IF NOT EXISTS income_history (
     id INT PRIMARY KEY AUTO_INCREMENT,
