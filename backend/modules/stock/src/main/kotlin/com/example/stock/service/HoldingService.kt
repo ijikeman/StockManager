@@ -10,8 +10,8 @@ open class HoldingService(private val holdingRepository: HoldingRepository) {
         return holdingRepository.findAll()
     }
 
-    open fun findByOwnerId(owner_id: Int): List<Holding> {
-        return holdingRepository.findByOwnerId(owner_id)
+    open fun findByOwnerId(ownerId: Int): List<Holding> {
+        return holdingRepository.findByOwnerId(ownerId)
     }
 
     /**
