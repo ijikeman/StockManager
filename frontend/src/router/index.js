@@ -8,6 +8,8 @@ import SectorAddEdit from '../views/sector/AddEdit.vue';
 import HoldingList from '../views/holding/List.vue';
 import TransactionList from '../views/transaction/List.vue';
 import TransactionAddEdit from '../views/transaction/AddEdit.vue';
+import IncomeList from '../views/income/List.vue';
+import IncomeAddEdit from '../views/income/AddEdit.vue';
 
 const routes = [
   {
@@ -33,6 +35,22 @@ const routes = [
     path: '/transaction/edit/:id',
     name: 'TransactionEdit',
     component: TransactionAddEdit,
+    props: true
+  },
+  {
+    path: '/income',
+    name: 'IncomeList',
+    component: IncomeList
+  },
+  {
+    path: '/income/add',
+    name: 'IncomeAdd',
+    component: IncomeAddEdit
+  },
+  {
+    path: '/income/edit/:id',
+    name: 'IncomeEdit',
+    component: IncomeAddEdit,
     props: true
   },
   {
