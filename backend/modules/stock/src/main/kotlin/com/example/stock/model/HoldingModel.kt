@@ -6,21 +6,21 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.Column
-import jakarta.validation.constraints.Pattern
-import jakarta.validation.constraints.NotBlank
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
 
-/* 
-    holding {
-        UUID id PK
-        UUID owner_id FK "株式を保有するユーザーID"
-        UUID stock_id FK "保有銘柄ID"
-        integer current_volume "現在保有している株数"
-        decimal average_price "購入にかかった平均取得単価"
-        timestamp updated_at "最終更新日時"
-    }
-*/
+/**
+ * 保有株式のエンティティ
+ * どのユーザーがどの銘柄をどれだけ保有しているかを管理します。
+ *
+ * @property id 保有ID (主キー)
+ * @property owner 株式を保有するユーザー ([Owner]エンティティへの参照)
+ * @property stock 保有する株式銘柄 ([Stock]エンティティへの参照)
+ * @property nisa NISA口座での保有かどうかを示すフラグ
+ * @property current_volume 現在の保有数量
+ * @property average_price 平均取得単価
+ * @property updated_at 最終更新日時
+ */
 @Entity
 @Table(name = "holding")
 data class Holding (
@@ -36,23 +36,15 @@ data class Holding (
     @JoinColumn(name = "stock_id")
     val stock: Stock,
 
-    @field:NotBlank(message = "NISAは必須です")
     @Column(name = "nisa", nullable = false)
-    @JoinColumn(name = "nisa")
     val nisa: Boolean = false,
 
-    @field:NotBlank(message = "数量は必須です")
-    @field:Pattern(regexp = "^[0-9]+$", message = "数量は数字のみで構成される必要があります")
     @Column(name = "current_volume", nullable = false)
     val current_volume: Int = 0,
 
-    @field:NotBlank(message = "平均取得単価は必須です")
-    @field:Pattern(regexp = "^[0-9]+$", message = "平均取得単価は数字のみで構成される必要があります")
     @Column(name = "average_price", nullable = false)
     val average_price: Double = 0.0,
 
-    @field:NotBlank(message = "最終更新日時は必須です")
-    @field:Pattern(regexp = "^[0-9]+$", message = "最終更新日時は数字のみで構成される必要があります")
     @Column(name = "updated_at")
     val updated_at: java.time.LocalDate? = null
 )
