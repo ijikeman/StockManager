@@ -6,6 +6,8 @@ import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
 import HoldingList from '../views/holding/List.vue';
+import TransactionList from '../views/transaction/List.vue';
+import TransactionAddEdit from '../views/transaction/AddEdit.vue';
 
 const routes = [
   {
@@ -16,6 +18,22 @@ const routes = [
     path: '/holding',
     name: 'HoldingList',
     component: HoldingList
+  },
+  {
+    path: '/transaction',
+    name: 'TransactionList',
+    component: TransactionList
+  },
+  {
+    path: '/transaction/add',
+    name: 'TransactionAdd',
+    component: TransactionAddEdit
+  },
+  {
+    path: '/transaction/edit/:id',
+    name: 'TransactionEdit',
+    component: TransactionAddEdit,
+    props: true
   },
   {
     path: '/owner',
