@@ -42,5 +42,3 @@ export default {
   }
 };
 </script>
-
-<style src="./List.css" scoped></style>

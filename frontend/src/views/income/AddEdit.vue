@@ -76,5 +76,3 @@ export default {
   }
 };
 </script>
-
-<style src="./AddEdit.css" scoped></style>
