@@ -1,0 +1,30 @@
+<div class="form-container">
+  <h3 class="form-title">{{ isEditing ? '配当編集' : '新規配当追加' }}</h3>
+
+  <form @submit.prevent="saveIncome" class="form-inline">
+    <input
+      type="date"
+      v-model="formData.date"
+      required
+      class="form-control"
+    >
+    <select v-model="formData.stock_code" required class="form-control">
+      <option :value="null" disabled>銘柄を選択</option>
+      <option v-for="stock in stocks" :key="stock.code" :value="stock.code">
+        {{ stock.name }} ({{ stock.code }})
+      </option>
+    </select>
+    <input
+      type="number"
+      v-model="formData.amount"
+      placeholder="金額"
+      required
+      class="form-control"
+    >
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>

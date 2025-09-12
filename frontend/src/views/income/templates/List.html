@@ -1,0 +1,32 @@
+<div>
+  <div class="page-header">
+    <h1 class="page-title">配当履歴</h1>
+    <div>
+      <button @click="goToAddIncome" class="btn btn-primary">新規登録</button>
+    </div>
+  </div>
+
+  <table class="common-table">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>銘柄コード</th>
+        <th>銘柄名</th>
+        <th>金額</th>
+        <th>アクション</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="income in incomes" :key="income.id">
+        <td>{{ income.date }}</td>
+        <td>{{ income.stock.code }}</td>
+        <td>{{ income.stock.name }}</td>
+        <td>{{ income.amount }}</td>
+        <td>
+          <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>
+          <button @click="deleteIncome(income.id)" class="btn btn-danger">削除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
