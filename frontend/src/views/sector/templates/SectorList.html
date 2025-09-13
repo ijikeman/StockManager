@@ -14,7 +14,7 @@
   </div>
 
   <!-- セクターを表示するためのテーブル -->
-  <table class="common-table">
+  <table class="common-table" v-if="sectors.length > 0">
     <!-- テーブルヘッダー -->
     <thead>
       <tr>
@@ -36,4 +36,7 @@
       </tr>
     </tbody>
   </table>
+  <div v-else>
+    <p>データはありません</p>
+  </div>
 </div>

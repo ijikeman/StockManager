@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <table class="common-table">
+  <table class="common-table" v-if="incomes.length > 0">
     <thead>
       <tr>
         <th>日付</th>
@@ -29,4 +29,7 @@
       </tr>
     </tbody>
   </table>
+  <div v-else>
+    <p>データはありません</p>
+  </div>
 </div>
