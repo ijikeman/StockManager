@@ -19,6 +19,9 @@ data class TransactionAddRequest(
     @field:NotBlank(message = "Stock code is mandatory")
     val stock_code: String,
 
+    @field:NotNull(message = "Owner ID is mandatory")
+    val owner_id: Int,
+
     @field:NotNull(message = "Quantity is mandatory")
     @field:Positive(message = "Quantity must be positive")
     val quantity: Int,

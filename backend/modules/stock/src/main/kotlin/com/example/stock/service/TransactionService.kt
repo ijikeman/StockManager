@@ -27,6 +27,8 @@ class TransactionService(
             code = this.holding.stock.code,
             name = this.holding.stock.name
         ),
+        owner_id = this.holding.owner.id,
+        owner_name = this.holding.owner.name,
         quantity = this.volume,
         price = this.price,
         fees = this.tax
@@ -43,11 +45,8 @@ class TransactionService(
     }
 
     fun createTransaction(request: TransactionAddRequest): TransactionDTO {
-        val stock = stockRepository.findByCode(request.stock_code)
-            ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
-
-        val holding = holdingRepository.findByStock(stock)
-            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code}")
+        val holding = holdingRepository.findByStockCodeAndOwnerId(request.stock_code, request.owner_id)
+            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code} and owner id: ${request.owner_id}")
 
         val transaction = Transaction(
             holding = holding,
@@ -67,11 +66,8 @@ class TransactionService(
         val transactionToUpdate = transactionRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Transaction not found with id: $id") }
 
-        val stock = stockRepository.findByCode(request.stock_code)
-            ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
-
-        val holding = holdingRepository.findByStock(stock)
-            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code}")
+        val holding = holdingRepository.findByStockCodeAndOwnerId(request.stock_code, request.owner_id)
+            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code} and owner id: ${request.owner_id}")
 
         val updatedTransaction = transactionToUpdate.copy(
             holding = holding,

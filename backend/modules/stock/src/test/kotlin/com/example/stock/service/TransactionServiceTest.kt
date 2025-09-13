@@ -34,21 +34,21 @@ class TransactionServiceTest {
     fun `createTransaction should create and return transaction DTO`() {
         // given
         val stockCode = "1234"
+        val owner = Owner(id = 1, name = "Test Owner")
         val request = TransactionAddRequest(
             date = LocalDate.now(),
             type = "buy",
             stock_code = stockCode,
+            owner_id = owner.id,
             quantity = 100,
             price = 500.0,
             fees = 10.0
         )
 
-        val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = stockCode, name = "Test Stock")
         val holding = Holding(id = 1, owner = owner, stock = stock, average_price = 450.0)
 
-        mockitoWhen(stockRepository.findByCode(stockCode)).thenReturn(stock)
-        mockitoWhen(holdingRepository.findByStock(stock)).thenReturn(holding)
+        mockitoWhen(holdingRepository.findByStockCodeAndOwnerId(stockCode, owner.id)).thenReturn(holding)
         // When save is called, just return the argument that was passed to it
         mockitoWhen(transactionRepository.save(any(Transaction::class.java))).thenAnswer { invocation ->
             invocation.getArgument(0)

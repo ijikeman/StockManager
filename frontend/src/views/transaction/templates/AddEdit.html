@@ -18,6 +18,12 @@
         {{ stock.name }} ({{ stock.code }})
       </option>
     </select>
+    <select v-model="formData.owner_id" required class="form-control">
+      <option :value="null" disabled>オーナーを選択</option>
+      <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+        {{ owner.name }}
+      </option>
+    </select>
     <input
       type="number"
       v-model="formData.quantity"

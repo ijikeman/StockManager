@@ -37,4 +37,14 @@ interface HoldingRepository : JpaRepository<Holding, Int> {
      */
     @Query("SELECT h FROM Holding h JOIN h.stock s WHERE s.code = :stockCode")
     fun findByStockCode(@Param("stockCode") stockCode: String): Holding?
+
+    /**
+     * 指定された銘柄コードとオーナーIDに紐づく保有株式を取得します。
+     *
+     * @param stockCode 検索対象の銘柄コード
+     * @param ownerId 検索対象のオーナーID
+     * @return 見つかった保有株式
+     */
+    @Query("SELECT h FROM Holding h JOIN h.stock s JOIN h.owner o WHERE s.code = :stockCode AND o.id = :ownerId")
+    fun findByStockCodeAndOwnerId(@Param("stockCode") stockCode: String, @Param("ownerId") ownerId: Int): Holding?
 }
