@@ -3,8 +3,10 @@ package com.example.stock.service
 import com.example.stock.dto.StockInfoDTO
 import com.example.stock.dto.TransactionAddRequest
 import com.example.stock.dto.TransactionDTO
+import com.example.stock.model.Holding
 import com.example.stock.model.Transaction
 import com.example.stock.repository.HoldingRepository
+import com.example.stock.repository.OwnerRepository
 import com.example.stock.repository.StockRepository
 import com.example.stock.repository.TransactionRepository
 import jakarta.persistence.EntityNotFoundException
@@ -16,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 class TransactionService(
     private val transactionRepository: TransactionRepository,
     private val holdingRepository: HoldingRepository,
-    private val stockRepository: StockRepository
+    private val stockRepository: StockRepository,
+    private val ownerRepository: OwnerRepository
 ) {
 
     /**
@@ -67,7 +70,20 @@ class TransactionService(
      */
     fun createTransaction(request: TransactionAddRequest): TransactionDTO {
         val holding = holdingRepository.findByStockCodeAndOwnerId(request.stock_code, request.owner_id)
-            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code} and owner id: ${request.owner_id}")
+            ?: run {
+                val stock = stockRepository.findByCode(request.stock_code)
+                    ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
+                val owner = ownerRepository.findById(request.owner_id)
+                    .orElseThrow { EntityNotFoundException("Owner not found with id: ${request.owner_id}") }
+                val newHolding = Holding(
+                    owner = owner,
+                    stock = stock,
+                    nisa = false, // NISAフラグはリクエストに含まれていないため、デフォルトでfalseに設定
+                    current_volume = 0,
+                    average_price = 0.0
+                )
+                holdingRepository.save(newHolding)
+            }
 
         val transaction = Transaction(
             holding = holding,
