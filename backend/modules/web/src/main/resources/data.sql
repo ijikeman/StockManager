@@ -1,6 +1,6 @@
 -- owner
--- INSERT INTO owner(name) VALUES
--- ('Father');
+INSERT INTO owner(name) VALUES
+('Father');
 
 -- sector
 -- 銘柄種別
@@ -68,5 +68,5 @@ INSERT INTO stock(code, name, current_price, dividend, earnings_date, sector_id)
 ('3923', 'ラクス', 0, 0, NULL, 20);
 
 -- holding
--- INSERT INTO holding(owner_id, stock_id, current_volume, average_price, updated_at) VALUES
--- (1, 1, 100, 1000, NULL);
+INSERT INTO holding(owner_id, stock_id, current_volume, average_price, updated_at) VALUES
+(1, 1, 100, 1000, NULL);

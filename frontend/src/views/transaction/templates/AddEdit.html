@@ -24,6 +24,15 @@
         {{ owner.name }}
       </option>
     </select>
+    <div class="form-check">
+      <input
+        type="checkbox"
+        v-model="formData.nisa"
+        id="nisa-checkbox"
+        class="form-check-input"
+      >
+      <label for="nisa-checkbox" class="form-check-label">NISA</label>
+    </div>
     <input
       type="number"
       v-model="formData.quantity"

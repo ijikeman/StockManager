@@ -41,6 +41,9 @@ class TransactionServiceTest {
     @Captor
     private lateinit var transactionCaptor: ArgumentCaptor<Transaction>
 
+    @Captor
+    private lateinit var holdingCaptor: ArgumentCaptor<Holding>
+
     @Test
     fun `createTransaction should create and return transaction DTO`() {
         // given
@@ -53,7 +56,8 @@ class TransactionServiceTest {
             owner_id = owner.id,
             quantity = 100,
             price = 500.0,
-            fees = 10.0
+            fees = 10.0,
+            nisa = true
         )
 
         val stock = Stock(id = 1, code = stockCode, name = "Test Stock")
@@ -91,7 +95,8 @@ class TransactionServiceTest {
             owner_id = ownerId,
             quantity = 50,
             price = 1000.0,
-            fees = 20.0
+            fees = 20.0,
+            nisa = true
         )
 
         val stock = Stock(id = 2, code = stockCode, name = "Another Stock")
@@ -109,9 +114,10 @@ class TransactionServiceTest {
         val result = transactionService.createTransaction(request)
 
         // then
-        verify(holdingRepository).save(any(Holding::class.java))
+        verify(holdingRepository).save(holdingCaptor.capture())
         verify(transactionRepository).save(transactionCaptor.capture())
         val capturedTransaction = transactionCaptor.value
+        val capturedHolding = holdingCaptor.value
 
         // Assert DTO properties
         assertThat(result).isNotNull
@@ -125,5 +131,8 @@ class TransactionServiceTest {
         assertThat(capturedTransaction.holding.owner.id).isEqualTo(ownerId)
         assertThat(capturedTransaction.holding.stock.code).isEqualTo(stockCode)
         assertThat(capturedTransaction.volume).isEqualTo(request.quantity)
+
+        // Assert captured Holding entity properties
+        assertThat(capturedHolding.nisa).isTrue()
     }
 }

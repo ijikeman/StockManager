@@ -78,7 +78,7 @@ class TransactionService(
                 val newHolding = Holding(
                     owner = owner,
                     stock = stock,
-                    nisa = false, // NISAフラグはリクエストに含まれていないため、デフォルトでfalseに設定
+                    nisa = request.nisa,
                     current_volume = 0,
                     average_price = 0.0
                 )
