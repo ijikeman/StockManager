@@ -20,7 +20,8 @@ export default {
         owner_id: null,
         quantity: null,
         price: null,
-        fees: null
+        fees: null,
+        nisa: false
       },
       stocks: [],
       owners: []
