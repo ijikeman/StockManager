@@ -1,59 +1,91 @@
 <div class="form-container">
   <h3 class="form-title">{{ isEditing ? '取引編集' : '新規取引追加' }}</h3>
 
-  <form @submit.prevent="saveTransaction" class="form-inline">
-    <input
-      type="date"
-      v-model="formData.date"
-      required
-      class="form-control"
-    >
-    <select v-model="formData.type" required class="form-control">
-      <option value="buy">Buy</option>
-      <option value="sell">Sell</option>
-    </select>
-    <select v-model="formData.stock_code" required class="form-control">
-      <option :value="null" disabled>銘柄を選択</option>
-      <option v-for="stock in stocks" :key="stock.code" :value="stock.code">
-        {{ stock.name }} ({{ stock.code }})
-      </option>
-    </select>
-    <select v-model="formData.owner_id" required class="form-control">
-      <option :value="null" disabled>オーナーを選択</option>
-      <option v-for="owner in owners" :key="owner.id" :value="owner.id">
-        {{ owner.name }}
-      </option>
-    </select>
-    <div class="form-check">
+  <form @submit.prevent="saveTransaction">
+    <div class="form-group">
+      <label for="date">日付</label>
+      <input
+        id="date"
+        type="date"
+        v-model="formData.date"
+        required
+        class="form-control"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="type">種別</label>
+      <select id="type" v-model="formData.type" required class="form-control">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="stock">銘柄</label>
+      <select id="stock" v-model="formData.stock_code" required class="form-control">
+        <option :value="null" disabled>銘柄を選択</option>
+        <option v-for="stock in stocks" :key="stock.code" :value="stock.code">
+          {{ stock.name }} ({{ stock.code }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="owner">オーナー</label>
+      <select id="owner" v-model="formData.owner_id" required class="form-control">
+        <option :value="null" disabled>オーナーを選択</option>
+        <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+          {{ owner.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="quantity">数量</label>
+      <input
+        id="quantity"
+        type="number"
+        v-model="formData.quantity"
+        placeholder="数量"
+        required
+        class="form-control"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="price">価格</label>
+      <input
+        id="price"
+        type="number"
+        v-model="formData.price"
+        placeholder="価格"
+        required
+        class="form-control"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="fees">手数料</label>
+      <input
+        id="fees"
+        type="number"
+        v-model="formData.fees"
+        placeholder="手数料"
+        required
+        class="form-control"
+      >
+    </div>
+
+    <div class="form-group form-check">
       <input
         type="checkbox"
         v-model="formData.nisa"
         id="nisa-checkbox"
         class="form-check-input"
       >
-      <label for="nisa-checkbox" class="form-check-label">NISA</label>
+      <label for="nisa-checkbox" class="form-check-label">NISA口座</label>
     </div>
-    <input
-      type="number"
-      v-model="formData.quantity"
-      placeholder="数量"
-      required
-      class="form-control"
-    >
-    <input
-      type="number"
-      v-model="formData.price"
-      placeholder="価格"
-      required
-      class="form-control"
-    >
-    <input
-      type="number"
-      v-model="formData.fees"
-      placeholder="手数料"
-      required
-      class="form-control"
-    >
 
     <div class="form-actions">
       <button type="submit" class="btn btn-success">保存</button>
