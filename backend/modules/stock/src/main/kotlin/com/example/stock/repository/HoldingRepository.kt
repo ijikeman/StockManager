@@ -17,4 +17,12 @@ interface HoldingRepository : JpaRepository<Holding, Int> {
      * @return 見つかった保有株式のリスト
      */
     fun findByOwnerId(ownerId: Int): List<Holding>
+
+    /**
+     * 指定された銘柄IDに紐づくすべての保有株式を取得します。
+     *
+     * @param stockId 検索対象の銘柄ID
+     * @return 見つかった保有株式のリスト
+     */
+    fun findByStockId(stockId: Int): List<Holding>
 }
