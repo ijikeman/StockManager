@@ -17,11 +17,13 @@ export default {
         date: new Date().toISOString().slice(0, 10),
         type: 'buy',
         stock_code: '',
+        owner_id: null,
         quantity: null,
         price: null,
         fees: null
       },
-      stocks: []
+      stocks: [],
+      owners: []
     };
   },
   computed: {
@@ -36,6 +38,14 @@ export default {
         this.stocks = response.data;
       } catch (error) {
         console.error('Error fetching stocks:', error);
+      }
+    },
+    async fetchOwners() {
+      try {
+        const response = await axios.get('/api/owner');
+        this.owners = response.data;
+      } catch (error) {
+        console.error('Error fetching owners:', error);
       }
     },
     async fetchTransaction() {
@@ -70,6 +80,7 @@ export default {
   },
   created() {
     this.fetchStocks();
+    this.fetchOwners();
     this.fetchTransaction();
   },
   watch: {
