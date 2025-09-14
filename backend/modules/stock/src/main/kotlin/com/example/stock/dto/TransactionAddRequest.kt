@@ -33,5 +33,7 @@ data class TransactionAddRequest(
     @field:NotNull(message = "Fees are mandatory")
     val fees: Double,
 
-    val nisa: Boolean = false
+    val nisa: Boolean = false,
+
+    val lot_id: Int? = null
 )

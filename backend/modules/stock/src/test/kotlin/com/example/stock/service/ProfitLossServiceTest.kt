@@ -1,15 +1,12 @@
 package com.example.stock.service
 
-import com.example.stock.model.Holding
-import com.example.stock.model.Owner
-import com.example.stock.model.Stock
-import com.example.stock.model.Transaction
-import com.example.stock.model.IncomeHistory
+import com.example.stock.model.*
 import com.example.stock.provider.FinanceProvider
 import com.example.stock.provider.StockInfo
-import com.example.stock.repository.HoldingRepository
+import com.example.stock.repository.BenefitHistoryRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.StockLotRepository
 import com.example.stock.repository.TransactionRepository
-import com.example.stock.repository.IncomeHistoryRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,13 +14,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.Optional
 
-/**
- * [ProfitLossService] の単体テストクラス
- * Mockito を使用して、依存関係をモック化し、サービスクラスのロジックのみをテストします。
- */
 @ExtendWith(MockitoExtension::class)
 class ProfitLossServiceTest {
 
@@ -31,64 +24,56 @@ class ProfitLossServiceTest {
     private lateinit var profitLossService: ProfitLossService
 
     @Mock
-    private lateinit var holdingRepository: HoldingRepository
+    private lateinit var stockLotRepository: StockLotRepository
 
     @Mock
     private lateinit var transactionRepository: TransactionRepository
 
     @Mock
-    private lateinit var incomeHistoryRepository: IncomeHistoryRepository
+    private lateinit var incomingHistoryRepository: IncomingHistoryRepository
+
+    @Mock
+    private lateinit var benefitHistoryRepository: BenefitHistoryRepository
 
     @Mock
     private lateinit var financeProvider: FinanceProvider
 
-    /**
-     * `calculateTotalProfitLoss` メソッドのテストケース
-     * - 確定損益、含み損益、配当金収益が正しく計算され、合計されることを確認します。
-     */
     @Test
     fun `calculateTotalProfitLoss should return correct summary`() {
-        // Arrange: テストデータの準備とモックの設定
+        // Arrange
         val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0, dividend = 0.0)
-        val holding = Holding(id = 1, owner = owner, stock = stock, current_volume = 100, average_price = 1000.0, nisa = false)
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0)
+        val lot = StockLot(id = 1, owner = owner, stock = stock, quantity = 100, status = LotStatus.HOLDING)
 
+        val buyTransaction = Transaction(
+            id = 1, stockLot = lot, type = TransactionType.BUY, quantity = 100,
+            price = BigDecimal("1000.0"), tax = BigDecimal.ZERO, transaction_date = LocalDate.now()
+        )
         val sellTransaction = Transaction(
-            id = 1,
-            holding = holding,
-            transaction_type = "sell",
-            volume = 50,
-            price = 1200.0,
-            average_price_at_transaction = 1000.0, // 売却時の平均取得単価
-            tax = 500.0,
-            date = LocalDate.now()
+            id = 2, stockLot = lot, type = TransactionType.SELL, quantity = 50,
+            price = BigDecimal("1200.0"), tax = BigDecimal("500.0"), transaction_date = LocalDate.now()
         )
 
-        val dividend = IncomeHistory(
-            id = 1,
-            holding = holding,
-            income_type = "dividend",
-            amount = 10000.0,
-            date = LocalDate.now()
-        )
+        val incoming = IncomingHistory(id = 1, stockLot = lot, incoming = BigDecimal("10000.0"), payment_date = LocalDate.now())
+        val benefit = BenefitHistory(id = 1, stockLot = lot, benefit = BigDecimal("5000.0"))
 
-        val ownerId = 1
-        `when`(holdingRepository.findByOwnerId(ownerId)).thenReturn(listOf(holding))
-        `when`(transactionRepository.findByHoldingId(holding.id)).thenReturn(listOf(sellTransaction))
-        `when`(incomeHistoryRepository.findByHoldingId(holding.id)).thenReturn(listOf(dividend))
+        `when`(stockLotRepository.findByOwnerId(owner.id)).thenReturn(listOf(lot))
+        `when`(transactionRepository.findByStockLotId(lot.id)).thenReturn(listOf(buyTransaction, sellTransaction))
+        `when`(incomingHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(incoming))
+        `when`(benefitHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(benefit))
         `when`(financeProvider.fetchStockInfo(stock.code)).thenReturn(StockInfo(price = 1500.0, dividend = 0.0, earnings_date = null))
 
-        // Act: テスト対象メソッドの実行
-        val summary = profitLossService.calculateTotalProfitLoss(ownerId)
+        // Act
+        val summary = profitLossService.calculateTotalProfitLoss(owner.id)
 
-        // Assert: 結果の検証
-        // 確定損益 = (1200 - 1000) * 50 - 500 = 9500
-        assertEquals(9500.0, summary.realizedPl)
-        // 含み損益 = (1500 - 1000) * 100 = 50000
-        assertEquals(50000.0, summary.unrealizedPl)
-        // 配当金収益 = 10000
-        assertEquals(10000.0, summary.dividendIncome)
-        // 合計損益 = 9500 + 50000 + 10000 = 69500
-        assertEquals(69500.0, summary.totalPl)
+        // Assert
+        // Realized PL = (1200 - 1000) * 50 - 500 = 9500
+        assertEquals(BigDecimal("9500.0"), summary.realizedPl)
+        // Unrealized PL = (1500 - 1000) * (100 - 50) = 25000
+        assertEquals(BigDecimal("25000.0"), summary.unrealizedPl)
+        // Income = 10000 + 5000 = 15000
+        assertEquals(BigDecimal("15000.0"), summary.income)
+        // Total PL = 9500 + 25000 + 15000 = 49500
+        assertEquals(BigDecimal("49500.0"), summary.totalPl)
     }
 }
