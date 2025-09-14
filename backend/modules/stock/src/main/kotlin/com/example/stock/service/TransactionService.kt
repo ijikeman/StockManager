@@ -36,7 +36,8 @@ class TransactionService(
         owner_name = this.stockLot.owner.name,
         quantity = this.quantity,
         price = this.price.toDouble(),
-        fees = this.tax.toDouble()
+        fees = this.tax.toDouble(),
+        lot_id = this.stockLot.id
     )
 
     fun findAllTransactions(): List<TransactionDTO> {

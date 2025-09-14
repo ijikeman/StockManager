@@ -17,6 +17,7 @@
         <th>数量</th>
         <th>価格</th>
         <th>手数料</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -29,6 +30,14 @@
         <td>{{ transaction.quantity }}</td>
         <td>{{ transaction.price }}</td>
         <td>{{ transaction.fees }}</td>
+        <td>
+          <button
+            v-if="transaction.type === 'BUY'"
+            @click="goToSellPage(transaction.lot_id)"
+            class="btn-sm btn-sell">
+            売却
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
