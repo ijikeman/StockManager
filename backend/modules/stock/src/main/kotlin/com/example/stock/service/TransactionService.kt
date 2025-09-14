@@ -86,6 +86,10 @@ class TransactionService(
                 transaction_date = request.date
             )
             transactions.add(transactionRepository.save(transaction))
+
+            // Mark the lot as sold
+            val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
+            stockLotRepository.save(soldStockLot)
         }
 
         return transactions.map { it.toDTO() }
