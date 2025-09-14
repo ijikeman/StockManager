@@ -10,38 +10,34 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.Enumerated
 import jakarta.persistence.EnumType
-import java.math.BigDecimal
-import java.time.LocalDate
 
-enum class TransactionType {
-    BUY,
-    SELL
+enum class LotStatus {
+    HOLDING,
+    SOLD
 }
 
 @Entity
-@Table(name = "transaction")
-data class Transaction(
+@Table(name = "stock_lot")
+data class StockLot(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
 
     @ManyToOne
-    @JoinColumn(name = "lot_id")
-    val stockLot: StockLot,
+    @JoinColumn(name = "owner_id")
+    val owner: Owner,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    val type: TransactionType,
+    @ManyToOne
+    @JoinColumn(name = "stock_id")
+    val stock: Stock,
 
     @Column(name = "quantity", nullable = false)
     val quantity: Int,
 
-    @Column(name = "price", nullable = false)
-    val price: BigDecimal,
+    @Column(name = "is_nisa", nullable = false)
+    val isNisa: Boolean = false,
 
-    @Column(name = "tax", nullable = false)
-    val tax: BigDecimal,
-
-    @Column(name = "transaction_date", nullable = false)
-    val transaction_date: LocalDate
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    val status: LotStatus = LotStatus.HOLDING
 )

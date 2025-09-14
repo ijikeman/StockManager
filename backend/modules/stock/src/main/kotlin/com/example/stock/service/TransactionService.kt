@@ -3,135 +3,92 @@ package com.example.stock.service
 import com.example.stock.dto.StockInfoDTO
 import com.example.stock.dto.TransactionAddRequest
 import com.example.stock.dto.TransactionDTO
-import com.example.stock.model.Holding
 import com.example.stock.model.Transaction
-import com.example.stock.repository.HoldingRepository
+import com.example.stock.model.TransactionType
 import com.example.stock.repository.OwnerRepository
 import com.example.stock.repository.StockRepository
 import com.example.stock.repository.TransactionRepository
+import com.example.stock.repository.StockLotRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 
 @Service
 @Transactional
 class TransactionService(
     private val transactionRepository: TransactionRepository,
-    private val holdingRepository: HoldingRepository,
+    private val stockLotRepository: StockLotRepository,
     private val stockRepository: StockRepository,
-    private val ownerRepository: OwnerRepository
+    private val ownerRepository: OwnerRepository,
+    private val stockLotService: StockLotService
 ) {
 
-    /**
-     * TransactionエンティティをTransactionDTOに変換します。
-     * @return TransactionDTO
-     * @throws IllegalStateException 取引日がない場合
-     */
     private fun Transaction.toDTO() = TransactionDTO(
         id = this.id,
-        date = this.date ?: throw IllegalStateException("Transaction date is null"),
-        type = this.transaction_type,
+        date = this.transaction_date,
+        type = this.type.toString(),
         stock = StockInfoDTO(
-            code = this.holding.stock.code,
-            name = this.holding.stock.name
+            code = this.stockLot.stock.code,
+            name = this.stockLot.stock.name
         ),
-        owner_id = this.holding.owner.id,
-        owner_name = this.holding.owner.name,
-        quantity = this.volume,
-        price = this.price,
-        fees = this.tax
+        owner_id = this.stockLot.owner.id,
+        owner_name = this.stockLot.owner.name,
+        quantity = this.quantity,
+        price = this.price.toDouble(),
+        fees = this.tax.toDouble()
     )
 
-    /**
-     * すべての取引を取得します。
-     * @return 取引DTOのリスト
-     */
-     fun findAllTransactions(): List<TransactionDTO> {
+    fun findAllTransactions(): List<TransactionDTO> {
         return transactionRepository.findAll().map { it.toDTO() }
     }
 
-    /**
-     * IDで取引を検索します。
-     * @param id 取引ID
-     * @return 取引DTO
-     * @throws EntityNotFoundException 指定されたIDの取引が見つからない場合
-     */
     fun findTransactionById(id: Int): TransactionDTO {
         return transactionRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Transaction not found with id: $id") }
             .toDTO()
     }
 
-    /**
-     * 新しい取引を作成します。
-     * @param request 取引追加リクエスト
-     * @return 作成された取引DTO
-     * @throws EntityNotFoundException 指定された銘柄コードまたは保有情報が見つからない場合
-     */
     fun createTransaction(request: TransactionAddRequest): TransactionDTO {
-        val holding = holdingRepository.findByStockCodeAndOwnerId(request.stock_code, request.owner_id)
-            ?: run {
-                val stock = stockRepository.findByCode(request.stock_code)
-                    ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
-                val owner = ownerRepository.findById(request.owner_id)
-                    .orElseThrow { EntityNotFoundException("Owner not found with id: ${request.owner_id}") }
-                val newHolding = Holding(
-                    owner = owner,
-                    stock = stock,
-                    nisa = request.nisa,
-                    current_volume = 0,
-                    average_price = 0.0
-                )
-                holdingRepository.save(newHolding)
-            }
+        val owner = ownerRepository.findById(request.owner_id)
+            .orElseThrow { EntityNotFoundException("Owner not found with id: ${request.owner_id}") }
+        val stock = stockRepository.findByCode(request.stock_code)
+            ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
 
-        val transaction = Transaction(
-            holding = holding,
-            transaction_type = request.type,
-            volume = request.quantity,
-            price = request.price,
-            tax = request.fees,
-            date = request.date,
-            average_price_at_transaction = holding.average_price
-        )
+        val transaction: Transaction = if (request.type.equals("BUY", ignoreCase = true)) {
+            // For a BUY transaction, we create a new lot.
+            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, request.quantity)
+            Transaction(
+                stockLot = stockLot,
+                type = TransactionType.BUY,
+                quantity = request.quantity,
+                price = request.price.toBigDecimal(),
+                tax = request.fees.toBigDecimal(),
+                transaction_date = request.date
+            )
+        } else {
+            // For a SELL transaction, we use an existing lot.
+            val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")
+            val stockLot = stockLotRepository.findById(lotId)
+                .orElseThrow { EntityNotFoundException("StockLot not found with id: $lotId") }
+
+            // Here you might want to add logic to check if the lot has enough quantity to sell.
+            // For now, we just create the transaction.
+
+            Transaction(
+                stockLot = stockLot,
+                type = TransactionType.SELL,
+                quantity = request.quantity,
+                price = request.price.toBigDecimal(),
+                tax = request.fees.toBigDecimal(),
+                transaction_date = request.date
+            )
+        }
 
         val savedTransaction = transactionRepository.save(transaction)
         return savedTransaction.toDTO()
     }
 
-    /**
-     * 取引を更新します。
-     * @param id 取引ID
-     * @param request 取引追加リクエスト
-     * @return 更新された取引DTO
-     * @throws EntityNotFoundException 指定されたIDの取引、銘柄コード、または保有情報が見つからない場合
-     */
-    fun updateTransaction(id: Int, request: TransactionAddRequest): TransactionDTO {
-        val transactionToUpdate = transactionRepository.findById(id)
-            .orElseThrow { EntityNotFoundException("Transaction not found with id: $id") }
-
-        val holding = holdingRepository.findByStockCodeAndOwnerId(request.stock_code, request.owner_id)
-            ?: throw EntityNotFoundException("Holding not found for stock code: ${request.stock_code} and owner id: ${request.owner_id}")
-
-        val updatedTransaction = transactionToUpdate.copy(
-            holding = holding,
-            transaction_type = request.type,
-            volume = request.quantity,
-            price = request.price,
-            tax = request.fees,
-            date = request.date,
-            average_price_at_transaction = holding.average_price
-        )
-
-        val savedTransaction = transactionRepository.save(updatedTransaction)
-        return savedTransaction.toDTO()
-    }
-
-    /**
-     * 取引を削除します。
-     * @param id 取引ID
-     * @throws EntityNotFoundException 指定されたIDの取引が見つからない場合
-     */
     fun deleteTransaction(id: Int) {
         if (!transactionRepository.existsById(id)) {
             throw EntityNotFoundException("Transaction not found with id: $id")

@@ -31,12 +31,6 @@ class TransactionController(
         return ResponseEntity(createdTransaction, HttpStatus.CREATED)
     }
 
-    @PutMapping("/{id}")
-    fun updateTransaction(@PathVariable id: Int, @Validated @RequestBody request: TransactionAddRequest): ResponseEntity<TransactionDTO> {
-        val updatedTransaction = transactionService.updateTransaction(id, request)
-        return ResponseEntity.ok(updatedTransaction)
-    }
-
     @DeleteMapping("/{id}")
     fun deleteTransaction(@PathVariable id: Int): ResponseEntity<Void> {
         transactionService.deleteTransaction(id)
