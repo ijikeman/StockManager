@@ -1,37 +1,32 @@
-<template src="./templates/HoldingList.html"></template>
+<template>
+  <div class="container-fluid" v-html="template"></div>
+</template>
 
 <script>
-import axios from 'axios';
+import api from '../../api';
 
 export default {
-  // コンポーネント名を'HoldingList'に設定
   name: 'HoldingList',
-  // コンポーネントのデータ
   data() {
     return {
-      // 保有ロットのリスト
       holdings: [],
+      template: ''
     };
   },
-  // メソッド
+  async created() {
+    const res = await fetch("/src/views/holding/templates/List.html");
+    this.template = await res.text();
+    this.fetchHoldings();
+  },
   methods: {
-    // APIから保有ロットのリストを取得
     async fetchHoldings() {
       try {
-        const response = await axios.get('/api/holding');
+        const response = await api.get('/api/holdings');
         this.holdings = response.data;
       } catch (error) {
-        console.error('保有ロットの取得中にエラーが発生しました:', error);
+        console.error('Error fetching holdings:', error);
       }
-    },
-    // 売却ボタンがクリックされた時の処理
-    sellHolding(id) {
-      this.$router.push(`/transaction/sell/${id}`);
-    },
-  },
-
-  mounted() {
-    this.fetchHoldings();
+    }
   }
 };
 </script>

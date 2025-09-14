@@ -77,6 +77,10 @@ class TransactionService(
             val stockLot = stockLotRepository.findById(lotId)
                 .orElseThrow { EntityNotFoundException("StockLot not found with id: $lotId") }
 
+            if (request.quantity > stockLot.quantity) {
+                throw IllegalArgumentException("Sell quantity cannot be greater than the lot's quantity.")
+            }
+
             val transaction = Transaction(
                 stockLot = stockLot,
                 type = TransactionType.SELL,
@@ -87,9 +91,20 @@ class TransactionService(
             )
             transactions.add(transactionRepository.save(transaction))
 
-            // Mark the lot as sold
-            val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
-            stockLotRepository.save(soldStockLot)
+            if (request.quantity < stockLot.quantity) {
+                // Partial sale: Reduce the quantity of the original lot
+                val remainingQuantity = stockLot.quantity - request.quantity
+                val updatedStockLot = stockLot.copy(quantity = remainingQuantity)
+                stockLotRepository.save(updatedStockLot)
+
+                // Create a new lot for the sold portion
+                val soldPortionLot = stockLot.copy(id = 0, quantity = request.quantity, status = com.example.stock.model.LotStatus.SOLD)
+                stockLotRepository.save(soldPortionLot)
+            } else {
+                // Full sale: Mark the entire lot as sold
+                val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
+                stockLotRepository.save(soldStockLot)
+            }
         }
 
         return transactions.map { it.toDTO() }
