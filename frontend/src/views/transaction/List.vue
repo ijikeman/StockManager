@@ -22,6 +22,9 @@ export default {
     goToAddTransaction() {
       this.$router.push('/transaction/add');
     },
+    goToSellPage(lotId) {
+      this.$router.push(`/transaction/sell/${lotId}`);
+    },
   },
   mounted() {
     this.fetchTransactions();
