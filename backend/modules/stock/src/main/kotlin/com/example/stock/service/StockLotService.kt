@@ -12,7 +12,24 @@ import org.springframework.transaction.annotation.Transactional
 class StockLotService(
     private val stockLotRepository: StockLotRepository
 ) {
-    fun createStockLot(owner: Owner, stock: Stock, isNisa: Boolean, quantity: Int): StockLot {
+    fun createStockLots(owner: Owner, stock: Stock, isNisa: Boolean, totalQuantity: Int): List<StockLot> {
+        if (totalQuantity % 100 != 0) {
+            throw IllegalArgumentException("Quantity must be a multiple of 100")
+        }
+        val lots = mutableListOf<StockLot>()
+        for (i in 0 until totalQuantity / 100) {
+            val stockLot = StockLot(
+                owner = owner,
+                stock = stock,
+                isNisa = isNisa,
+                quantity = 100
+            )
+            lots.add(stockLotRepository.save(stockLot))
+        }
+        return lots
+    }
+
+    fun createSingleStockLot(owner: Owner, stock: Stock, isNisa: Boolean, quantity: Int): StockLot {
         val stockLot = StockLot(
             owner = owner,
             stock = stock,

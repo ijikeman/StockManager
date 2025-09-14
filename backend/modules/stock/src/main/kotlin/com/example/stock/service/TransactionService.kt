@@ -49,33 +49,34 @@ class TransactionService(
             .toDTO()
     }
 
-    fun createTransaction(request: TransactionAddRequest): TransactionDTO {
+    fun createTransaction(request: TransactionAddRequest): List<TransactionDTO> {
         val owner = ownerRepository.findById(request.owner_id)
             .orElseThrow { EntityNotFoundException("Owner not found with id: ${request.owner_id}") }
         val stock = stockRepository.findByCode(request.stock_code)
             ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
 
-        val transaction: Transaction = if (request.type.equals("BUY", ignoreCase = true)) {
-            // For a BUY transaction, we create a new lot.
-            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, request.quantity)
-            Transaction(
-                stockLot = stockLot,
-                type = TransactionType.BUY,
-                quantity = request.quantity,
-                price = request.price.toBigDecimal(),
-                tax = request.fees.toBigDecimal(),
-                transaction_date = request.date
-            )
+        val transactions = mutableListOf<Transaction>()
+
+        if (request.type.equals("BUY", ignoreCase = true)) {
+            val stockLots = stockLotService.createStockLots(owner, stock, request.nisa, request.quantity)
+            for (stockLot in stockLots) {
+                val transaction = Transaction(
+                    stockLot = stockLot,
+                    type = TransactionType.BUY,
+                    quantity = stockLot.quantity,
+                    price = request.price.toBigDecimal(),
+                    tax = request.fees.toBigDecimal(),
+                    transaction_date = request.date
+                )
+                transactions.add(transactionRepository.save(transaction))
+            }
         } else {
             // For a SELL transaction, we use an existing lot.
             val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")
             val stockLot = stockLotRepository.findById(lotId)
                 .orElseThrow { EntityNotFoundException("StockLot not found with id: $lotId") }
 
-            // Here you might want to add logic to check if the lot has enough quantity to sell.
-            // For now, we just create the transaction.
-
-            Transaction(
+            val transaction = Transaction(
                 stockLot = stockLot,
                 type = TransactionType.SELL,
                 quantity = request.quantity,
@@ -83,10 +84,10 @@ class TransactionService(
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
+            transactions.add(transactionRepository.save(transaction))
         }
 
-        val savedTransaction = transactionRepository.save(transaction)
-        return savedTransaction.toDTO()
+        return transactions.map { it.toDTO() }
     }
 
     fun deleteTransaction(id: Int) {

@@ -39,6 +39,10 @@ export default {
       }
     },
     async saveTransaction() {
+      if (this.formData.quantity % 100 !== 0) {
+        alert('数量は100の倍数である必要があります。');
+        return;
+      }
       try {
         await axios.post('/api/transaction', this.formData);
         this.$router.push('/transaction');
