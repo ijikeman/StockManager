@@ -45,7 +45,7 @@ class TransactionServiceTest {
     private lateinit var transactionCaptor: ArgumentCaptor<Transaction>
 
     @Test
-    fun `createTransaction for BUY should create new lot and transaction`() {
+    fun `createTransaction for BUY should create new lots and transactions`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Test Stock")
@@ -54,29 +54,37 @@ class TransactionServiceTest {
             type = "BUY",
             stock_code = stock.code,
             owner_id = owner.id,
-            quantity = 100,
+            quantity = 200, // 2 lots of 100
             price = 500.0,
             fees = 10.0,
             nisa = true
         )
 
-        val stockLot = StockLot(id = 1, owner = owner, stock = stock, quantity = 100, isNisa = true)
+        val stockLots = listOf(
+            StockLot(id = 1, owner = owner, stock = stock, quantity = 100, isNisa = true),
+            StockLot(id = 2, owner = owner, stock = stock, quantity = 100, isNisa = true)
+        )
 
         mockitoWhen(ownerRepository.findById(owner.id)).thenReturn(Optional.of(owner))
         mockitoWhen(stockRepository.findByCode(stock.code)).thenReturn(stock)
-        mockitoWhen(stockLotService.createStockLot(owner, stock, request.nisa, request.quantity)).thenReturn(stockLot)
+        mockitoWhen(stockLotService.createStockLots(owner, stock, request.nisa, request.quantity)).thenReturn(stockLots)
         mockitoWhen(transactionRepository.save(any(Transaction::class.java))).thenAnswer { it.getArgument(0) }
 
         // when
         val result = transactionService.createTransaction(request)
 
         // then
-        verify(transactionRepository).save(transactionCaptor.capture())
-        val capturedTransaction = transactionCaptor.value
+        verify(transactionRepository, org.mockito.Mockito.times(2)).save(transactionCaptor.capture())
+        val capturedTransactions = transactionCaptor.allValues
 
-        assertThat(result.type).isEqualTo("BUY")
-        assertThat(result.quantity).isEqualTo(100)
-        assertThat(capturedTransaction.stockLot).isEqualTo(stockLot)
+        assertThat(result).hasSize(2)
+        assertThat(result[0].type).isEqualTo("BUY")
+        assertThat(result[0].quantity).isEqualTo(100)
+        assertThat(capturedTransactions[0].stockLot).isEqualTo(stockLots[0])
+
+        assertThat(result[1].type).isEqualTo("BUY")
+        assertThat(result[1].quantity).isEqualTo(100)
+        assertThat(capturedTransactions[1].stockLot).isEqualTo(stockLots[1])
     }
 
     @Test
@@ -108,8 +116,9 @@ class TransactionServiceTest {
         verify(transactionRepository).save(transactionCaptor.capture())
         val capturedTransaction = transactionCaptor.value
 
-        assertThat(result.type).isEqualTo("SELL")
-        assertThat(result.quantity).isEqualTo(50)
+        assertThat(result).hasSize(1)
+        assertThat(result[0].type).isEqualTo("SELL")
+        assertThat(result[0].quantity).isEqualTo(50)
         assertThat(capturedTransaction.stockLot).isEqualTo(stockLot)
     }
 }

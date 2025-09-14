@@ -26,9 +26,9 @@ class TransactionController(
     }
 
     @PostMapping
-    fun createTransaction(@Validated @RequestBody request: TransactionAddRequest): ResponseEntity<TransactionDTO> {
-        val createdTransaction = transactionService.createTransaction(request)
-        return ResponseEntity(createdTransaction, HttpStatus.CREATED)
+    fun createTransaction(@Validated @RequestBody request: TransactionAddRequest): ResponseEntity<List<TransactionDTO>> {
+        val createdTransactions = transactionService.createTransaction(request)
+        return ResponseEntity(createdTransactions, HttpStatus.CREATED)
     }
 
     @DeleteMapping("/{id}")
