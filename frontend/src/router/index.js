@@ -7,7 +7,8 @@ import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
 import HoldingList from '../views/holding/List.vue';
 import TransactionList from '../views/transaction/List.vue';
-import TransactionAddEdit from '../views/transaction/AddEdit.vue';
+import BuyTransaction from '../views/transaction/Buy.vue';
+import SellTransaction from '../views/transaction/Sell.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAddEdit from '../views/income/AddEdit.vue';
 
@@ -29,12 +30,12 @@ const routes = [
   {
     path: '/transaction/add',
     name: 'TransactionAdd',
-    component: TransactionAddEdit
+    component: BuyTransaction
   },
   {
-    path: '/transaction/edit/:id',
-    name: 'TransactionEdit',
-    component: TransactionAddEdit,
+    path: '/transaction/sell/:lot_id',
+    name: 'TransactionSell',
+    component: SellTransaction,
     props: true
   },
   {

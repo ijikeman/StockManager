@@ -11,20 +11,23 @@ import jakarta.persistence.JoinColumn
 import java.math.BigDecimal
 import java.time.LocalDate
 
+/**
+ * 入金履歴エンティティ
+ */
 @Entity
 @Table(name = "incoming_history")
 data class IncomingHistory(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Int = 0, // ID
 
     @ManyToOne
     @JoinColumn(name = "lot_id")
-    val stockLot: StockLot,
+    val stockLot: StockLot, // 株式ロット
 
     @Column(name = "incoming", nullable = false)
-    val incoming: BigDecimal,
+    val incoming: BigDecimal, // 入金額
 
     @Column(name = "payment_date", nullable = false)
-    val payment_date: LocalDate
+    val payment_date: LocalDate // 支払日
 )

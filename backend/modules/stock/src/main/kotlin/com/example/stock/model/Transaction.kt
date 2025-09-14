@@ -13,35 +13,41 @@ import jakarta.persistence.EnumType
 import java.math.BigDecimal
 import java.time.LocalDate
 
+/**
+ * 取引種別
+ */
 enum class TransactionType {
-    BUY,
-    SELL
+    BUY,  // 購入
+    SELL // 売却
 }
 
+/**
+ * 取引エンティティ
+ */
 @Entity
 @Table(name = "transaction")
 data class Transaction(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Int = 0, // ID
 
     @ManyToOne
     @JoinColumn(name = "lot_id")
-    val stockLot: StockLot,
+    val stockLot: StockLot, // 株式ロット
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    val type: TransactionType,
+    val type: TransactionType, // 取引種別
 
     @Column(name = "quantity", nullable = false)
-    val quantity: Int,
+    val quantity: Int, // 数量
 
     @Column(name = "price", nullable = false)
-    val price: BigDecimal,
+    val price: BigDecimal, // 価格
 
     @Column(name = "tax", nullable = false)
-    val tax: BigDecimal,
+    val tax: BigDecimal, // 税金
 
     @Column(name = "transaction_date", nullable = false)
-    val transaction_date: LocalDate
+    val transaction_date: LocalDate // 取引日
 )
