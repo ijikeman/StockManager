@@ -1,16 +1,10 @@
-<template src="./templates/AddEdit.html"></template>
+<template src="./templates/Buy.html"></template>
 
 <script>
 import axios from 'axios';
 
 export default {
-  name: 'TransactionAddEdit',
-  props: {
-    id: {
-      type: [String, Number],
-      default: null
-    }
-  },
+  name: 'BuyTransaction',
   data() {
     return {
       formData: {
@@ -26,11 +20,6 @@ export default {
       stocks: [],
       owners: []
     };
-  },
-  computed: {
-    isEditing() {
-      return this.id != null;
-    }
   },
   methods: {
     async fetchStocks() {
@@ -49,26 +38,9 @@ export default {
         console.error('Error fetching owners:', error);
       }
     },
-    async fetchTransaction() {
-      if (!this.isEditing) return;
-      try {
-        const response = await axios.get(`/api/transaction/${this.id}`);
-        this.formData = response.data;
-        if (this.formData.stock) {
-          this.formData.stock_code = this.formData.stock.code;
-        }
-      } catch (error) {
-        console.error('Error fetching transaction:', error);
-      }
-    },
     async saveTransaction() {
       try {
-        const transactionData = { ...this.formData };
-        if (this.isEditing) {
-          await axios.put(`/api/transaction/${this.id}`, transactionData);
-        } else {
-          await axios.post('/api/transaction', transactionData);
-        }
+        await axios.post('/api/transaction', this.formData);
         this.$router.push('/transaction');
       } catch (error) {
         console.error('Error saving transaction:', error);
@@ -82,12 +54,6 @@ export default {
   created() {
     this.fetchStocks();
     this.fetchOwners();
-    this.fetchTransaction();
-  },
-  watch: {
-    '$route.params.id'() {
-      this.fetchTransaction();
-    }
   }
 };
 </script>
