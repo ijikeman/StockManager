@@ -66,3 +66,11 @@ INSERT INTO stock(code, name, current_price, dividend, earnings_date, sector_id)
 ('4071', 'プラスアルファコンサルティング', 0, 0, NULL, 20),
 ('2432', 'DeNa', 0, 0, NULL, 21),
 ('3923', 'ラクス', 0, 0, NULL, 20);
+
+-- stock_lot
+INSERT INTO stock_lot(owner_id, stock_id, quantity, is_nisa, status) VALUES
+(1, 1, 100, false, 'HOLDING');
+
+-- transaction
+INSERT INTO transaction(lot_id, type, quantity, price, tax, transaction_date) VALUES
+(1, 'buy', 100, 1000, 0, '2024-01-01');

@@ -1,14 +1,17 @@
 <div class="form-container">
-  <h3 class="form-title">{{ isEditing ? '配当編集' : '新規配当追加' }}</h3>
+  <h3 class="form-title">{{ isEditing ? '配当編集' : (isForLot ? 'ロット配当追加' : '新規配当追加') }}</h3>
 
   <form @submit.prevent="saveIncome" class="form-inline">
     <input
       type="date"
-      v-model="formData.date"
+      v-model="formData.payment_date"
       required
       class="form-control"
     >
-    <select v-model="formData.stock_code" required class="form-control">
+    <div v-if="isForLot && holding">
+      <p>銘柄: {{ holding.stock.name }} ({{ holding.stock.code }})</p>
+    </div>
+    <select v-else v-model="formData.stock_code" required class="form-control">
       <option :value="null" disabled>銘柄を選択</option>
       <option v-for="stock in stocks" :key="stock.code" :value="stock.code">
         {{ stock.name }} ({{ stock.code }})
@@ -16,7 +19,7 @@
     </select>
     <input
       type="number"
-      v-model="formData.amount"
+      v-model="formData.incoming"
       placeholder="金額"
       required
       class="form-control"

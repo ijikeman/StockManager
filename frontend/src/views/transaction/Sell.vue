@@ -29,7 +29,7 @@ export default {
       try {
         // Assuming an endpoint to get a single lot's details exists.
         // If not, would need to fetch all and filter.
-        const response = await axios.get(`/api/holding/${this.lot_id}`);
+        const response = await axios.get(`/api/stock-lot/${this.lot_id}`);
         this.lot = response.data;
         // Pre-fill quantity for convenience, user can edit if they are partially selling.
         this.formData.quantity = this.lot.quantity;

@@ -31,6 +31,7 @@
         <td>{{ holding.price }}</td>
         <td>
           <button @click="sellHolding(holding.id)" class="btn btn-success">売却</button>
+          <button @click="registerDividend(holding.id)" class="btn btn-primary">配当登録</button>
         </td>
       </tr>
     </tbody>

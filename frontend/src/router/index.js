@@ -49,6 +49,12 @@ const routes = [
     component: IncomeAddEdit
   },
   {
+    path: '/income/add/lot/:lotId',
+    name: 'IncomeAddForLot',
+    component: IncomeAddEdit,
+    props: true
+  },
+  {
     path: '/income/edit/:id',
     name: 'IncomeEdit',
     component: IncomeAddEdit,
