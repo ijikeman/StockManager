@@ -66,7 +66,3 @@ INSERT INTO stock(code, name, current_price, dividend, earnings_date, sector_id)
 ('4071', 'プラスアルファコンサルティング', 0, 0, NULL, 20),
 ('2432', 'DeNa', 0, 0, NULL, 21),
 ('3923', 'ラクス', 0, 0, NULL, 20);
-
--- holding
-INSERT INTO holding(owner_id, stock_id, current_volume, average_price, updated_at) VALUES
-(1, 1, 100, 1000, NULL);

@@ -9,16 +9,18 @@ import jakarta.persistence.Column
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.NotBlank
 
+
+/**
+ * セクターエンティティ
+ */
 @Entity
-@Table(name = "owner")
-data class Owner(
+@Table(name = "sector")
+data class Sector(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    val id: Int = 0, // ID
 
-    // ユーザ名
-    @field:NotBlank(message = "名前は必須です")
-    @field:Pattern(regexp = "^[a-zA-Z]+$", message = "名前はアルファベットのみで構成される必要があります")
+    @field:NotBlank(message = "セクター名は必須です")
     @Column(name = "name", nullable = false)
-    val name: String
+    val name: String = "" // セクター名
 )
