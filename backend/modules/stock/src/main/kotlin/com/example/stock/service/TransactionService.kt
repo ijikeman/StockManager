@@ -36,7 +36,8 @@ class TransactionService(
         owner_name = this.stockLot.owner.name,
         quantity = this.quantity,
         price = this.price.toDouble(),
-        fees = this.tax.toDouble()
+        fees = this.tax.toDouble(),
+        lot_id = this.stockLot.id
     )
 
     fun findAllTransactions(): List<TransactionDTO> {
@@ -85,6 +86,10 @@ class TransactionService(
                 transaction_date = request.date
             )
             transactions.add(transactionRepository.save(transaction))
+
+            // Mark the lot as sold
+            val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
+            stockLotRepository.save(soldStockLot)
         }
 
         return transactions.map { it.toDTO() }

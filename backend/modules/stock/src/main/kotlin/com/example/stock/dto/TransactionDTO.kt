@@ -18,7 +18,8 @@ data class TransactionDTO(
     val owner_name: String,
     val quantity: Int,
     val price: Double,
-    val fees: Double
+    val fees: Double,
+    val lot_id: Int
 )
 
 /**
