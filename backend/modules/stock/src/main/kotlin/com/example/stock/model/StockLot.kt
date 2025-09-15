@@ -37,8 +37,8 @@ data class StockLot(
     @JoinColumn(name = "stock_id")
     val stock: Stock, // 銘柄
 
-    @Column(name = "quantity", nullable = false)
-    val quantity: Int, // 最低単元数
+    @Column(name = "unit", nullable = false)
+    val unit: Int, // 単元数
 
     @Column(name = "is_nisa", nullable = false)
     val isNisa: Boolean = false, // NISAかどうか
