@@ -1,5 +1,6 @@
 package com.example.stock.service
 
+import com.example.stock.model.LotStatus
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
@@ -27,7 +28,8 @@ class StockLotService(
     fun findByOwnerId(ownerId: Int, status: String?): List<StockLot> {
         return if (status != null) {
             // statusが指定されていれば、新しいメソッドを呼び出す
-            stockLotRepository.findByOwnerIdAndStatus(ownerId, status)
+            val lotStatus = LotStatus.valueOf(status.uppercase())
+            stockLotRepository.findByOwnerIdAndStatus(ownerId, lotStatus)
         } else {
             // statusがなければ、既存のメソッドを呼び出す
             stockLotRepository.findByOwnerId(ownerId)
