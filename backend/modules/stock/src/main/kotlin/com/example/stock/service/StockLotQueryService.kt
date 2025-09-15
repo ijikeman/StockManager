@@ -1,6 +1,7 @@
 package com.example.stock.service
 
 import com.example.stock.dto.StockLotDTO
+import com.example.stock.model.LotStatus
 import com.example.stock.repository.StockLotRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -38,5 +39,28 @@ class StockLotQueryService(
      */
     fun findAllStockLots(): List<StockLotDTO> {
         return stockLotRepository.findAll().map { it.toDTO() }
+    }
+
+    /**
+     * 保有中の株式ロットをNISA区分でグループ化して取得します。
+     *
+     * @return NISA区分をキー、StockLotDTOのリストを値とするマップ
+     */
+    fun findHoldingStockLots(): Map<Boolean, List<StockLotDTO>> {
+        return stockLotRepository.findByStatus(LotStatus.HOLDING)
+            .map { it.toDTO() }
+            .groupBy { it.is_nisa }
+    }
+
+    /**
+     * 指定された所有者の保有中の株式ロットをNISA区分でグループ化して取得します。
+     *
+     * @param ownerId 所有者のID
+     * @return NISA区分をキー、StockLotDTOのリストを値とするマップ
+     */
+    fun findHoldingStockLotsByOwner(ownerId: Int): Map<Boolean, List<StockLotDTO>> {
+        return stockLotRepository.findByOwnerIdAndStatus(ownerId, LotStatus.HOLDING)
+            .map { it.toDTO() }
+            .groupBy { it.is_nisa }
     }
 }
