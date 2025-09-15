@@ -41,5 +41,8 @@ data class Stock(
 
     @ManyToOne
     @JoinColumn(name = "sector_id")
-    var sector: Sector? = null // セクター
+    var sector: Sector? = null, // セクター
+
+    @Column(name = "minimum_unit", nullable = false)
+    val minimum_unit: Int = 100 // 最低単元数
 )
