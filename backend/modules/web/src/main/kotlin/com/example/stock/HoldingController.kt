@@ -17,8 +17,13 @@ class HoldingController(
         return stockLotQueryService.findHoldingStockLots()
     }
 
-    @GetMapping("/{ownerId}")
+    @GetMapping("/owner/{ownerId}")
     fun getHoldingStockLotsByOwner(@PathVariable ownerId: Int): Map<Boolean, List<StockLotDTO>> {
         return stockLotQueryService.findHoldingStockLotsByOwner(ownerId)
+    }
+
+    @GetMapping("/{lotId}")
+    fun getHoldingStockLot(@PathVariable lotId: Int): StockLotDTO {
+        return stockLotQueryService.findStockLotById(lotId)
     }
 }

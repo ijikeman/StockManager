@@ -58,6 +58,7 @@ CREATE TABLE transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
     lot_id INT,
     type VARCHAR(255) NOT NULL,
+    unit INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     tax DECIMAL(10, 2) NOT NULL,

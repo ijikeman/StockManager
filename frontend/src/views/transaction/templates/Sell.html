@@ -4,7 +4,7 @@
   <div v-if="lot" class="lot-details">
     <h4>売却対象ロット</h4>
     <p><strong>銘柄:</strong> {{ lot.stock.name }} ({{ lot.stock.code }})</p>
-    <p><strong>保有数量:</strong> {{ lot.quantity }}</p>
+    <p><strong>保有単元数:</strong> {{ lot.unit }}</p>
     <p><strong>取得価格:</strong> {{ lot.price }}</p>
     <p><strong>NISA:</strong> {{ lot.is_nisa ? 'はい' : 'いいえ' }}</p>
   </div>
@@ -18,6 +18,20 @@
         v-model="formData.date"
         required
         class="form-control"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="unit">売却単元数</label>
+      <input
+        id="unit"
+        type="number"
+        v-model="formData.unit"
+        placeholder="単元数"
+        required
+        class="form-control"
+        min="1"
+        :max="lot.unit"
       >
     </div>
 

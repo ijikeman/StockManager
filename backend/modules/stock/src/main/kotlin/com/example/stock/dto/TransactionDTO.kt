@@ -16,7 +16,7 @@ data class TransactionDTO(
     val stock: StockInfoDTO,
     val owner_id: Int,
     val owner_name: String,
-    val quantity: Int,
+    val unit: Int,
     val price: Double,
     val fees: Double,
     val lot_id: Int

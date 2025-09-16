@@ -39,6 +39,9 @@ data class Transaction(
     @Column(name = "type", nullable = false)
     val type: TransactionType, // 取引種別
 
+    @Column(name = "unit", nullable = false)
+    val unit: Int, // 単元数
+
     @Column(name = "quantity", nullable = false)
     val quantity: Int, // 数量
 

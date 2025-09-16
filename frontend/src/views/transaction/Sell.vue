@@ -18,7 +18,7 @@ export default {
         date: new Date().toISOString().slice(0, 10),
         type: 'sell',
         lot_id: this.lot_id,
-        quantity: null,
+        unit: null,
         price: null,
         fees: null,
       }
@@ -31,21 +31,26 @@ export default {
         // If not, would need to fetch all and filter.
         const response = await axios.get(`/api/holding/${this.lot_id}`);
         this.lot = response.data;
-        // Pre-fill quantity for convenience, user can edit if they are partially selling.
-        this.formData.quantity = this.lot.quantity;
+        // Pre-fill unit for convenience, user can edit if they are partially selling.
+        this.formData.unit = this.lot.unit;
       } catch (error) {
         console.error('Error fetching lot details:', error);
         alert('ロット情報の取得に失敗しました。');
       }
     },
     async saveTransaction() {
-      if (this.formData.quantity > this.lot.quantity) {
-        alert('売却数量が保有数量を超えています。');
+      if (this.formData.unit > this.lot.unit) {
+        alert('売却単元数が保有単元数を超えています。');
         return;
       }
 
       try {
-        await axios.post('/api/transaction', this.formData);
+        const payload = {
+          ...this.formData,
+          stock_code: this.lot.stock.code,
+          owner_id: this.lot.owner.id,
+        }
+        await axios.post('/api/transaction', payload);
         this.$router.push('/holding');
       } catch (error) {
         console.error('Error saving transaction:', error);
