@@ -18,10 +18,10 @@
     </thead>
     <tbody>
       <tr v-for="income in incomes" :key="income.id">
-        <td>{{ income.date }}</td>
-        <td>{{ income.stock.code }}</td>
-        <td>{{ income.stock.name }}</td>
-        <td>{{ income.amount }}</td>
+        <td>{{ income.payment_date }}</td>
+        <td>{{ income.stockLot.stock_code }}</td>
+        <td>{{ income.stockLot.stock_name }}</td>
+        <td>{{ income.incoming }}</td>
         <td>
           <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>
           <button @click="deleteIncome(income.id)" class="btn btn-danger">削除</button>
