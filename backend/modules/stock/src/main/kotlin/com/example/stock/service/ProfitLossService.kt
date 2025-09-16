@@ -68,8 +68,9 @@ class ProfitLossService(
         // 売却トランザクションのみ抽出
 
         return sellTransactions.sumOf { sell ->
-            (sell.price - buyPrice) * sell.quantity.toBigDecimal() - sell.tax
-                // 各売却ごとに損益を計算し合計
+            val quantity = sell.unit * sell.stockLot.stock.minimalUnit
+            (sell.price - buyPrice) * quantity.toBigDecimal() - sell.tax
+            // 各売却ごとに損益を計算し合計
         }
     }
 
@@ -77,7 +78,7 @@ class ProfitLossService(
         // 指定ロットの含み損益を計算
         if (lot.status == LotStatus.SOLD) {
             return BigDecimal.ZERO
-                // 既に売却済みの場合は0を返す
+            // 既に売却済みの場合は0を返す
         }
 
         val transactions = transactionRepository.findByStockLotId(lot.id)
@@ -88,8 +89,8 @@ class ProfitLossService(
 
         val buyPrice = buyTransaction.price
 
-        val soldQuantity = transactions.filter { it.type == TransactionType.SELL }.sumOf { it.quantity }
-    val remainingQuantity = (lot.unit * lot.stock.minimalUnit) - soldQuantity
+        val soldQuantity = transactions.filter { it.type == TransactionType.SELL }.sumOf { it.unit * it.stockLot.stock.minimalUnit }
+        val remainingQuantity = (lot.unit * lot.stock.minimalUnit) - soldQuantity
         // 売却済み数量を差し引いた残数量を計算
 
         if (remainingQuantity <= 0) {

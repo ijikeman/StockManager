@@ -42,9 +42,6 @@ data class Transaction(
     @Column(name = "unit", nullable = false)
     val unit: Int, // 単元数
 
-    @Column(name = "quantity", nullable = false)
-    val quantity: Int, // 数量
-
     @Column(name = "price", nullable = false)
     val price: BigDecimal, // 価格
 
