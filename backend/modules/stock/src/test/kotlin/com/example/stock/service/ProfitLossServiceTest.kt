@@ -42,8 +42,8 @@ class ProfitLossServiceTest {
     fun `calculateTotalProfitLoss should return correct summary`() {
         // Arrange
         val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0)
-        val lot = StockLot(id = 1, owner = owner, stock = stock, quantity = 100, status = LotStatus.HOLDING)
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0, minumalUnit = 100)
+        val lot = StockLot(id = 1, owner = owner, stock = stock, unit = 1, status = LotStatus.HOLDING)
 
         val buyTransaction = Transaction(
             id = 1, stockLot = lot, type = TransactionType.BUY, quantity = 100,
@@ -69,7 +69,7 @@ class ProfitLossServiceTest {
         // Assert
         // Realized PL = (1200 - 1000) * 50 - 500 = 9500
         assertEquals(BigDecimal("9500.0"), summary.realizedPl)
-        // Unrealized PL = (1500 - 1000) * (100 - 50) = 25000
+        // Unrealized PL = (1500 - 1000) * (1 * 100 - 50) = 25000
         assertEquals(BigDecimal("25000.0"), summary.unrealizedPl)
         // Income = 10000 + 5000 = 15000
         assertEquals(BigDecimal("15000.0"), summary.income)

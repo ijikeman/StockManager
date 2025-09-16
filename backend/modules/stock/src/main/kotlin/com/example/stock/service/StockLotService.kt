@@ -37,48 +37,20 @@ class StockLotService(
     }
 
     /**
-     * 複数の株式ロットを作成します。株数は100の倍数でなければなりません。
-     *
-     * @param owner 所有者
-     * @param stock 株式
-     * @param isNisa NISA口座かどうか
-     * @param totalQuantity 合計株数
-     * @return 作成されたStockLotのリスト
-     * @throws IllegalArgumentException 株数が100の倍数でない場合
-     */
-    fun createStockLots(owner: Owner, stock: Stock, isNisa: Boolean, totalQuantity: Int): List<StockLot> {
-        val minimumUnit = if (stock.minimum_unit == 0) 1 else stock.minimum_unit
-        if (totalQuantity % minimumUnit != 0) {
-            throw IllegalArgumentException("Quantity must be a multiple of ${minimumUnit}")
-        }
-        val lots = mutableListOf<StockLot>()
-        for (i in 0 until totalQuantity / minimumUnit) {
-            val stockLot = StockLot(
-                owner = owner,
-                stock = stock,
-                isNisa = isNisa,
-                quantity = minimumUnit
-            )
-            lots.add(stockLotRepository.save(stockLot))
-        }
-        return lots
-    }
-
-    /**
      * 単一の株式ロットを作成します。
      *
      * @param owner 所有者
      * @param stock 株式
      * @param isNisa NISA口座かどうか
-     * @param quantity 株数
+     * @param unit 単元数
      * @return 作成されたStockLot
      */
-    fun createSingleStockLot(owner: Owner, stock: Stock, isNisa: Boolean, quantity: Int): StockLot {
+    fun createStockLot(owner: Owner, stock: Stock, isNisa: Boolean, unit: Int): StockLot {
         val stockLot = StockLot(
             owner = owner,
             stock = stock,
             isNisa = isNisa,
-            quantity = quantity
+            unit = unit
         )
         return stockLotRepository.save(stockLot)
     }
