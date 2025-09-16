@@ -24,7 +24,7 @@ class IncomingHistoryService(
      */
     private fun IncomingHistory.toDTO() = IncomingHistoryDTO(
         id = this.id,
-        lot_id = this.stockLot.id,
+        lot_id = this.lot.id,
         incoming = this.incoming,
         payment_date = this.payment_date
     )
@@ -41,11 +41,11 @@ class IncomingHistoryService(
      * 入金履歴を作成します
      */
     fun createIncomingHistory(request: IncomingHistoryAddRequest): IncomingHistoryDTO {
-        val stockLot = stockLotRepository.findById(request.lot_id)
+        val lot = stockLotRepository.findById(request.lot_id)
             .orElseThrow { EntityNotFoundException("StockLot not found with id: ${request.lot_id}") }
 
         val incomingHistory = IncomingHistory(
-            stockLot = stockLot,
+            lot = lot,
             incoming = request.incoming,
             payment_date = request.payment_date
         )

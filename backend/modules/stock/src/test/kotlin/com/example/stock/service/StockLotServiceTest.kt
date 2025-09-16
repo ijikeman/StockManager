@@ -26,7 +26,7 @@ class StockLotServiceTest {
     private lateinit var stockLotRepository: StockLotRepository
 
     @Captor
-    private lateinit var stockLotCaptor: ArgumentCaptor<StockLot>
+    private lateinit var lotCaptor: ArgumentCaptor<StockLot>
 
     @Test
     fun `createStockLot should create a single lot with correct unit`() {
@@ -41,12 +41,12 @@ class StockLotServiceTest {
         val result = stockLotService.createStockLot(owner, stock, false, unit)
 
         // then
-        verify(stockLotRepository).save(stockLotCaptor.capture())
-        val capturedStockLot = stockLotCaptor.value
+        verify(stockLotRepository).save(lotCaptor.capture())
+        val capturedLot = lotCaptor.value
 
         assertThat(result).isNotNull
-        assertThat(capturedStockLot.unit).isEqualTo(2)
-        assertThat(capturedStockLot.owner).isEqualTo(owner)
-        assertThat(capturedStockLot.stock).isEqualTo(stock)
+        assertThat(capturedLot.unit).isEqualTo(2)
+        assertThat(capturedLot.owner).isEqualTo(owner)
+        assertThat(capturedLot.stock).isEqualTo(stock)
     }
 }

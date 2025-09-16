@@ -46,12 +46,12 @@ class StockLotService(
      * @return 作成されたStockLot
      */
     fun createStockLot(owner: Owner, stock: Stock, isNisa: Boolean, unit: Int): StockLot {
-        val stockLot = StockLot(
+        val lot = StockLot(
             owner = owner,
             stock = stock,
             isNisa = isNisa,
             unit = unit
         )
-        return stockLotRepository.save(stockLot)
+        return stockLotRepository.save(lot)
     }
 }

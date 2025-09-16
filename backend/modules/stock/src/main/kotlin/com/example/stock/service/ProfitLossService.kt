@@ -56,7 +56,7 @@ class ProfitLossService(
 
     private fun calculateRealizedPlForLot(lot: StockLot): BigDecimal {
         // 指定ロットの実現損益を計算
-        val transactions = transactionRepository.findByStockLotId(lot.id)
+        val transactions = transactionRepository.findByLotId(lot.id)
         // ロットに紐づく全トランザクションを取得
         val buyTransaction = transactions.firstOrNull { it.type == TransactionType.BUY }
             ?: return BigDecimal.ZERO // Should not happen if design is correct
@@ -68,7 +68,7 @@ class ProfitLossService(
         // 売却トランザクションのみ抽出
 
         return sellTransactions.sumOf { sell ->
-            val quantity = sell.unit * sell.stockLot.stock.minimalUnit
+            val quantity = sell.unit * sell.lot.stock.minimalUnit
             (sell.price - buyPrice) * quantity.toBigDecimal() - sell.fee
             // 各売却ごとに損益を計算し合計
         }
@@ -81,7 +81,7 @@ class ProfitLossService(
             // 既に売却済みの場合は0を返す
         }
 
-        val transactions = transactionRepository.findByStockLotId(lot.id)
+        val transactions = transactionRepository.findByLotId(lot.id)
         // ロットに紐づく全トランザクションを取得
         val buyTransaction = transactions.firstOrNull { it.type == TransactionType.BUY }
             ?: return BigDecimal.ZERO
@@ -89,7 +89,7 @@ class ProfitLossService(
 
         val buyPrice = buyTransaction.price
 
-        val soldQuantity = transactions.filter { it.type == TransactionType.SELL }.sumOf { it.unit * it.stockLot.stock.minimalUnit }
+        val soldQuantity = transactions.filter { it.type == TransactionType.SELL }.sumOf { it.unit * it.lot.stock.minimalUnit }
         val remainingQuantity = (lot.unit * lot.stock.minimalUnit) - soldQuantity
         // 売却済み数量を差し引いた残数量を計算
 
@@ -113,8 +113,8 @@ class ProfitLossService(
 
     private fun calculateIncomeForLot(lotId: Int): BigDecimal {
         // 指定ロットの配当・利益を合算
-        val incoming = incomingHistoryRepository.findByStockLotId(lotId).sumOf { it.incoming }
-        val benefits = benefitHistoryRepository.findByStockLotId(lotId).sumOf { it.benefit }
+        val incoming = incomingHistoryRepository.findByLotId(lotId).sumOf { it.incoming }
+        val benefits = benefitHistoryRepository.findByLotId(lotId).sumOf { it.benefit }
         return incoming + benefits
         // 合計収入を返却
     }

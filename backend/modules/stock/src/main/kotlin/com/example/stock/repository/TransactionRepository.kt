@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransactionRepository : JpaRepository<Transaction, Int> {
-    fun findByStockLotId(stockLotId: Int): List<Transaction>
+    fun findByLotId(lotId: Int): List<Transaction>
 }

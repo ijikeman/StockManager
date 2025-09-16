@@ -22,7 +22,7 @@ data class BenefitHistory(
 
     @ManyToOne
     @JoinColumn(name = "lot_id")
-    val stockLot: StockLot, // 株式ロット
+    val lot: StockLot, // 株式ロット
 
     @Column(name = "benefit", nullable = false)
     val benefit: BigDecimal // 利益

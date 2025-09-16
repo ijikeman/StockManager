@@ -31,15 +31,15 @@ class TransactionService(
         date = this.transaction_date,
         type = this.type.toString(),
         stock = StockInfoDTO(
-            code = this.stockLot.stock.code,
-            name = this.stockLot.stock.name
+            code = this.lot.stock.code,
+            name = this.lot.stock.name
         ),
-        owner_id = this.stockLot.owner.id,
-        owner_name = this.stockLot.owner.name,
+        owner_id = this.lot.owner.id,
+        owner_name = this.lot.owner.name,
         unit = this.unit,
         price = this.price.toDouble(),
         fees = this.fee.toDouble(),
-        lot_id = this.stockLot.id
+        lot_id = this.lot.id
     )
 
     fun findAllTransactions(): List<TransactionDTO> {
@@ -68,9 +68,9 @@ class TransactionService(
         if (request.type.equals("BUY", ignoreCase = true)) {
             // 買い注文の場合
             // 新しいロットを作成
-            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, request.unit)
+            val lot = stockLotService.createStockLot(owner, stock, request.nisa, request.unit)
             val transaction = Transaction(
-                stockLot = stockLot,
+                lot = lot,
                 type = TransactionType.BUY,
                 unit = request.unit, // 取引の量は単元数
                 price = request.price.toBigDecimal(),
@@ -83,11 +83,11 @@ class TransactionService(
             // 売り注文の場合、既存ロットを利用
             // For a SELL transaction, we use an existing lot.
             val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")
-            val stockLot = stockLotRepository.findById(lotId)
+            val lot = stockLotRepository.findById(lotId)
                 .orElseThrow { EntityNotFoundException("StockLot not found with id: $lotId") }
 
             val transaction = Transaction(
-                stockLot = stockLot,
+                lot = lot,
                 type = TransactionType.SELL,
                 unit = request.unit,
                 price = request.price.toBigDecimal(),
@@ -99,8 +99,8 @@ class TransactionService(
 
             // Mark the lot as sold
             // ロットの状態をSOLDに更新
-            val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
-            stockLotRepository.save(soldStockLot)
+            val soldLot = lot.copy(status = com.example.stock.model.LotStatus.SOLD)
+            stockLotRepository.save(soldLot)
         }
 
         // DTOリストで返却

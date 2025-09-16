@@ -33,7 +33,7 @@ data class Transaction(
 
     @ManyToOne
     @JoinColumn(name = "lot_id")
-    val stockLot: StockLot, // 株式ロット
+    val lot: StockLot, // 株式ロット
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

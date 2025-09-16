@@ -53,24 +53,24 @@ class ProfitLossServiceTest {
         // 売買トランザクションを作成
         // 2単元（100株）購入
         val buyTransaction = Transaction(
-            id = 1, stockLot = lot, type = TransactionType.BUY, unit = 2,
+            id = 1, lot = lot, type = TransactionType.BUY, unit = 2,
             price = BigDecimal("1000.0"), fee = BigDecimal.ZERO, transaction_date = LocalDate.now()
         )
         // 1単元（50株）売却
         val sellTransaction = Transaction(
-            id = 2, stockLot = lot, type = TransactionType.SELL, unit = 1,
+            id = 2, lot = lot, type = TransactionType.SELL, unit = 1,
             price = BigDecimal("1200.0"), fee = BigDecimal("500.0"), transaction_date = LocalDate.now()
         )
 
         // 配当・利益データを作成
-        val incoming = IncomingHistory(id = 1, stockLot = lot, incoming = BigDecimal("10000.0"), payment_date = LocalDate.now())
-        val benefit = BenefitHistory(id = 1, stockLot = lot, benefit = BigDecimal("5000.0"))
+        val incoming = IncomingHistory(id = 1, lot = lot, incoming = BigDecimal("10000.0"), payment_date = LocalDate.now())
+        val benefit = BenefitHistory(id = 1, lot = lot, benefit = BigDecimal("5000.0"))
 
         // モックの戻り値を設定
         `when`(stockLotRepository.findByOwnerId(owner.id)).thenReturn(listOf(lot))
-        `when`(transactionRepository.findByStockLotId(lot.id)).thenReturn(listOf(buyTransaction, sellTransaction))
-        `when`(incomingHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(incoming))
-        `when`(benefitHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(benefit))
+        `when`(transactionRepository.findByLotId(lot.id)).thenReturn(listOf(buyTransaction, sellTransaction))
+        `when`(incomingHistoryRepository.findByLotId(lot.id)).thenReturn(listOf(incoming))
+        `when`(benefitHistoryRepository.findByLotId(lot.id)).thenReturn(listOf(benefit))
         `when`(financeProvider.fetchStockInfo(stock.code)).thenReturn(StockInfo(price = 1500.0, dividend = 0.0, earnings_date = null))
 
 
