@@ -47,7 +47,7 @@ export default {
       try {
         let url = '/api/holding';
         if (this.selectedOwnerId) {
-          url += `/${this.selectedOwnerId}`;
+          url += `/owner/${this.selectedOwnerId}`;
         }
         const response = await axios.get(url);
         this.holdings = response.data;

@@ -34,10 +34,10 @@
     <tbody>
       <!-- 保有銘柄情報をループで表示 -->
       <tr v-for="holding in holdingList" :key="holding.id">
-        <td>{{ holding.stock.code }}</td>
-        <td>{{ holding.stock.name }}</td>
-        <td>{{ holding.owner.name }}</td>
-        <td>{{ holding.isNisa ? 'はい' : 'いいえ' }}</td>
+        <td>{{ holding.stock_code }}</td>
+        <td>{{ holding.stock_name }}</td>
+        <td>{{ holding.owner_name }}</td>
+        <td>{{ holding.is_nisa ? 'はい' : 'いいえ' }}</td>
         <td>{{ holding.unit }}</td>
         <td>{{ holding.status }}</td>
         <td>
