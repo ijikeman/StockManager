@@ -9,14 +9,10 @@ import com.example.stock.repository.TransactionRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.Mockito.`when` as mockitoWhen
-import org.mockito.Mockito.verify
-import org.mockito.ArgumentMatchers.any
+import org.mockito.kotlin.*
 import java.time.LocalDate
 import java.util.Optional
 
@@ -41,58 +37,52 @@ class TransactionServiceTest {
     @Mock
     private lateinit var stockLotService: StockLotService
 
-    @Captor
-    private lateinit var transactionCaptor: ArgumentCaptor<Transaction>
-
     @Test
-    fun `createTransaction for BUY should create new lots and transactions`() {
+    fun `createTransaction for BUY should create a new lot and a transaction`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock")
+    val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
         val request = TransactionAddRequest(
             date = LocalDate.now(),
             type = "BUY",
             stock_code = stock.code,
             owner_id = owner.id,
-            quantity = 200, // 2 lots of 100
+            quantity = 200,
             price = 500.0,
             fees = 10.0,
             nisa = true
         )
+        val newStockLot = StockLot(id = 1, owner = owner, stock = stock, unit = 2, isNisa = true)
+        val transactionCaptor = argumentCaptor<Transaction>()
+        val unitCaptor = argumentCaptor<Int>()
 
-        val stockLots = listOf(
-            StockLot(id = 1, owner = owner, stock = stock, quantity = 100, isNisa = true),
-            StockLot(id = 2, owner = owner, stock = stock, quantity = 100, isNisa = true)
-        )
-
-        mockitoWhen(ownerRepository.findById(owner.id)).thenReturn(Optional.of(owner))
-        mockitoWhen(stockRepository.findByCode(stock.code)).thenReturn(stock)
-        mockitoWhen(stockLotService.createStockLots(owner, stock, request.nisa, request.quantity)).thenReturn(stockLots)
-        mockitoWhen(transactionRepository.save(any(Transaction::class.java))).thenAnswer { it.getArgument(0) }
+        whenever(ownerRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+        whenever(stockRepository.findByCode(stock.code)).thenReturn(stock)
+        whenever(stockLotService.createStockLot(any(), any(), any(), any())).thenReturn(newStockLot)
+        whenever(transactionRepository.save(any())).thenAnswer { it.getArgument(0) }
 
         // when
         val result = transactionService.createTransaction(request)
 
         // then
-        verify(transactionRepository, org.mockito.Mockito.times(2)).save(transactionCaptor.capture())
-        val capturedTransactions = transactionCaptor.allValues
+        verify(stockLotService).createStockLot(any(), any(), any(), unitCaptor.capture())
+        assertThat(unitCaptor.firstValue).isEqualTo(2)
 
-        assertThat(result).hasSize(2)
+        verify(transactionRepository).save(transactionCaptor.capture())
+        val capturedTransaction = transactionCaptor.firstValue
+
+        assertThat(result).hasSize(1)
         assertThat(result[0].type).isEqualTo("BUY")
-        assertThat(result[0].quantity).isEqualTo(100)
-        assertThat(capturedTransactions[0].stockLot).isEqualTo(stockLots[0])
-
-        assertThat(result[1].type).isEqualTo("BUY")
-        assertThat(result[1].quantity).isEqualTo(100)
-        assertThat(capturedTransactions[1].stockLot).isEqualTo(stockLots[1])
+        assertThat(result[0].quantity).isEqualTo(200)
+        assertThat(capturedTransaction.stockLot).isEqualTo(newStockLot)
     }
 
     @Test
     fun `createTransaction for SELL should use existing lot and create transaction`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock")
-        val stockLot = StockLot(id = 1, owner = owner, stock = stock, quantity = 100, isNisa = true)
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, unit = 1, isNisa = true)
         val request = TransactionAddRequest(
             date = LocalDate.now(),
             type = "SELL",
@@ -103,18 +93,20 @@ class TransactionServiceTest {
             fees = 15.0,
             lot_id = stockLot.id
         )
+        val transactionCaptor = argumentCaptor<Transaction>()
 
-        mockitoWhen(ownerRepository.findById(owner.id)).thenReturn(Optional.of(owner))
-        mockitoWhen(stockRepository.findByCode(stock.code)).thenReturn(stock)
-        mockitoWhen(stockLotRepository.findById(stockLot.id)).thenReturn(Optional.of(stockLot))
-        mockitoWhen(transactionRepository.save(any(Transaction::class.java))).thenAnswer { it.getArgument(0) }
+        whenever(ownerRepository.findById(owner.id)).thenReturn(Optional.of(owner))
+        whenever(stockRepository.findByCode(stock.code)).thenReturn(stock)
+        whenever(stockLotRepository.findById(stockLot.id)).thenReturn(Optional.of(stockLot))
+        whenever(transactionRepository.save(any())).thenAnswer { it.getArgument(0) }
+        whenever(stockLotRepository.save(any())).thenAnswer { it.getArgument(0) }
 
         // when
         val result = transactionService.createTransaction(request)
 
         // then
         verify(transactionRepository).save(transactionCaptor.capture())
-        val capturedTransaction = transactionCaptor.value
+        val capturedTransaction = transactionCaptor.firstValue
 
         assertThat(result).hasSize(1)
         assertThat(result[0].type).isEqualTo("SELL")
