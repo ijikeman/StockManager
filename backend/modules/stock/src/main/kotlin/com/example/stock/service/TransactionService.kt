@@ -65,9 +65,6 @@ class TransactionService(
 
         val transactions = mutableListOf<Transaction>()
 
-        val minimumUnit = if (stock.minimalUnit == 0) 1 else stock.minimalUnit
-        val quantity = request.unit * minimumUnit
-
         if (request.type.equals("BUY", ignoreCase = true)) {
             // 買い注文の場合
             // 新しいロットを作成
@@ -76,7 +73,6 @@ class TransactionService(
                 stockLot = stockLot,
                 type = TransactionType.BUY,
                 unit = request.unit, // 取引の量は単元数
-                quantity = quantity,
                 price = request.price.toBigDecimal(),
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
@@ -94,7 +90,6 @@ class TransactionService(
                 stockLot = stockLot,
                 type = TransactionType.SELL,
                 unit = request.unit,
-                quantity = quantity,
                 price = request.price.toBigDecimal(),
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
