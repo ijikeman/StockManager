@@ -60,7 +60,7 @@ CREATE TABLE transaction (
     type VARCHAR(255) NOT NULL,
     unit INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    tax DECIMAL(10, 2) NOT NULL,
+    fee DECIMAL(10, 2) NOT NULL,
     transaction_date DATE NOT NULL,
     FOREIGN KEY (lot_id) REFERENCES stock_lot(id)
 );

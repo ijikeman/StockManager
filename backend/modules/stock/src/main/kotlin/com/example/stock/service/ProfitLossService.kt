@@ -69,7 +69,7 @@ class ProfitLossService(
 
         return sellTransactions.sumOf { sell ->
             val quantity = sell.unit * sell.stockLot.stock.minimalUnit
-            (sell.price - buyPrice) * quantity.toBigDecimal() - sell.tax
+            (sell.price - buyPrice) * quantity.toBigDecimal() - sell.fee
             // 各売却ごとに損益を計算し合計
         }
     }

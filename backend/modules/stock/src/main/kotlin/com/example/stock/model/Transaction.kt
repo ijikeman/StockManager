@@ -45,8 +45,8 @@ data class Transaction(
     @Column(name = "price", nullable = false)
     val price: BigDecimal, // 価格
 
-    @Column(name = "tax", nullable = false)
-    val tax: BigDecimal, // 税金
+    @Column(name = "fee", nullable = false)
+    val fee: BigDecimal, // 手数料
 
     @Column(name = "transaction_date", nullable = false)
     val transaction_date: LocalDate // 取引日

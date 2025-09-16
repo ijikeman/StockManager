@@ -36,7 +36,7 @@ erDiagram
         UUID lot_id FK "ロットID"
         ENUM type "buy or sell"
         decimal price "単価"
-        decimal tax "手数料"
+        decimal fee "手数料"
         timestamp transaction_date "取引日"
     }
 
