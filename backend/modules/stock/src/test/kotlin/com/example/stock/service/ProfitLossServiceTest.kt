@@ -54,12 +54,12 @@ class ProfitLossServiceTest {
         // 2単元（100株）購入
         val buyTransaction = Transaction(
             id = 1, stockLot = lot, type = TransactionType.BUY, unit = 2,
-            price = BigDecimal("1000.0"), tax = BigDecimal.ZERO, transaction_date = LocalDate.now()
+            price = BigDecimal("1000.0"), fee = BigDecimal.ZERO, transaction_date = LocalDate.now()
         )
         // 1単元（50株）売却
         val sellTransaction = Transaction(
             id = 2, stockLot = lot, type = TransactionType.SELL, unit = 1,
-            price = BigDecimal("1200.0"), tax = BigDecimal("500.0"), transaction_date = LocalDate.now()
+            price = BigDecimal("1200.0"), fee = BigDecimal("500.0"), transaction_date = LocalDate.now()
         )
 
         // 配当・利益データを作成

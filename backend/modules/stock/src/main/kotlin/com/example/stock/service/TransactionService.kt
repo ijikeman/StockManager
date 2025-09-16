@@ -38,7 +38,7 @@ class TransactionService(
         owner_name = this.stockLot.owner.name,
         unit = this.unit,
         price = this.price.toDouble(),
-        fees = this.tax.toDouble(),
+        fees = this.fee.toDouble(),
         lot_id = this.stockLot.id
     )
 
@@ -74,7 +74,7 @@ class TransactionService(
                 type = TransactionType.BUY,
                 unit = request.unit, // 取引の量は単元数
                 price = request.price.toBigDecimal(),
-                tax = request.fees.toBigDecimal(),
+                fee = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
             // 取引を保存
@@ -91,7 +91,7 @@ class TransactionService(
                 type = TransactionType.SELL,
                 unit = request.unit,
                 price = request.price.toBigDecimal(),
-                tax = request.fees.toBigDecimal(),
+                fee = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
             // 取引を保存
