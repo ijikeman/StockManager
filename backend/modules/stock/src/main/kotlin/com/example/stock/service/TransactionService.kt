@@ -17,6 +17,7 @@ import java.math.BigDecimal
 @Service
 @Transactional
 class TransactionService(
+    // 取引（売買）に関するサービスクラス
     private val transactionRepository: TransactionRepository,
     private val stockLotRepository: StockLotRepository,
     private val stockRepository: StockRepository,
@@ -25,6 +26,7 @@ class TransactionService(
 ) {
 
     private fun Transaction.toDTO() = TransactionDTO(
+        // EntityからDTOへの変換
         id = this.id,
         date = this.transaction_date,
         type = this.type.toString(),
@@ -41,29 +43,36 @@ class TransactionService(
     )
 
     fun findAllTransactions(): List<TransactionDTO> {
+        // 全ての取引を取得
         return transactionRepository.findAll().map { it.toDTO() }
     }
 
     fun findTransactionById(id: Int): TransactionDTO {
+        // IDで取引を取得（存在しなければ例外）
         return transactionRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Transaction not found with id: $id") }
             .toDTO()
     }
 
     fun createTransaction(request: TransactionAddRequest): List<TransactionDTO> {
+        // 取引（売買）を新規作成
         val owner = ownerRepository.findById(request.owner_id)
             .orElseThrow { EntityNotFoundException("Owner not found with id: ${request.owner_id}") }
         val stock = stockRepository.findByCode(request.stock_code)
             ?: throw EntityNotFoundException("Stock not found with code: ${request.stock_code}")
 
+        // 取引リスト（通常は1件のみ）
+
         val transactions = mutableListOf<Transaction>()
 
         if (request.type.equals("BUY", ignoreCase = true)) {
+                // 買い注文の場合
             val minimumUnit = if (stock.minimalUnit == 0) 1 else stock.minimalUnit
             if (request.quantity % minimumUnit != 0) {
                 throw IllegalArgumentException("Quantity must be a multiple of ${minimumUnit}")
             }
             val unit = request.quantity / minimumUnit
+                // 新しいロットを作成
             val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, unit)
             val transaction = Transaction(
                 stockLot = stockLot,
@@ -73,8 +82,10 @@ class TransactionService(
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
+                // 取引を保存
             transactions.add(transactionRepository.save(transaction))
         } else {
+                // 売り注文の場合、既存ロットを利用
             // For a SELL transaction, we use an existing lot.
             val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")
             val stockLot = stockLotRepository.findById(lotId)
@@ -88,17 +99,21 @@ class TransactionService(
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
+                // 取引を保存
             transactions.add(transactionRepository.save(transaction))
 
             // Mark the lot as sold
+                // ロットの状態をSOLDに更新
             val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
             stockLotRepository.save(soldStockLot)
         }
 
+        // DTOリストで返却
         return transactions.map { it.toDTO() }
     }
 
     fun deleteTransaction(id: Int) {
+        // 取引を削除
         if (!transactionRepository.existsById(id)) {
             throw EntityNotFoundException("Transaction not found with id: $id")
         }
