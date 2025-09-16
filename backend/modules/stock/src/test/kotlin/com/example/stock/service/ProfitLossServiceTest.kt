@@ -50,11 +50,11 @@ class ProfitLossServiceTest {
 
         // 売買トランザクションを作成
         val buyTransaction = Transaction(
-            id = 1, stockLot = lot, type = TransactionType.BUY, quantity = 100,
+            id = 1, stockLot = lot, type = TransactionType.BUY, unit = 1, quantity = 100,
             price = BigDecimal("1000.0"), tax = BigDecimal.ZERO, transaction_date = LocalDate.now()
         )
         val sellTransaction = Transaction(
-            id = 2, stockLot = lot, type = TransactionType.SELL, quantity = 50,
+            id = 2, stockLot = lot, type = TransactionType.SELL, unit = 1, quantity = 50,
             price = BigDecimal("1200.0"), tax = BigDecimal("500.0"), transaction_date = LocalDate.now()
         )
 

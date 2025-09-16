@@ -61,4 +61,16 @@ class StockLotQueryService(
             .map { it.toDto() }
             .groupBy { it.is_nisa }
     }
+
+    /**
+     * 指定されたIDの株式ロットを取得します。
+     *
+     * @param lotId ロットのID
+     * @return StockLotDTO
+     */
+    fun findStockLotById(lotId: Int): StockLotDTO {
+        return stockLotRepository.findById(lotId)
+            .map { it.toDto() }
+            .orElseThrow { jakarta.persistence.EntityNotFoundException("StockLot not found with id: $lotId") }
+    }
 }

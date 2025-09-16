@@ -47,7 +47,7 @@ class TransactionServiceTest {
             type = "BUY",
             stock_code = stock.code,
             owner_id = owner.id,
-            quantity = 200,
+            unit = 2,
             price = 500.0,
             fees = 10.0,
             nisa = true
@@ -73,7 +73,7 @@ class TransactionServiceTest {
 
         assertThat(result).hasSize(1)
         assertThat(result[0].type).isEqualTo("BUY")
-        assertThat(result[0].quantity).isEqualTo(200)
+        assertThat(result[0].unit).isEqualTo(2)
         assertThat(capturedTransaction.stockLot).isEqualTo(newStockLot)
     }
 
@@ -88,7 +88,7 @@ class TransactionServiceTest {
             type = "SELL",
             stock_code = stock.code,
             owner_id = owner.id,
-            quantity = 50,
+            unit = 1,
             price = 600.0,
             fees = 15.0,
             lot_id = stockLot.id
@@ -110,7 +110,7 @@ class TransactionServiceTest {
 
         assertThat(result).hasSize(1)
         assertThat(result[0].type).isEqualTo("SELL")
-        assertThat(result[0].quantity).isEqualTo(50)
+        assertThat(result[0].unit).isEqualTo(1)
         assertThat(capturedTransaction.stockLot).isEqualTo(stockLot)
     }
 }

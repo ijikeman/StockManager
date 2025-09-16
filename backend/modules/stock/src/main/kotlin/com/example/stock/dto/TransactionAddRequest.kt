@@ -22,9 +22,9 @@ data class TransactionAddRequest(
     @field:NotNull(message = "Owner ID is mandatory")
     val owner_id: Int,
 
-    @field:NotNull(message = "Quantity is mandatory")
-    @field:Positive(message = "Quantity must be positive")
-    val quantity: Int,
+    @field:NotNull(message = "Unit is mandatory")
+    @field:Positive(message = "Unit must be positive")
+    val unit: Int,
 
     @field:NotNull(message = "Price is mandatory")
     @field:Positive(message = "Price must be positive")

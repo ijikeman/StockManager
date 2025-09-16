@@ -36,7 +36,7 @@ class TransactionService(
         ),
         owner_id = this.stockLot.owner.id,
         owner_name = this.stockLot.owner.name,
-        quantity = this.quantity,
+        unit = this.unit,
         price = this.price.toDouble(),
         fees = this.tax.toDouble(),
         lot_id = this.stockLot.id
@@ -65,27 +65,26 @@ class TransactionService(
 
         val transactions = mutableListOf<Transaction>()
 
+        val minimumUnit = if (stock.minimalUnit == 0) 1 else stock.minimalUnit
+        val quantity = request.unit * minimumUnit
+
         if (request.type.equals("BUY", ignoreCase = true)) {
-                // 買い注文の場合
-            val minimumUnit = if (stock.minimalUnit == 0) 1 else stock.minimalUnit
-            if (request.quantity % minimumUnit != 0) {
-                throw IllegalArgumentException("Quantity must be a multiple of ${minimumUnit}")
-            }
-            val unit = request.quantity / minimumUnit
-                // 新しいロットを作成
-            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, unit)
+            // 買い注文の場合
+            // 新しいロットを作成
+            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, request.unit)
             val transaction = Transaction(
                 stockLot = stockLot,
                 type = TransactionType.BUY,
-                quantity = request.quantity, // 取引の量は株数
+                unit = request.unit, // 取引の量は単元数
+                quantity = quantity,
                 price = request.price.toBigDecimal(),
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
-                // 取引を保存
+            // 取引を保存
             transactions.add(transactionRepository.save(transaction))
         } else {
-                // 売り注文の場合、既存ロットを利用
+            // 売り注文の場合、既存ロットを利用
             // For a SELL transaction, we use an existing lot.
             val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")
             val stockLot = stockLotRepository.findById(lotId)
@@ -94,16 +93,17 @@ class TransactionService(
             val transaction = Transaction(
                 stockLot = stockLot,
                 type = TransactionType.SELL,
-                quantity = request.quantity,
+                unit = request.unit,
+                quantity = quantity,
                 price = request.price.toBigDecimal(),
                 tax = request.fees.toBigDecimal(),
                 transaction_date = request.date
             )
-                // 取引を保存
+            // 取引を保存
             transactions.add(transactionRepository.save(transaction))
 
             // Mark the lot as sold
-                // ロットの状態をSOLDに更新
+            // ロットの状態をSOLDに更新
             val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
             stockLotRepository.save(soldStockLot)
         }
