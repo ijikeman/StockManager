@@ -38,7 +38,7 @@
         <td>{{ holding.stock.name }}</td>
         <td>{{ holding.owner.name }}</td>
         <td>{{ holding.isNisa ? 'はい' : 'いいえ' }}</td>
-        <td>{{ holding.quantity }}</td>
+        <td>{{ holding.unit }}</td>
         <td>{{ holding.status }}</td>
         <td>
           <button @click="sellHolding(holding.id)" class="btn btn-success">売却</button>
