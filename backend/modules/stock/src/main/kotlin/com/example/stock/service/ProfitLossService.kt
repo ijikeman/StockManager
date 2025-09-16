@@ -74,7 +74,7 @@ class ProfitLossService(
         val buyPrice = buyTransaction.price
 
         val soldQuantity = transactions.filter { it.type == TransactionType.SELL }.sumOf { it.quantity }
-        val remainingQuantity = lot.quantity - soldQuantity
+        val remainingQuantity = (lot.unit * lot.stock.minumalUnit) - soldQuantity
 
         if (remainingQuantity <= 0) {
             return BigDecimal.ZERO

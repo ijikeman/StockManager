@@ -43,6 +43,6 @@ data class Stock(
     @JoinColumn(name = "sector_id")
     var sector: Sector? = null, // セクター
 
-    @Column(name = "minimum_unit", nullable = false)
-    val minimum_unit: Int = 100 // 最低単元数
+    @Column(name = "minimal_unit", nullable = false)
+    val minimalUnit: Int = 100 // 最低単元数
 )
