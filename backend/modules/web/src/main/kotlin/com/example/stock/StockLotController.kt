@@ -1,6 +1,6 @@
 package com.example.stock
 
-import com.example.stock.model.StockLot
+import com.example.stock.dto.StockLotDTO
 import com.example.stock.service.StockLotQueryService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,7 +12,7 @@ class StockLotController(
     private val stockLotQueryService: StockLotQueryService
 ) {
     @GetMapping
-    fun getStockLots(): List<StockLot> {
+    fun getStockLots(): List<StockLotDTO> {
         return stockLotQueryService.findAllStockLots()
     }
 }

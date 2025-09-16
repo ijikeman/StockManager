@@ -59,18 +59,21 @@ class TransactionService(
         val transactions = mutableListOf<Transaction>()
 
         if (request.type.equals("BUY", ignoreCase = true)) {
-            val stockLots = stockLotService.createStockLots(owner, stock, request.nisa, request.quantity)
-            for (stockLot in stockLots) {
-                val transaction = Transaction(
-                    stockLot = stockLot,
-                    type = TransactionType.BUY,
-                    quantity = stockLot.quantity,
-                    price = request.price.toBigDecimal(),
-                    tax = request.fees.toBigDecimal(),
-                    transaction_date = request.date
-                )
-                transactions.add(transactionRepository.save(transaction))
+            val minimumUnit = if (stock.minimalUnit == 0) 1 else stock.minimalUnit
+            if (request.quantity % minimumUnit != 0) {
+                throw IllegalArgumentException("Quantity must be a multiple of ${minimumUnit}")
             }
+            val unit = request.quantity / minimumUnit
+            val stockLot = stockLotService.createStockLot(owner, stock, request.nisa, unit)
+            val transaction = Transaction(
+                stockLot = stockLot,
+                type = TransactionType.BUY,
+                quantity = request.quantity, // 取引の量は株数
+                price = request.price.toBigDecimal(),
+                tax = request.fees.toBigDecimal(),
+                transaction_date = request.date
+            )
+            transactions.add(transactionRepository.save(transaction))
         } else {
             // For a SELL transaction, we use an existing lot.
             val lotId = request.lot_id ?: throw IllegalArgumentException("lot_id is required for SELL transactions")

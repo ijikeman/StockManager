@@ -35,6 +35,7 @@ CREATE TABLE stock (
     name VARCHAR(255) NOT NULL,
     current_price DECIMAL(10, 2) NOT NULL,
     dividend DECIMAL(10, 2) NOT NULL,
+    minimal_unit INT NOT NULL DEFAULT 100,
     earnings_date DATE NULL,
     sector_id INT,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
@@ -45,7 +46,7 @@ CREATE TABLE stock_lot (
     id INT PRIMARY KEY AUTO_INCREMENT,
     owner_id INT,
     stock_id INT,
-    quantity INT NOT NULL,
+    unit INT NOT NULL,
     is_nisa BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(255) NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES owner(id),

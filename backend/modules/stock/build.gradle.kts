@@ -33,6 +33,7 @@ dependencies {
 
     // テスト実行の為、記載が必要(JUnitが内包されている)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     // サブモジュールで単体テストする為、こちらにも記載している
     testRuntimeOnly("com.h2database:h2")
 }

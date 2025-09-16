@@ -10,6 +10,7 @@ import com.example.stock.model.LotStatus
  * @property owner_name 所有者の名前
  * @property stock_code 銘柄コード
  * @property stock_name 銘柄名
+ * @property unit 単元数
  * @property quantity 株数
  * @property is_nisa NISA口座かどうか
  * @property status ロットのステータス
@@ -20,6 +21,7 @@ data class StockLotDTO(
     val owner_name: String,
     val stock_code: String,
     val stock_name: String,
+    val unit: Int,
     val quantity: Int,
     val is_nisa: Boolean,
     val status: LotStatus
