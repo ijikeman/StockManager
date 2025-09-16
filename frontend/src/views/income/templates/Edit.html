@@ -1,0 +1,30 @@
+<div class="form-container">
+  <h3 class="form-title">配当編集</h3>
+
+  <form @submit.prevent="saveIncome" class="form-inline">
+    <input
+      type="date"
+      v-model="formData.payment_date"
+      required
+      class="form-control"
+    >
+    <input
+      type="text"
+      :value="formData.stockLot ? formData.stockLot.stock_name : ''"
+      readonly
+      class="form-control"
+    >
+    <input
+      type="number"
+      v-model="formData.incoming"
+      placeholder="金額"
+      required
+      class="form-control"
+    >
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>

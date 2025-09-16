@@ -1,0 +1,48 @@
+<template src="./templates/Add.html"></template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'IncomeAdd',
+  data() {
+    return {
+      formData: {
+        payment_date: new Date().toISOString().slice(0, 10),
+        lot_id: null,
+        incoming: null
+      },
+      stockLots: []
+    };
+  },
+  methods: {
+    async fetchStockLots() {
+      try {
+        const response = await axios.get('/api/holding');
+        const holdings = response.data;
+        this.stockLots = [
+          ...(holdings['true'] || []),
+          ...(holdings['false'] || [])
+        ];
+      } catch (error) {
+        console.error('Error fetching stock lots:', error);
+      }
+    },
+    async saveIncome() {
+      try {
+        await axios.post('/api/incoming-history', this.formData);
+        this.$router.push('/income');
+      } catch (error) {
+        console.error('Error saving income:', error);
+        alert('Failed to save income.');
+      }
+    },
+    cancel() {
+      this.$router.push('/income');
+    }
+  },
+  created() {
+    this.fetchStockLots();
+  }
+};
+</script>

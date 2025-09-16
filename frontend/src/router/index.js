@@ -10,7 +10,8 @@ import TransactionList from '../views/transaction/List.vue';
 import BuyTransaction from '../views/transaction/Buy.vue';
 import SellTransaction from '../views/transaction/Sell.vue';
 import IncomeList from '../views/income/List.vue';
-import IncomeAddEdit from '../views/income/AddEdit.vue';
+import IncomeAdd from '../views/income/Add.vue';
+import IncomeEdit from '../views/income/Edit.vue';
 
 const routes = [
   {
@@ -46,12 +47,12 @@ const routes = [
   {
     path: '/income/add',
     name: 'IncomeAdd',
-    component: IncomeAddEdit
+    component: IncomeAdd
   },
   {
     path: '/income/edit/:id',
     name: 'IncomeEdit',
-    component: IncomeAddEdit,
+    component: IncomeEdit,
     props: true
   },
   {
