@@ -90,13 +90,13 @@ class IncomingHistoryService(
         val stockLot = stockLotRepository.findById(request.lot_id)
             .orElseThrow { EntityNotFoundException("StockLot not found with id: ${request.lot_id}") }
 
-        incomingHistory.apply {
-            this.stockLot = stockLot
-            this.incoming = request.incoming
-            this.payment_date = request.payment_date
-        }
+        val updatedIncomingHistory = incomingHistory.copy(
+            stockLot = stockLot,
+            incoming = request.incoming,
+            payment_date = request.payment_date
+        )
 
-        val saved = incomingHistoryRepository.save(incomingHistory)
+        val saved = incomingHistoryRepository.save(updatedIncomingHistory)
         return saved.toDTO()
     }
 

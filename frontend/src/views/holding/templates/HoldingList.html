@@ -26,6 +26,10 @@
         <th>所有者</th>
         <th>NISA</th>
         <th>数量</th>
+        <th>取得価格</th>
+        <th>現在価格</th>
+        <th>損益</th>
+        <th>配当金</th>
         <th>ステータス</th>
         <th>アクション</th>
       </tr>
@@ -39,9 +43,13 @@
         <td>{{ holding.owner_name }}</td>
         <td>{{ holding.is_nisa ? 'はい' : 'いいえ' }}</td>
         <td>{{ holding.unit }}</td>
+        <td>{{ holding.acquisition_price }}</td>
+        <td>{{ holding.current_price }}</td>
+        <td>{{ holding.profit_loss }}</td>
+        <td>{{ holding.dividend }}</td>
         <td>{{ holding.status }}</td>
         <td>
-          <button @click="sellHolding(holding.id)" class="btn btn-success">売却</button>
+          <button @click="sellHolding(holding.id)" class.bind="btn btn-success">売却</button>
         </td>
       </tr>
     </tbody>
