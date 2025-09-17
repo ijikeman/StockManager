@@ -33,8 +33,8 @@ data class Stock(
     @Column(name = "current_price", nullable = false)
     val current_price: Double = 0.0, // 現在の株価
 
-    @Column(name = "dividend", nullable = false)
-    val dividend: Double = 0.0, // 配当金
+    @Column(name = "incoming", nullable = false)
+    val incoming: Double = 0.0, // 配当金
 
     @Column(name = "earnings_date")
     val earnings_date: java.time.LocalDate? = null, // 業績発表日

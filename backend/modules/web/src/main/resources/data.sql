@@ -40,7 +40,7 @@ INSERT INTO sector(name) VALUES
 ('不動産業'); -- 33
 
 -- stock
-INSERT INTO stock(code, name, current_price, dividend, earnings_date, sector_id) VALUES
+INSERT INTO stock(code, name, current_price, incoming, earnings_date, sector_id) VALUES
 ('9142', '九州旅客鉄道', 0, 0, NULL, 25),
 ('3563', 'FOOD & LIFE COMPANIES', 0, 0, NULL, 28),
 ('9434', 'ソフトバンク', 0, 0, NULL, 20),

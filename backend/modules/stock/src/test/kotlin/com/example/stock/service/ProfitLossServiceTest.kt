@@ -71,7 +71,7 @@ class ProfitLossServiceTest {
         `when`(transactionRepository.findByStockLotId(lot.id)).thenReturn(listOf(buyTransaction, sellTransaction))
         `when`(incomingHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(incoming))
         `when`(benefitHistoryRepository.findByStockLotId(lot.id)).thenReturn(listOf(benefit))
-        `when`(financeProvider.fetchStockInfo(stock.code)).thenReturn(StockInfo(price = 1500.0, dividend = 0.0, earnings_date = null))
+        `when`(financeProvider.fetchStockInfo(stock.code)).thenReturn(StockInfo(price = 1500.0, incoming = 0.0, earnings_date = null))
 
 
         // Act（テスト対象メソッドの実行）

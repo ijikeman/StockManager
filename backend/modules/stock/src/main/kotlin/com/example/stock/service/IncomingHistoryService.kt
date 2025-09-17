@@ -31,7 +31,7 @@ class IncomingHistoryService(
         stock_code = this.stock.code,
         stock_name = this.stock.name,
         unit = this.unit,
-        quantity = this.stock.unit * this.unit,
+        quantity = this.stock.minimalUnit * this.unit,
         is_nisa = this.isNisa,
         status = this.status
     )

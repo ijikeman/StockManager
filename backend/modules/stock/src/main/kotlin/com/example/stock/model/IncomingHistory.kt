@@ -23,11 +23,11 @@ data class IncomingHistory(
 
     @ManyToOne
     @JoinColumn(name = "lot_id")
-    val stockLot: StockLot, // 株式ロット
+    var stockLot: StockLot, // 株式ロット
 
     @Column(name = "incoming", nullable = false)
-    val incoming: BigDecimal, // 入金額
+    var incoming: BigDecimal, // 入金額
 
     @Column(name = "payment_date", nullable = false)
-    val payment_date: LocalDate // 支払日
+    var payment_date: LocalDate // 支払日
 )
