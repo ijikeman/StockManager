@@ -34,7 +34,7 @@ CREATE TABLE stock (
     code VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     current_price DECIMAL(10, 2) NOT NULL,
-    dividend DECIMAL(10, 2) NOT NULL,
+    incoming DECIMAL(10, 2) NOT NULL,
     minimal_unit INT NOT NULL DEFAULT 100,
     earnings_date DATE NULL,
     sector_id INT,

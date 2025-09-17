@@ -26,11 +26,11 @@ class YahooFinanceProvider(
 
             // docから各データを取得
             val price = extractPrice(doc)
-            val dividend = extractDividend(doc)
+            val incoming = extractIncoming(doc)
             val earnings_date = extractEarningsDate(doc)
 
             // 取得したデータをStockInfoに格納しreturnする
-            StockInfo(price, dividend, earnings_date)
+            StockInfo(price, incoming, earnings_date)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -66,7 +66,7 @@ class YahooFinanceProvider(
         return priceText?.toDoubleOrNull()
     }
 
-    private fun extractDividend(doc: org.jsoup.nodes.Document): Double? {
+    private fun extractIncoming(doc: org.jsoup.nodes.Document): Double? {
         val dividendElement = doc.select("dt").find { it.text().contains("1株配当") }
         val valueText = dividendElement?.nextElementSibling()?.selectFirst("""span[class*="DataListItem__value"]""")?.text()
         return valueText?.toDoubleOrNull()

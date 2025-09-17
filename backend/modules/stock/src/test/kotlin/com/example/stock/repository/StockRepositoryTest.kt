@@ -25,7 +25,7 @@ class StockRepositoryTest {
         // given
         val sector = Sector(name = "test sector")
         val persistedSector = entityManager.persist(sector)
-    val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
+    val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
         // persistした結果、自動採番されたIDを含むインスタンスが返る
         val persistedStock = entityManager.persist(stock)
         entityManager.flush()
@@ -44,7 +44,7 @@ class StockRepositoryTest {
         // given
         val sector = Sector(name = "test sector")
         val persistedSector = entityManager.persist(sector)
-    val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
+    val stock = Stock(code = "9999", name = "test stock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
         entityManager.persist(stock)
         entityManager.flush()
 
@@ -62,7 +62,7 @@ class StockRepositoryTest {
         // given
         val sector = Sector(name = "test sector")
         val persistedSector = entityManager.persist(sector)
-    val stock = Stock(code = "9998", name = "new stock", current_price = 2000.0, dividend = 20.0, earnings_date = java.time.LocalDate.of(2025, 1, 2), sector = persistedSector)
+    val stock = Stock(code = "9998", name = "new stock", current_price = 2000.0, incoming = 20.0, earnings_date = java.time.LocalDate.of(2025, 1, 2), sector = persistedSector)
 
         // when
         val savedStock = stockRepository.save(stock)

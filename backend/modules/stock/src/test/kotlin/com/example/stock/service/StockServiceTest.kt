@@ -41,8 +41,8 @@ class StockServiceTest {
         // given: 前提条件の設定
         // モックのstockRepositoryがfindAll()メソッドを呼ばれた場合に、あらかじめ用意したstocksリストを返すように設定
         val stocks = listOf(
-            Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector),
-            Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, dividend = 20.0, earnings_date = java.time.LocalDate.of(2025, 2, 2), sector = sector)
+            Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector),
+            Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, incoming = 20.0, earnings_date = java.time.LocalDate.of(2025, 2, 2), sector = sector)
         )
         mockitoWhen(stockRepository.findAll()).thenReturn(stocks) // stockRepository.findAll()を読んだときはstocksを返す
 
@@ -58,7 +58,7 @@ class StockServiceTest {
     @Test
     fun `findByCode should return stock when found`() {
         // given: "1301"というコードで検索されたら、特定のstockオブジェクトを返すように設定
-    val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
         mockitoWhen(stockRepository.findByCode("1301")).thenReturn(stock)
 
         // when: 実際に"1301"で検索を実行
@@ -84,7 +84,7 @@ class StockServiceTest {
     @Test
     fun `findById should return stock when found`() {
         // given: IDが1で検索されたら、Optionalに包まれたstockオブジェクトを返すように設定
-    val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val stock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
         mockitoWhen(stockRepository.findById(1)).thenReturn(Optional.of(stock))
 
         // when: 実際にID=1で検索を実行
@@ -110,8 +110,8 @@ class StockServiceTest {
     @Test
     fun `save should return saved stock`() {
         // given: 特定のstockオブジェクトを保存しようとしたら、IDが採番されたstockオブジェクトを返すように設定
-    val stockToSave = Stock(code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
-    val savedStock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val stockToSave = Stock(code = "1301", name = "teststock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val savedStock = Stock(id = 1, code = "1301", name = "teststock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
         mockitoWhen(stockRepository.save(stockToSave)).thenReturn(savedStock)
 
         // when: 実際に保存処理を実行
@@ -127,9 +127,9 @@ class StockServiceTest {
     fun `updateStockPrice should update and return stock when found`() {
         // given
         val code = "1301"
-    val originalStock = Stock(id = 1, code = code, name = "teststock", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
-    val stockInfo = StockInfo(price = 1200.0, dividend = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
-    val updatedStock = originalStock.copy(current_price = 1200.0, dividend = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
+    val originalStock = Stock(id = 1, code = code, name = "teststock", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
+    val updatedStock = originalStock.copy(current_price = 1200.0, incoming = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
 
         mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
         mockitoWhen(stockRepository.findByCode(code)).thenReturn(originalStock)
@@ -141,7 +141,7 @@ class StockServiceTest {
         // then
         assertThat(result).isNotNull
         assertThat(result?.current_price).isEqualTo(1200.0)
-        assertThat(result?.dividend).isEqualTo(12.0)
+        assertThat(result?.incoming).isEqualTo(12.0)
     assertThat(result?.earnings_date).isEqualTo(java.time.LocalDate.of(2025, 1, 2))
     }
 
@@ -149,7 +149,7 @@ class StockServiceTest {
     fun `updateStockPrice should return null when stock not in db`() {
         // given
         val code = "1301"
-    val stockInfo = StockInfo(price = 1200.0, dividend = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
+    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earnings_date = java.time.LocalDate.of(2025, 1, 2))
 
         mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
         mockitoWhen(stockRepository.findByCode(code)).thenReturn(null)
@@ -177,15 +177,15 @@ class StockServiceTest {
     @Test
     fun `updateAllStockPrices should update all stocks`() {
         // given
-    val stock1 = Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, dividend = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
-    val stock2 = Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, dividend = 20.0, earnings_date = java.time.LocalDate.of(2025, 2, 2), sector = sector)
+    val stock1 = Stock(id = 1, code = "1301", name = "stock1", current_price = 1000.0, incoming = 10.0, earnings_date = java.time.LocalDate.of(2025, 1, 1), sector = sector)
+    val stock2 = Stock(id = 2, code = "1302", name = "stock2", current_price = 2000.0, incoming = 20.0, earnings_date = java.time.LocalDate.of(2025, 2, 2), sector = sector)
         val stocks = listOf(stock1, stock2)
 
-    val stockInfo1 = StockInfo(price = 1100.0, dividend = 11.0, earnings_date = java.time.LocalDate.of(2025, 1, 11))
-    val stockInfo2 = StockInfo(price = 2200.0, dividend = 22.0, earnings_date = java.time.LocalDate.of(2025, 2, 12))
+    val stockInfo1 = StockInfo(price = 1100.0, incoming = 11.0, earnings_date = java.time.LocalDate.of(2025, 1, 11))
+    val stockInfo2 = StockInfo(price = 2200.0, incoming = 22.0, earnings_date = java.time.LocalDate.of(2025, 2, 12))
 
-    val updatedStock1 = stock1.copy(current_price = 1100.0, dividend = 11.0, earnings_date = java.time.LocalDate.of(2025, 1, 11))
-    val updatedStock2 = stock2.copy(current_price = 2200.0, dividend = 22.0, earnings_date = java.time.LocalDate.of(2025, 2, 12))
+    val updatedStock1 = stock1.copy(current_price = 1100.0, incoming = 11.0, earnings_date = java.time.LocalDate.of(2025, 1, 11))
+    val updatedStock2 = stock2.copy(current_price = 2200.0, incoming = 22.0, earnings_date = java.time.LocalDate.of(2025, 2, 12))
 
         mockitoWhen(stockRepository.findAll()).thenReturn(stocks)
         mockitoWhen(yahooFinanceProvider.fetchStockInfo("1301")).thenReturn(stockInfo1)

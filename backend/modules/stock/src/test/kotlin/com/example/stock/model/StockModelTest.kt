@@ -26,7 +26,7 @@ class StockTest {
             code = "7203",
             name = "トヨタ自動車",
             current_price = 9000.0,
-            dividend = 150.0,
+            incoming = 150.0,
             earnings_date = java.time.LocalDate.of(2025, 8, 27),
             sector = sector
         )
