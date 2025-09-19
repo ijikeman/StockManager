@@ -25,7 +25,7 @@ export default {
       if (this.formData.lot_id && this.dividend_per_unit) {
         const selectedLot = this.stockLots.find(lot => lot.id === this.formData.lot_id);
         if (selectedLot) {
-          this.formData.incoming = this.dividend_per_unit * selectedLot.unit;
+          this.formData.incoming = this.dividend_per_unit * selectedLot.unit * selectedLot.minimalUnit;
         }
       } else {
         this.formData.incoming = null;

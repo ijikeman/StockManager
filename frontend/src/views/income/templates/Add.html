@@ -24,6 +24,9 @@
     <div v-if="formData.lot_id">
       単元数: {{ stockLots.find(lot => lot.id === formData.lot_id).unit }}
     </div>
+    <div v-if="formData.lot_id">
+      最低単元数: {{ stockLots.find(lot => lot.id === formData.lot_id).minimalUnit }}
+    </div>
     <div v-if="formData.incoming">
       総配当金: {{ formData.incoming }}
     </div>

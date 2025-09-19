@@ -26,7 +26,8 @@ class StockLotQueryService(
             unit = this.unit,
             quantity = this.unit * this.stock.minimalUnit,
             is_nisa = this.isNisa,
-            status = this.status
+            status = this.status,
+            minimalUnit = this.stock.minimalUnit
         )
     }
 
