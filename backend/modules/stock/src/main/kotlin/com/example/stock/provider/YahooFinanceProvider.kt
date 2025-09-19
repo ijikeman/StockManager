@@ -62,7 +62,7 @@ class YahooFinanceProvider(
     }
 
     private fun extractPrice(doc: org.jsoup.nodes.Document): Double? {
-        val priceText = doc.selectFirst("""span[class*="PriceBoard__price"]""")?.text()?.replace(",", "")
+        val priceText = doc.selectFirst("""div[class*="PriceBoard__priceInformation"] span[class*="StyledNumber__value"]""")?.text()?.replace(",", "")
         return priceText?.toDoubleOrNull()
     }
 
