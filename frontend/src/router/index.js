@@ -9,6 +9,7 @@ import HoldingList from '../views/holding/List.vue';
 import TransactionList from '../views/transaction/List.vue';
 import BuyTransaction from '../views/transaction/Buy.vue';
 import SellTransaction from '../views/transaction/Sell.vue';
+import DisposeLot from '../views/holding/Dispose.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAdd from '../views/income/Add.vue';
 import IncomeEdit from '../views/income/Edit.vue';
@@ -22,6 +23,12 @@ const routes = [
     path: '/holding',
     name: 'HoldingList',
     component: HoldingList
+  },
+  {
+    path: '/holding/dispose/:lot_id',
+    name: 'DisposeLot',
+    component: DisposeLot,
+    props: true
   },
   {
     path: '/transaction',
