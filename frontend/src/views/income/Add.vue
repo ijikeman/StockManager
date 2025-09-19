@@ -12,10 +12,25 @@ export default {
         lot_id: null,
         incoming: null
       },
+      dividend_per_unit: null,
       stockLots: []
     };
   },
+  watch: {
+    dividend_per_unit: 'calculateTotal',
+    'formData.lot_id': 'calculateTotal'
+  },
   methods: {
+    calculateTotal() {
+      if (this.formData.lot_id && this.dividend_per_unit) {
+        const selectedLot = this.stockLots.find(lot => lot.id === this.formData.lot_id);
+        if (selectedLot) {
+          this.formData.incoming = this.dividend_per_unit * selectedLot.unit;
+        }
+      } else {
+        this.formData.incoming = null;
+      }
+    },
     async fetchStockLots() {
       try {
         const response = await axios.get('/api/holding');

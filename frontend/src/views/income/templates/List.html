@@ -12,7 +12,9 @@
         <th>日付</th>
         <th>銘柄コード</th>
         <th>銘柄名</th>
-        <th>金額</th>
+        <th>単元数</th>
+        <th>単元あたり配当</th>
+        <th>配当金合計</th>
         <th>アクション</th>
       </tr>
     </thead>
@@ -21,6 +23,8 @@
         <td>{{ income.payment_date }}</td>
         <td>{{ income.stockLot.stock_code }}</td>
         <td>{{ income.stockLot.stock_name }}</td>
+        <td>{{ income.stockLot.unit }}</td>
+        <td>{{ (income.incoming / income.stockLot.unit).toFixed(2) }}</td>
         <td>{{ income.incoming }}</td>
         <td>
           <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>

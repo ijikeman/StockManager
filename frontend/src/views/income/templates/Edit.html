@@ -16,11 +16,17 @@
     >
     <input
       type="number"
-      v-model="formData.incoming"
-      placeholder="金額"
+      v-model="dividend_per_unit"
+      placeholder="単元あたり配当"
       required
       class="form-control"
     >
+    <div v-if="formData.stockLot">
+      単元数: {{ formData.stockLot.unit }}
+    </div>
+    <div v-if="formData.incoming">
+      総配当金: {{ formData.incoming }}
+    </div>
 
     <div class="form-actions">
       <button type="submit" class="btn btn-success">保存</button>
