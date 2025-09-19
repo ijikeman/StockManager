@@ -55,7 +55,8 @@ class HoldingStockService(
                 acquisition_price = acquisitionPrice,
                 current_price = currentPrice,
                 profit_loss = profitLoss,
-                dividend = dividend
+                dividend = dividend,
+                minimalUnit = stockLot.stock.minimalUnit
             )
         }.groupBy { it.is_nisa }
     }

@@ -24,5 +24,6 @@ data class StockLotDTO(
     val unit: Int,
     val quantity: Int,
     val is_nisa: Boolean,
-    val status: LotStatus
+    val status: LotStatus,
+    val minimalUnit: Int
 )
