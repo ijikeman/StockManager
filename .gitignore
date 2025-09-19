@@ -1,3 +1,6 @@
 # IDEA系の設定
 .idea
 *.iml
+
+# Log files
+*.log
