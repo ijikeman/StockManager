@@ -7,9 +7,11 @@ import com.example.stock.provider.YahooFinanceProvider
 import com.example.stock.repository.IncomingHistoryRepository
 import com.example.stock.repository.StockLotRepository
 import com.example.stock.repository.TransactionRepository
+import com.example.stock.model.Transaction
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -56,5 +58,36 @@ class HoldingStockService(
                 dividend = dividend
             )
         }.groupBy { it.is_nisa }
+    }
+
+    @Transactional
+    fun deleteStockLot(lotId: Int) {
+        stockLotRepository.deleteById(lotId)
+    }
+
+    @Transactional
+    fun disposePartialStockLot(lotId: Int, unitsToDispose: Int) {
+        val stockLot = stockLotRepository.findById(lotId)
+            .orElseThrow { IllegalArgumentException("Invalid stock lot ID: $lotId") }
+
+        if (unitsToDispose <= 0 || unitsToDispose >= stockLot.unit) {
+            throw IllegalArgumentException("Invalid number of units to dispose")
+        }
+
+        stockLot.unit -= unitsToDispose
+        stockLotRepository.save(stockLot)
+
+        val stockInfo = yahooFinanceProvider.fetchStockInfo(stockLot.stock.code)
+        val currentPrice = stockInfo?.price?.toBigDecimal() ?: BigDecimal.ZERO
+
+        val disposalTransaction = Transaction(
+            stockLot = stockLot,
+            type = TransactionType.SELL,
+            unit = unitsToDispose,
+            price = currentPrice,
+            fee = BigDecimal.ZERO,
+            transaction_date = LocalDate.now()
+        )
+        transactionRepository.save(disposalTransaction)
     }
 }

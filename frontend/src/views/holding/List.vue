@@ -55,9 +55,9 @@ export default {
         console.error('保有ロットの取得中にエラーが発生しました:', error);
       }
     },
-    // 売却ボタンがクリックされた時の処理
-    sellHolding(id) {
-      this.$router.push(`/transaction/sell/${id}`);
+    // 処分ボタンがクリックされた時の処理
+    disposeHolding(id) {
+      this.$router.push(`/holding/dispose/${id}`);
     },
   },
 
