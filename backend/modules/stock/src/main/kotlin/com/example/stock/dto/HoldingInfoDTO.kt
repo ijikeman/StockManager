@@ -16,5 +16,6 @@ data class HoldingInfoDTO(
     val acquisition_price: BigDecimal,
     val current_price: BigDecimal,
     val profit_loss: BigDecimal,
-    val dividend: BigDecimal
+    val dividend: BigDecimal,
+    val minimalUnit: Int
 )
