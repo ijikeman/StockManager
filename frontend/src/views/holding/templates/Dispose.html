@@ -1,0 +1,23 @@
+<div class="form-container">
+  <h3 class="form-title">保有ロット処分</h3>
+
+  <div v-if="lot" class="lot-details">
+    <h4>処分対象ロット</h4>
+    <p><strong>銘柄:</strong> {{ lot.stock.name }} ({{ lot.stock.code }})</p>
+    <p><strong>保有単元数:</strong> {{ lot.unit }}</p>
+    <p><strong>取得価格:</strong> {{ lot.price }}</p>
+    <p><strong>NISA:</strong> {{ lot.is_nisa ? 'はい' : 'いいえ' }}</p>
+  </div>
+
+  <form @submit.prevent="confirmDisposal">
+    <div class="form-group">
+      <label for="unit">処分単元数</label>
+      <input id="unit" type="number" v-model.number="unitsToDispose" required class="form-control" min="1" :max="lot ? lot.unit : 1">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-danger">処分実行</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>
