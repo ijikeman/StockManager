@@ -14,6 +14,7 @@ export default {
   data() {
     return {
       lot: null,
+      error: null,
       formData: {
         date: new Date().toISOString().slice(0, 10),
         type: 'sell',
@@ -27,15 +28,16 @@ export default {
   methods: {
     async fetchLotDetails() {
       try {
-        // Assuming an endpoint to get a single lot's details exists.
-        // If not, would need to fetch all and filter.
         const response = await axios.get(`/api/holding/${this.lot_id}`);
-        this.lot = response.data;
-        // Pre-fill unit for convenience, user can edit if they are partially selling.
-        this.formData.unit = this.lot.unit;
+        if (response.data) {
+          this.lot = response.data;
+          this.formData.unit = this.lot.unit;
+        } else {
+          this.error = '指定されたロットが見つかりません。';
+        }
       } catch (error) {
         console.error('Error fetching lot details:', error);
-        alert('ロット情報の取得に失敗しました。');
+        this.error = 'ロット情報の取得に失敗しました。';
       }
     },
     async saveTransaction() {
