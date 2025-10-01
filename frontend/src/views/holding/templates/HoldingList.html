@@ -49,7 +49,7 @@
         <td>{{ holding.dividend }}</td>
         <td>{{ holding.status }}</td>
         <td>
-          <button @click="disposeHolding(holding.id)" class="btn btn-danger">処分</button>
+          <router-link :to="{ name: 'TransactionSell', params: { lot_id: holding.id } }" class="btn btn-success">売却</router-link>
         </td>
       </tr>
     </tbody>
