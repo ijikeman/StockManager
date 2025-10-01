@@ -15,18 +15,22 @@ export default {
     return {
       lot: null,
       unitsToDispose: null,
+      error: null,
     };
   },
   methods: {
     async fetchLotDetails() {
       try {
         const response = await axios.get(`/api/holding/${this.lot_id}`);
-        this.lot = response.data;
-        this.unitsToDispose = this.lot.unit; // Default to full amount
+        if (response.data) {
+          this.lot = response.data;
+          this.unitsToDispose = this.lot.unit; // Default to full amount
+        } else {
+          this.error = '指定されたロットが見つかりません。';
+        }
       } catch (error) {
         console.error('Error fetching lot details:', error);
-        alert('ロット情報の取得に失敗しました。');
-        this.$router.push('/holding');
+        this.error = 'ロット情報の取得に失敗しました。';
       }
     },
     async confirmDisposal() {
