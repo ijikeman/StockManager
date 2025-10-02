@@ -2,7 +2,6 @@ package com.example.stock.service
 
 import com.example.stock.dto.StockLotDTO
 import com.example.stock.dto.StockLotDetailResponse
-import com.example.stock.model.LotStatus
 import com.example.stock.model.StockLot
 import com.example.stock.model.TransactionType
 import com.example.stock.repository.StockLotRepository
@@ -30,7 +29,6 @@ class StockLotQueryService(
             unit = this.unit,
             quantity = this.unit * this.stock.minimalUnit,
             is_nisa = this.isNisa,
-            status = this.status,
             minimalUnit = this.stock.minimalUnit,
         )
     }
@@ -50,7 +48,7 @@ class StockLotQueryService(
      * @return NISA区分をキー、StockLotDTOのリストを値とするマップ
      */
     fun findHoldingStockLots(): Map<Boolean, List<StockLotDTO>> {
-        return stockLotRepository.findByStatus(LotStatus.HOLDING)
+        return stockLotRepository.findAll()
             .map { it.toDto() }
             .groupBy { it.is_nisa }
     }
@@ -62,7 +60,7 @@ class StockLotQueryService(
      * @return NISA区分をキー、StockLotDTOのリストを値とするマップ
      */
     fun findHoldingStockLotsByOwner(ownerId: Int): Map<Boolean, List<StockLotDTO>> {
-        return stockLotRepository.findByOwnerIdAndStatus(ownerId, LotStatus.HOLDING)
+        return stockLotRepository.findByOwnerId(ownerId)
             .map { it.toDto() }
             .groupBy { it.is_nisa }
     }

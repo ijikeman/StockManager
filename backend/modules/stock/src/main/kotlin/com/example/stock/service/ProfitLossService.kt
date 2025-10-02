@@ -1,6 +1,5 @@
 package com.example.stock.service
 
-import com.example.stock.model.LotStatus
 import com.example.stock.model.StockLot
 import com.example.stock.model.TransactionType
 import com.example.stock.provider.FinanceProvider
@@ -76,11 +75,6 @@ class ProfitLossService(
 
     private fun calculateUnrealizedPlForLot(lot: StockLot): BigDecimal {
         // 指定ロットの含み損益を計算
-        if (lot.status == LotStatus.SOLD) {
-            return BigDecimal.ZERO
-            // 既に売却済みの場合は0を返す
-        }
-
         val transactions = transactionRepository.findByStockLotId(lot.id)
         // ロットに紐づく全トランザクションを取得
         val buyTransaction = transactions.firstOrNull { it.type == TransactionType.BUY }

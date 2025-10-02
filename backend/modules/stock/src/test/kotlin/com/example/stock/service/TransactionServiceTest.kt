@@ -99,7 +99,6 @@ class TransactionServiceTest {
         whenever(stockRepository.findByCode(stock.code)).thenReturn(stock)
         whenever(stockLotRepository.findById(stockLot.id)).thenReturn(Optional.of(stockLot))
         whenever(transactionRepository.save(any())).thenAnswer { it.getArgument(0) }
-        whenever(stockLotRepository.save(any())).thenAnswer { it.getArgument(0) }
 
         // when
         val result = transactionService.createTransaction(request)
