@@ -27,11 +27,8 @@ export default {
   methods: {
     async fetchLotDetails() {
       try {
-        // Assuming an endpoint to get a single lot's details exists.
-        // If not, would need to fetch all and filter.
-        const response = await axios.get(`/api/holding/${this.lot_id}`);
+        const response = await axios.get(`/api/stock-lot/${this.lot_id}`);
         this.lot = response.data;
-        // Pre-fill unit for convenience, user can edit if they are partially selling.
         this.formData.unit = this.lot.unit;
       } catch (error) {
         console.error('Error fetching lot details:', error);
@@ -51,14 +48,14 @@ export default {
           owner_id: this.lot.owner.id,
         }
         await axios.post('/api/transaction', payload);
-        this.$router.push('/holding');
+        this.$router.push('/transaction');
       } catch (error) {
         console.error('Error saving transaction:', error);
         alert('取引の保存に失敗しました。');
       }
     },
     cancel() {
-      this.$router.push('/holding');
+      this.$router.push('/transaction');
     }
   },
   created() {

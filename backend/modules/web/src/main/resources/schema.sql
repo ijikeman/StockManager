@@ -4,7 +4,6 @@
 -- Drop existing tables in reverse order of dependency
 DROP TABLE IF EXISTS transaction;
 DROP TABLE IF EXISTS income_history;
-DROP TABLE IF EXISTS holding;
 DROP TABLE IF EXISTS incoming_history;
 DROP TABLE IF EXISTS benefit_history;
 DROP TABLE IF EXISTS stock_lot;

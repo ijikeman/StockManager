@@ -62,7 +62,7 @@ class YahooFinanceProvider(
     }
 
     private fun extractPrice(doc: org.jsoup.nodes.Document): Double? {
-        val priceText = doc.selectFirst("""div[class*="PriceBoard__priceInformation"] span[class*="StyledNumber__value"]""")?.text()?.replace(",", "")
+        val priceText = doc.selectFirst("""div[class*="PriceBoard__priceInformation"] span[class*="StyledNumber__value"], span.PriceBoard__price""")?.text()?.replace(",", "")
         return priceText?.toDoubleOrNull()
     }
 
@@ -73,13 +73,13 @@ class YahooFinanceProvider(
     }
 
     private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
-        val earningsText = doc.select("p:contains(決算発表日は)").text()
-        if (earningsText.contains("未定")) {
+        val earningsText = doc.select("p:contains(決算発表日)").first()?.text()
+        if (earningsText == null || earningsText.contains("未定")) {
             return null
         }
         val pattern = Pattern.compile("(\\d{4})年(\\d{1,2})月(\\d{1,2})日")
         val matcher = pattern.matcher(earningsText)
-        
+
         return if (matcher.find()) {
             val year = matcher.group(1).toInt()
             val month = matcher.group(2).toInt()
