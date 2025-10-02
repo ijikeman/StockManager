@@ -33,12 +33,8 @@ export default {
     },
     async fetchStockLots() {
       try {
-        const response = await axios.get('/api/holding');
-        const holdings = response.data;
-        this.stockLots = [
-          ...(holdings['true'] || []),
-          ...(holdings['false'] || [])
-        ];
+        const response = await axios.get('/api/stock-lot');
+        this.stockLots = response.data;
       } catch (error) {
         console.error('Error fetching stock lots:', error);
       }

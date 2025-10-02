@@ -5,7 +5,6 @@ import StockList from '../views/stock/List.vue';
 import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
-import HoldingList from '../views/holding/List.vue';
 import TransactionList from '../views/transaction/List.vue';
 import BuyTransaction from '../views/transaction/Buy.vue';
 import SellTransaction from '../views/transaction/Sell.vue';
@@ -17,11 +16,6 @@ const routes = [
   {
     path: '/',
     redirect: '/sector'
-  },
-  {
-    path: '/holding',
-    name: 'HoldingList',
-    component: HoldingList
   },
   {
     path: '/transaction',

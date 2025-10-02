@@ -28,7 +28,6 @@ erDiagram
         UUID stock_id FK "銘柄ID" 
         boolean is_nisa "NISA口座フラグ"
         decimal unit "単元数"
-        ENUM status "ステータス (holding/sold)"
     }
     
     transaction {
