@@ -44,4 +44,28 @@ class StockLotService(
         )
         return stockLotRepository.save(stockLot)
     }
+
+    /**
+     * 株式ロットを更新します。
+     *
+     * @param id 株式ロットID
+     * @param unit 単元数
+     * @param isNisa NISAかどうか
+     * @return 更新されたStockLot
+     */
+    fun updateStockLot(id: Int, unit: Int, isNisa: Boolean): StockLot {
+        val stockLot = stockLotRepository.findById(id)
+            .orElseThrow { jakarta.persistence.EntityNotFoundException("StockLot not found with id: $id") }
+        stockLot.update(unit, isNisa)
+        return stockLotRepository.save(stockLot)
+    }
+
+    /**
+     * 株式ロットを削除します。
+     *
+     * @param id 株式ロットID
+     */
+    fun deleteStockLot(id: Int) {
+        stockLotRepository.deleteById(id)
+    }
 }

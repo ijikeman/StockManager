@@ -49,4 +49,34 @@ class StockLotServiceTest {
         assertThat(capturedStockLot.owner).isEqualTo(owner)
         assertThat(capturedStockLot.stock).isEqualTo(stock)
     }
+
+    @Test
+    fun `updateStockLot should update an existing stock lot`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val existingStockLot = StockLot(id = 1, owner = owner, stock = stock, unit = 1, isNisa = false)
+        mockitoWhen(stockLotRepository.findById(1)).thenReturn(java.util.Optional.of(existingStockLot))
+        mockitoWhen(stockLotRepository.save(any(StockLot::class.java))).thenAnswer { it.getArgument(0) }
+
+        // when
+        val result = stockLotService.updateStockLot(1, 3, true)
+
+        // then
+        verify(stockLotRepository).save(stockLotCaptor.capture())
+        val capturedStockLot = stockLotCaptor.value
+
+        assertThat(result).isNotNull
+        assertThat(capturedStockLot.unit).isEqualTo(3)
+        assertThat(capturedStockLot.isNisa).isTrue()
+    }
+
+    @Test
+    fun `deleteStockLot should delete an existing stock lot`() {
+        // when
+        stockLotService.deleteStockLot(1)
+
+        // then
+        verify(stockLotRepository).deleteById(1)
+    }
 }

@@ -12,6 +12,7 @@ export default {
         { name: 'セクター管理', path: '/sector' },
         { name: 'オーナー管理', path: '/owner' },
         { name: '銘柄管理', path: '/stock' },
+        { name: 'ロット管理', path: '/stock-lot' },
         { name: '取引管理', path: '/transaction' },
         { name: '配当履歴', path: '/income' }
       ]

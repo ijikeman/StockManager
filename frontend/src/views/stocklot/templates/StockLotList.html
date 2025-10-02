@@ -1,0 +1,51 @@
+<div>
+  <div class="page-header">
+    <h1 class="page-title">Stock Lot Management</h1>
+  </div>
+
+  <div class="page-actions">
+    <!-- The add button is commented out as the add form is not yet implemented. -->
+    <!--
+    <button class="btn btn-primary" @click="showAddForm">
+      Add New Stock Lot
+    </button>
+    -->
+  </div>
+
+  <div v-if="showAddEditForm">
+    <StockLotAddEdit
+      :stockLot="editingStockLot"
+      @saved="onStockLotSaved"
+      @cancelled="hideForm"
+    />
+  </div>
+
+  <table class="common-table" v-if="stockLots.length > 0">
+    <thead>
+      <tr>
+        <th>Owner</th>
+        <th>Stock</th>
+        <th>Units</th>
+        <th>Quantity</th>
+        <th>NISA</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="stockLot in stockLots" :key="stockLot.id">
+        <td>{{ stockLot.owner_name }}</td>
+        <td>{{ stockLot.stock_name }} ({{ stockLot.stock_code }})</td>
+        <td>{{ stockLot.unit }}</td>
+        <td>{{ stockLot.quantity }}</td>
+        <td>{{ stockLot.is_nisa ? 'Yes' : 'No' }}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" @click="editStockLot(stockLot)">Edit</button>
+          <button class="btn btn-danger btn-sm" @click="deleteStockLot(stockLot.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div v-else>
+    <p>No data available</p>
+  </div>
+</div>
