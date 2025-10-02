@@ -48,7 +48,7 @@ class ProfitLossServiceTest {
         // 50株を1単元とする
         val stock = Stock(id = 1, code = "1234", name = "Test Stock", current_price = 1500.0, minimalUnit = 50)
         // 2単元（100株）保有
-        val lot = StockLot(id = 1, owner = owner, stock = stock, unit = 2, status = LotStatus.HOLDING)
+        val lot = StockLot(id = 1, owner = owner, stock = stock, unit = 2)
 
         // 売買トランザクションを作成
         // 2単元（100株）購入

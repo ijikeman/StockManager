@@ -8,17 +8,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.Column
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.Enumerated
-import jakarta.persistence.EnumType
-
-/**
- * 保有状況
- */
-enum class LotStatus {
-    HOLDING, // 保有
-    SOLD     // 売却済み
-}
-
 /**
  * 株式ロット エンティティ
  */
@@ -41,9 +30,5 @@ data class StockLot(
     val unit: Int, // 単元数
 
     @Column(name = "is_nisa", nullable = false)
-    val isNisa: Boolean = false, // NISAかどうか
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    val status: LotStatus = LotStatus.HOLDING // 保有状況
+    val isNisa: Boolean = false // NISAかどうか
 )

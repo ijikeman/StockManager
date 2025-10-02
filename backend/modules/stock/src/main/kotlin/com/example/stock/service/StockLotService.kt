@@ -1,6 +1,5 @@
 package com.example.stock.service
 
-import com.example.stock.model.LotStatus
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
@@ -18,22 +17,13 @@ class StockLotService(
     private val stockLotRepository: StockLotRepository
 ) {
     /**
-     * 所有者IDとステータスによって株式ロットを検索します。
+     * 所有者IDによって株式ロットを検索します。
      *
      * @param ownerId 所有者ID
-     * @param status ロットのステータス (オプション)
      * @return StockLotのリスト
      */
-    // statusはオプションパラメータとして渡される
-    fun findByOwnerId(ownerId: Int, status: String?): List<StockLot> {
-        return if (status != null) {
-            // statusが指定されていれば、新しいメソッドを呼び出す
-            val lotStatus = LotStatus.valueOf(status.uppercase())
-            stockLotRepository.findByOwnerIdAndStatus(ownerId, lotStatus)
-        } else {
-            // statusがなければ、既存のメソッドを呼び出す
-            stockLotRepository.findByOwnerId(ownerId)
-        }
+    fun findByOwnerId(ownerId: Int): List<StockLot> {
+        return stockLotRepository.findByOwnerId(ownerId)
     }
 
     /**

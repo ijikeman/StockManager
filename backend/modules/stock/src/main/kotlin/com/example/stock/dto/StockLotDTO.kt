@@ -1,7 +1,5 @@
 package com.example.stock.dto
 
-import com.example.stock.model.LotStatus
-
 /**
  * 株式ロットのデータ転送オブジェクト(DTO)。
  *
@@ -13,7 +11,6 @@ import com.example.stock.model.LotStatus
  * @property unit 単元数
  * @property quantity 株数
  * @property is_nisa NISA口座かどうか
- * @property status ロットのステータス
  */
 data class StockLotDTO(
     val id: Int,
@@ -24,6 +21,5 @@ data class StockLotDTO(
     val unit: Int,
     val quantity: Int,
     val is_nisa: Boolean,
-    val status: LotStatus,
     val minimalUnit: Int
 )

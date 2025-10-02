@@ -33,7 +33,6 @@ class IncomingHistoryService(
         unit = this.unit,
         quantity = this.stock.minimalUnit * this.unit,
         is_nisa = this.isNisa,
-        status = this.status,
         minimalUnit = this.stock.minimalUnit
     )
 

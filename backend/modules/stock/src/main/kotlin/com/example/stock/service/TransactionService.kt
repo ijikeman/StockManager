@@ -99,8 +99,7 @@ class TransactionService(
 
             // Mark the lot as sold
             // ロットの状態をSOLDに更新
-            val soldStockLot = stockLot.copy(status = com.example.stock.model.LotStatus.SOLD)
-            stockLotRepository.save(soldStockLot)
+            stockLotRepository.delete(stockLot)
         }
 
         // DTOリストで返却
