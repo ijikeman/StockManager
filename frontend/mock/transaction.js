@@ -35,5 +35,14 @@ export default [
       transactions.push(newTransaction);
       return newTransaction;
     }
+  },
+  {
+    url: '/api/transaction/:id',
+    method: 'get',
+    response: ({ url }) => {
+      const id = parseInt(url.split('/').pop());
+      const transaction = transactions.find(t => t.id === id);
+      return transaction;
+    }
   }
 ];

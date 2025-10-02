@@ -58,5 +58,32 @@ export default [
       });
       return holdings;
     }
+  },
+  {
+    url: '/api/holding/:id',
+    method: 'get',
+    response: ({ url }) => {
+      const id = parseInt(url.split('/').pop());
+      const lot = stocklots.find(l => l.id === id);
+
+      if (lot) {
+        return {
+          id: lot.id,
+          stock: {
+            code: lot.stock_code,
+            name: lot.stock_name,
+          },
+          owner: {
+            id: lot.owner_id,
+            name: lot.owner_name,
+          },
+          unit: lot.unit,
+          price: lot.acquisition_price,
+          is_nisa: lot.is_nisa,
+        };
+      } else {
+        return null;
+      }
+    }
   }
 ];
