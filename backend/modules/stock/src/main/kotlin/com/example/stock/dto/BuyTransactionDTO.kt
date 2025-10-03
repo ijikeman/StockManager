@@ -6,7 +6,7 @@ import java.time.LocalDate
 /**
  * DTO for representing a transaction in API responses.
  */
-data class TransactionDTO(
+data class BuyTransactionDTO(
     val id: Int,
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -15,11 +15,9 @@ data class TransactionDTO(
     val type: String,
     val stock: StockInfoDTO,
     val owner_id: Int,
-    val owner_name: String,
     val unit: Int,
     val price: Double,
     val fees: Double,
-    val lot_id: Int
 )
 
 /**

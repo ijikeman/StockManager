@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class IncomingHistoryDTO(
     val id: Int,
-    val lot_id: Int,
+    val stock_lot_id: Int,
     val incoming: BigDecimal,
     val payment_date: LocalDate,
     val stockLot: StockLotDTO
