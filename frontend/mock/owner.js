@@ -3,8 +3,8 @@ import Mock from 'mockjs';
 
 // モックデータを生成
 let owners = Mock.mock({
-  // 3〜5個のオーナーアイテムを生成
-  'list|3-5': [{
+  // 5個のオーナーアイテムを生成
+  'list|5': [{
     'id|+1': 1, // IDを1からインクリメント
     'name': '@name', // 名前を生成
   }]

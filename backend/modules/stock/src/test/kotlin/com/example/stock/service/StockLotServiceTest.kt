@@ -1,9 +1,12 @@
 package com.example.stock.service
 
+import com.example.stock.dto.CreateStockLotRequest
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.repository.OwnerRepository
 import com.example.stock.repository.StockLotRepository
+import com.example.stock.repository.StockRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,6 +18,7 @@ import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.Mockito.`when` as mockitoWhen
 import org.mockito.ArgumentMatchers.any
+import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 class StockLotServiceTest {
@@ -24,6 +28,12 @@ class StockLotServiceTest {
 
     @Mock
     private lateinit var stockLotRepository: StockLotRepository
+
+    @Mock
+    private lateinit var ownerRepository: OwnerRepository
+
+    @Mock
+    private lateinit var stockRepository: StockRepository
 
     @Captor
     private lateinit var stockLotCaptor: ArgumentCaptor<StockLot>
@@ -78,5 +88,30 @@ class StockLotServiceTest {
 
         // then
         verify(stockLotRepository).deleteById(1)
+    }
+
+    @Test
+    fun `createStockLot with DTO should create a single lot`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val request = CreateStockLotRequest(ownerId = 1, stockId = 1, unit = 2, isNisa = false)
+
+        mockitoWhen(ownerRepository.findById(1)).thenReturn(Optional.of(owner))
+        mockitoWhen(stockRepository.findById(1)).thenReturn(Optional.of(stock))
+        mockitoWhen(stockLotRepository.save(any(StockLot::class.java))).thenAnswer { it.getArgument(0) }
+
+        // when
+        val result = stockLotService.createStockLot(request)
+
+        // then
+        verify(stockLotRepository).save(stockLotCaptor.capture())
+        val capturedStockLot = stockLotCaptor.value
+
+        assertThat(result).isNotNull
+        assertThat(capturedStockLot.unit).isEqualTo(2)
+        assertThat(capturedStockLot.isNisa).isFalse()
+        assertThat(capturedStockLot.owner).isEqualTo(owner)
+        assertThat(capturedStockLot.stock).isEqualTo(stock)
     }
 }

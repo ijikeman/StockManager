@@ -2,11 +2,27 @@
   <h3 class="form-title">{{ isEditing ? 'Edit Stock Lot' : 'Add New Stock Lot' }}</h3>
 
   <form @submit.prevent="saveStockLot" class="form-inline">
-    <div>
-      <strong>Owner:</strong> {{ stockLot.owner_name }}
+    <div v-if="isEditing">
+      <div>
+        <strong>Owner:</strong> {{ stockLot.owner_name }}
+      </div>
+      <div>
+        <strong>Stock:</strong> {{ stockLot.stock_name }} ({{ stockLot.stock_code }})
+      </div>
     </div>
-    <div>
-      <strong>Stock:</strong> {{ stockLot.stock_name }} ({{ stockLot.stock_code }})
+    <div v-else>
+      <select v-model="formData.ownerId" required class="form-control">
+        <option :value="null" disabled>Select Owner</option>
+        <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+          {{ owner.name }}
+        </option>
+      </select>
+      <select v-model="formData.stockId" required class="form-control">
+        <option :value="null" disabled>Select Stock</option>
+        <option v-for="stock in stocks" :key="stock.id" :value="stock.id">
+          {{ stock.name }} ({{ stock.code }})
+        </option>
+      </select>
     </div>
 
     <input

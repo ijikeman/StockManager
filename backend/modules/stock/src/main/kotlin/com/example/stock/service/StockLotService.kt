@@ -1,9 +1,12 @@
 package com.example.stock.service
 
+import com.example.stock.dto.CreateStockLotRequest
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.repository.OwnerRepository
 import com.example.stock.repository.StockLotRepository
+import com.example.stock.repository.StockRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class StockLotService(
-    private val stockLotRepository: StockLotRepository
+    private val stockLotRepository: StockLotRepository,
+    private val ownerRepository: OwnerRepository,
+    private val stockRepository: StockRepository
 ) {
     /**
      * 所有者IDによって株式ロットを検索します。
@@ -67,5 +72,20 @@ class StockLotService(
      */
     fun deleteStockLot(id: Int) {
         stockLotRepository.deleteById(id)
+    }
+
+    /**
+     * 新しい株式ロットを作成します。
+     *
+     * @param request 株式ロット作成リクエスト
+     * @return 作成されたStockLot
+     */
+    fun createStockLot(request: CreateStockLotRequest): StockLot {
+        val owner = ownerRepository.findById(request.ownerId)
+            .orElseThrow { jakarta.persistence.EntityNotFoundException("Owner not found with id: ${request.ownerId}") }
+        val stock = stockRepository.findById(request.stockId)
+            .orElseThrow { jakarta.persistence.EntityNotFoundException("Stock not found with id: ${request.stockId}") }
+
+        return createStockLot(owner, stock, request.isNisa, request.unit)
     }
 }
