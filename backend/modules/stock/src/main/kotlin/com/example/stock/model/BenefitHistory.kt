@@ -31,8 +31,8 @@ data class BenefitHistory(
     var sellTransaction: SellTransaction, // 売却取引
 
     @Column(name = "benefit", nullable = false)
-    val benefit: BigDecimal // 利益
+    val benefit: BigDecimal, // 利益
 
     @Column(name = "payment_date", nullable = false)
-    var paymentDate: LocalDate // 支払日
+    var paymentDate: java.time.LocalDate // 支払日
 )

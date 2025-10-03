@@ -22,7 +22,7 @@ data class Stock(
     val id: Int = 0, // ID
 
     @field:NotBlank(message = "銘柄コードは必須です")
-    @field:Pattern(regexp = "^[0-9a-zA-Z]+$", message = "名前は数字あるいはアルファベットのみで構成される必要があります")
+    @field:Pattern(regexp = "^[0-9a-zA-Z]+$", message = "銘柄コードは数字あるいはアルファベットのみで構成される必要があります")
     @Column(name = "code", nullable = false)
     val code: String = "", // 銘柄コード
 

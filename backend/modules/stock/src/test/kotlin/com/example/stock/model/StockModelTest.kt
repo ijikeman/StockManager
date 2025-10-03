@@ -79,7 +79,7 @@ class StockTest {
         assertEquals(2, violations.size)
         val messages = violations.map { it.message }
         assertTrue(messages.contains("銘柄コードは必須です"))
-        assertTrue(messages.contains("名前は数字あるいはアルファベットのみで構成される必要があります"))
+        assertTrue(messages.contains("銘柄コードは数字あるいはアルファベットのみで構成される必要があります"))
     }
 
     @Test
@@ -87,7 +87,7 @@ class StockTest {
     val stock = Stock(code = "123-", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
-        assertEquals("名前は数字あるいはアルファベットのみで構成される必要があります", violations.first().message)
+        assertEquals("銘柄コードは数字あるいはアルファベットのみで構成される必要があります", violations.first().message)
     }
 
     // 異常系: name
