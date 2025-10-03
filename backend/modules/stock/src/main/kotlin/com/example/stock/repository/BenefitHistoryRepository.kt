@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BenefitHistoryRepository : JpaRepository<BenefitHistory, Int> {
     fun findByStockLotId(stockLotId: Int): List<BenefitHistory>
+    fun findBySellTransactionId(sellTransactionId: Int): List<BenefitHistory>
 }

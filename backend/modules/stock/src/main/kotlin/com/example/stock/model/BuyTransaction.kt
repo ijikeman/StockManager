@@ -24,6 +24,10 @@ data class BuyTransaction(
     val id: Int = 0, // ID
 
     @ManyToOne
+    @JoinColumn(name = "owner_id")
+    val owner: Owner, // 所有者
+
+    @ManyToOne
     @JoinColumn(name = "stock_id")
     val stock: Stock, // 銘柄
 

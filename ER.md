@@ -35,6 +35,7 @@ erDiagram
     
     buy_transaction {
         UUID id PK
+        UUID owner_id FK "オーナーID"
         UUID stock_id FK "ストックID"
         decimal unit "購入単元数"
         decimal price "単価"

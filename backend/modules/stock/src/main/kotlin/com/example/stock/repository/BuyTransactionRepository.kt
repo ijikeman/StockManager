@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TransactionRepository : JpaRepository<Transaction, Int> {
-    fun findByStockLotId(stockLotId: Int): List<Transaction>
-
-    fun findByStockLotAndType(stockLot: StockLot, type: TransactionType): List<Transaction>
+interface BuyTransactionRepository : JpaRepository<Transaction, Int> {
+    fun findByStockId(stockId: Int): List<Transaction>
 }
