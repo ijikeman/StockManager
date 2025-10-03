@@ -12,6 +12,8 @@ import java.math.BigDecimal
 
 /**
  * 利益履歴エンティティ
+ * 株式ロットが売却された場合にこのbenefit_historyレコードが指定された場合は、
+ * stock_lot_idはnullになり、代わりにsell_transaction_idは指定されます。
  */
 @Entity
 @Table(name = "benefit_history")
@@ -21,9 +23,16 @@ data class BenefitHistory(
     val id: Int = 0, // ID
 
     @ManyToOne
-    @JoinColumn(name = "lot_id")
-    val stockLot: StockLot, // 株式ロット
+    @JoinColumn(name = "stock_lot_id")
+    var stockLot: StockLot, // 株式ロット
+
+    @ManyToOne
+    @JoinColumn(name = "sell_transaction_id")
+    var sellTransaction: SellTransaction, // 売却取引
 
     @Column(name = "benefit", nullable = false)
     val benefit: BigDecimal // 利益
+
+    @Column(name = "payment_date", nullable = false)
+    var paymentDate: LocalDate // 支払日
 )

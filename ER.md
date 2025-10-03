@@ -56,6 +56,7 @@ erDiagram
         UUID stock_lot_id FK "ロットID"
         UUID sell_transaction_id FK "売却取引ID"
         decimal incoming "配当金"
+        decimal payment_date "支払日"
     }
 
     benefit_history {
@@ -63,6 +64,7 @@ erDiagram
         UUID stock_lot_id FK "ロットID"
         UUID sell_transaction_id FK "売却取引ID"
         decimal benefit "優待金"
+        decimal payment_date "支払日"
     }
 
     owner {

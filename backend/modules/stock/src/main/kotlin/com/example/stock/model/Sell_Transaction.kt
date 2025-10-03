@@ -14,30 +14,18 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 /**
- * 取引種別
- */
-enum class TransactionType {
-    BUY,  // 購入
-    SELL // 売却
-}
-
-/**
  * 取引エンティティ
  */
 @Entity
-@Table(name = "transaction")
-data class Transaction(
+@Table(name = "sell_transaction")
+data class SellTransaction(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0, // ID
 
     @ManyToOne
-    @JoinColumn(name = "lot_id")
-    val stockLot: StockLot, // 株式ロット
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    val type: TransactionType, // 取引種別
+    @JoinColumn(name = "buy_transaction_id")
+    val buyTransaction: BuyTransaction, // 購入取引
 
     @Column(name = "unit", nullable = false)
     val unit: Int, // 単元数

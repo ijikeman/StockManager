@@ -13,6 +13,8 @@ import java.time.LocalDate
 
 /**
  * 入金履歴エンティティ
+ * 株式ロットが売却された場合にこのincoming_historyレコードが指定された場合は、
+ * stock_lot_idはnullになり、代わりにsell_transaction_idは指定されます。
  */
 @Entity
 @Table(name = "incoming_history")
@@ -22,8 +24,12 @@ data class IncomingHistory(
     val id: Int = 0, // ID
 
     @ManyToOne
-    @JoinColumn(name = "lot_id")
+    @JoinColumn(name = "stock_lot_id")
     var stockLot: StockLot, // 株式ロット
+
+    @ManyToOne
+    @JoinColumn(name = "sell_transaction_id")
+    var sellTransaction: SellTransaction, // 売却取引
 
     @Column(name = "incoming", nullable = false)
     var incoming: BigDecimal, // 入金額

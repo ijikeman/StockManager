@@ -2,15 +2,14 @@
 -- Be cautious when running this in a production environment.
 
 -- Drop existing tables in reverse order of dependency
-DROP TABLE IF EXISTS transaction;
-DROP TABLE IF EXISTS income_history;
+DROP TABLE IF EXISTS sell_transaction;
+DROP TABLE IF EXISTS buy_transaction;
 DROP TABLE IF EXISTS incoming_history;
 DROP TABLE IF EXISTS benefit_history;
 DROP TABLE IF EXISTS stock_lot;
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS sector;
 DROP TABLE IF EXISTS owner;
-
 
 -- ユーザー情報を管理するテーブル
 -- ownerテーブル
@@ -52,31 +51,45 @@ CREATE TABLE stock_lot (
     FOREIGN KEY (stock_id) REFERENCES stock(id)
 );
 
--- transactionテーブル
-CREATE TABLE transaction (
+-- buy_transactionテーブル
+CREATE TABLE buy_transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    lot_id INT,
-    type VARCHAR(255) NOT NULL,
+    stock_id INT,
     unit INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     fee DECIMAL(10, 2) NOT NULL,
     transaction_date DATE NOT NULL,
-    FOREIGN KEY (lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (stock_id) REFERENCES stock(id)
+);
+
+-- sell_transactionテーブル
+CREATE TABLE cell_transaction (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    buy_transaction_id INT,
+    unit INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    fee DECIMAL(10, 2) NOT NULL,
+    transaction_date DATE NOT NULL,
+    FOREIGN KEY (buy_transaction_id) REFERENCES buy_transaction(id)
 );
 
 -- incoming_historyテーブル
 CREATE TABLE incoming_history (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    lot_id INT,
+    stock_lot_id INT,
+    sell_transaction_id INT,
     incoming DECIMAL(10, 2) NOT NULL,
     payment_date DATE NOT NULL,
-    FOREIGN KEY (lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );
 
 -- benefit_historyテーブル
 CREATE TABLE benefit_history (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    lot_id INT,
+    stock_lot_id INT,
+    sell_transaction_id INT,
     benefit DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );
