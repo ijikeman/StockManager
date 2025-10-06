@@ -1,7 +1,6 @@
 package com.example.stock
 
-import com.example.stock.dto.StockLotDTO
-import com.example.stock.dto.StockLotDetailResponse
+import com.example.stock.model.StockLot
 import com.example.stock.service.StockLotService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,12 +13,12 @@ class StockLotController(
     private val StockLotService: StockLotService,
 ) {
     @GetMapping
-    fun getStockLots(): List<StockLotDTO> {
+    fun getStockLots(): List<StockLot> {
         return StockLotService.findAllStockLots()
     }
 
     @GetMapping("/{id}")
-    fun getStockLot(@PathVariable id: Long): StockLotDetailResponse {
-        return StockLotService.getStockLot(id)
+    fun getStockLot(@PathVariable id: Int): StockLot {
+        return StockLotService.findStockLotById(id)
     }
 }
