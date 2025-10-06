@@ -34,7 +34,7 @@ export default {
   methods: {
     async fetchIncome() {
       try {
-        const response = await axios.get(`/api/incoming-history/${this.id}`);
+        const response = await axios.get(`/api/incominghistory/${this.id}`);
         this.formData = response.data;
         if (this.formData.incoming && this.formData.stockLot) {
           this.dividend_per_unit = this.formData.incoming / this.formData.stockLot.unit / this.formData.stockLot.minimalUnit;
@@ -45,7 +45,7 @@ export default {
     },
     async saveIncome() {
       try {
-        await axios.put(`/api/incoming-history/${this.id}`, this.formData);
+        await axios.put(`/api/incominghistory/${this.id}`, this.formData);
         this.$router.push('/income');
       } catch (error) {
         console.error('Error saving income:', error);

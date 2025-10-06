@@ -27,7 +27,7 @@ export default {
   methods: {
     async fetchLotDetails() {
       try {
-        const response = await axios.get(`/api/stock-lot/${this.lot_id}`);
+        const response = await axios.get(`/api/stocklot/${this.lot_id}`);
         this.lot = response.data;
         this.formData.unit = this.lot.unit;
       } catch (error) {

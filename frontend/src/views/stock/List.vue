@@ -11,9 +11,9 @@ export default {
     const csvColumns = {
       code: { label: 'コード' },
       name: { label: '名前' },
-      current_price: { label: '現在の株価' },
+      currentPrice: { label: '現在の株価' },
       dividend: { label: '配当金' },
-      earnings_date: { label: '業績発表日' },
+      earningsDate: { label: '業績発表日' },
       sector: { label: 'セクター', formatter: (value) => value.name },
     };
 

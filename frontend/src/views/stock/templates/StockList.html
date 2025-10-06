@@ -48,9 +48,9 @@
         <td><input type="checkbox" :value="stock.code" v-model="selectedStocks"></td>
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
-        <td>{{ stock.current_price }}</td>
+        <td>{{ stock.currentPrice }}</td>
         <td>{{ stock.dividend }}</td>
-        <td>{{ stock.earnings_date }}</td>
+        <td>{{ stock.earningsDate }}</td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>

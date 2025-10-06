@@ -13,7 +13,7 @@ export default {
   methods: {
     async fetchIncomes() {
       try {
-        const response = await axios.get('/api/incoming-history');
+        const response = await axios.get('/api/incominghistory');
         this.incomes = response.data;
       } catch (error) {
         console.error('Error fetching incomes:', error);
@@ -28,7 +28,7 @@ export default {
     async deleteIncome(id) {
       if (confirm('Are you sure you want to delete this income?')) {
         try {
-          await axios.delete(`/api/incoming-history/${id}`);
+          await axios.delete(`/api/incominghistory/${id}`);
           this.fetchIncomes();
         } catch (error) {
           console.error('Error deleting income:', error);

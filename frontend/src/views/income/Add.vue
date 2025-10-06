@@ -33,7 +33,7 @@ export default {
     },
     async fetchStockLots() {
       try {
-        const response = await axios.get('/api/stock-lot');
+        const response = await axios.get('/api/stocklot');
         this.stockLots = response.data;
       } catch (error) {
         console.error('Error fetching stock lots:', error);
@@ -41,7 +41,7 @@ export default {
     },
     async saveIncome() {
       try {
-        await axios.post('/api/incoming-history', this.formData);
+        await axios.post('/api/incominghistory', this.formData);
         this.$router.push('/income');
       } catch (error) {
         console.error('Error saving income:', error);

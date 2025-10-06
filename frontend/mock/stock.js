@@ -16,9 +16,9 @@ let stocks = Mock.mock({
     'id|+1': 1, // IDを1からインクリメント
     'code': '@string("number", 3, 5)', // 3文字から5文字の数字でコードを生成
     'name': '@word(3, 5)', // 3〜5文字の単語で商品名を生成
-    'current_price': '@float(100, 1000, 2, 2)', // 100〜1000の浮動小数点数で現在価格を生成（小数点以下2桁）
+    'currentPrice': '@float(100, 1000, 2, 2)', // 100〜1000の浮動小数点数で現在価格を生成（小数点以下2桁）
     'dividend': '@float(0, 10, 2, 2)', // 0〜10の浮動小数点数で配当を生成（小数点以下2桁）
-    'earnings_date': '@date("yyyy-MM-dd")', // YYYY-MM-DD形式でリリース日を生成
+    'earningsDate': '@date("yyyy-MM-dd")', // YYYY-MM-DD形式でリリース日を生成
     'sector_id|1': mockSectors.map(s => s.id), // mockSectorsからランダムにIDを選択
   }]
 }).list;
@@ -101,9 +101,9 @@ export default [
       const stock = stocks.find(s => s.code === code);
       if (stock) {
         // 株価、配当、業績発表日をランダムに更新
-        stock.current_price = Mock.Random.float(100, 1000, 2, 2);
+        stock.currentPrice = Mock.Random.float(100, 1000, 2, 2);
         stock.dividend = Mock.Random.float(0, 10, 2, 2);
-        stock.earnings_date = Mock.mock('@date("yyyy-MM-dd")');
+        stock.earningsDate = Mock.mock('@date("yyyy-MM-dd")');
         return stock;
       }
       // 在庫が見つからない場合はエラーを返す
@@ -120,3 +120,4 @@ export default [
     },
   },
   ];
+  
