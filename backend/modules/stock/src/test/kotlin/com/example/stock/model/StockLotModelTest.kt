@@ -16,20 +16,20 @@ class StockLotModelTest {
             code = "1234",
             name = "Test Stock",
             sector = sector,
-            current_price = 1000.0,
+            currentPrice = 1000.0,
             incoming = 10.0,
-            earnings_date = LocalDate.now(),
-            minimal_unit = 100
+            earningsDate = LocalDate.now(),
+            minimalUnit = 100
         )
         val stockLot = StockLot(
             id = 1,
             owner = owner,
             stock = stock,
-            current_unit = 100
+            currentUnit = 100
         )
         assertEquals(1, stockLot.id)
         assertEquals(owner, stockLot.owner)
         assertEquals(stock, stockLot.stock)
-        assertEquals(100, stockLot.current_unit)
+        assertEquals(100, stockLot.currentUnit)
     }
 }

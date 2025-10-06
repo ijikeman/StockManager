@@ -25,7 +25,7 @@ data class SellTransaction(
 
     @ManyToOne
     @JoinColumn(name = "buy_transaction_id")
-    val buy_transaction: BuyTransaction, // 購入取引
+    val buyTransaction: BuyTransaction, // 購入取引
 
     @Column(name = "unit", nullable = false)
     val unit: Int, // 単元数
@@ -37,5 +37,5 @@ data class SellTransaction(
     val fee: BigDecimal, // 手数料
 
     @Column(name = "transaction_date", nullable = false)
-    val transaction_date: LocalDate // 取引日
+    val transactionDate: LocalDate // 取引日
 )

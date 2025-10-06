@@ -26,24 +26,24 @@ data class IncomingHistory(
 
     @ManyToOne
     @JoinColumn(name = "stock_lot_id")
-    var stock_lot: StockLot? = null, // 株式ロット（売却時はnull）
+    var stockLot: StockLot? = null, // 株式ロット（売却時はnull）
 
     @ManyToOne
     @JoinColumn(name = "sell_transaction_id")
-    var sell_transaction: SellTransaction? = null, // 売却取引（通常はnull）
+    var sellTransaction: SellTransaction? = null, // 売却取引（通常はnull）
 
 
     @Column(name = "incoming", nullable = false)
     var incoming: BigDecimal, // 入金額
 
     @Column(name = "payment_date", nullable = false)
-    var payment_date: LocalDate // 支払日
+    var paymentDate: LocalDate // 支払日
 )
 {
     init {
-        // stock_lotとsell_transactionのどちらか一方のみがセットされていること
-        if ((stock_lot == null && sell_transaction == null) || (stock_lot != null && sell_transaction != null)) {
-            throw IllegalArgumentException("stock_lotとsell_transactionのどちらか一方のみを指定してください")
+        // stockLotとsellTransactionのどちらか一方のみがセットされていること
+        if ((stockLot == null && sellTransaction == null) || (stockLot != null && sellTransaction != null)) {
+            throw IllegalArgumentException("stockLotとsellTransactionのどちらか一方のみを指定してください")
         }
     }
 }

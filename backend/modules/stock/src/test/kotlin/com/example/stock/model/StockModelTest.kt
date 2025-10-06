@@ -24,11 +24,11 @@ class StockTest {
         val stock = Stock(
             code = "7203",
             name = "トヨタ自動車",
-            current_price = 9000.0,
+            currentPrice = 9000.0,
             incoming = 150.0,
-            earnings_date = java.time.LocalDate.of(2025, 8, 27),
+            earningsDate = java.time.LocalDate.of(2025, 8, 27),
             sector = sector,
-            minimal_unit = 200
+            minimalUnit = 200
         )
         val violations = validator.validate(stock)
         assertEquals(0, violations.size)
@@ -46,10 +46,10 @@ class StockTest {
         assertEquals(0, violations.size)
     }
 
-    // earnings_date の null 許容
+    // earningsDate の null 許容
     @Test
-    fun `stock with null earnings_date should be valid`() {
-        val stock = Stock(code = "1234", name = "Test", earnings_date = null, sector = sector)
+    fun `stock with null earningsDate should be valid`() {
+        val stock = Stock(code = "1234", name = "Test", earningsDate = null, sector = sector)
         val violations = validator.validate(stock)
         assertEquals(0, violations.size)
     }
@@ -74,7 +74,7 @@ class StockTest {
     // 異常系: code
     @Test
     fun `stock with blank code should have two violations`() {
-    val stock = Stock(code = "", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
+    val stock = Stock(code = "", name = "Test", earningsDate = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
         val violations = validator.validate(stock)
         assertEquals(2, violations.size)
         val messages = violations.map { it.message }
@@ -84,7 +84,7 @@ class StockTest {
 
     @Test
     fun `stock with invalid pattern code should have violation`() {
-    val stock = Stock(code = "123-", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
+    val stock = Stock(code = "123-", name = "Test", earningsDate = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("銘柄コードは数字あるいはアルファベットのみで構成される必要があります", violations.first().message)
@@ -93,18 +93,18 @@ class StockTest {
     // 異常系: name
     @Test
     fun `stock with blank name should have violation`() {
-    val stock = Stock(code = "1234", name = "", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
+    val stock = Stock(code = "1234", name = "", earningsDate = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("銘柄名は必須です", violations.first().message)
     }
 
-    // current_price, incoming, minimal_unit の値テスト
+    // currentPrice, incoming, minimalUnit の値テスト
     @Test
-    fun `stock with negative current_price should be allowed`() {
-        val stock = Stock(code = "1234", name = "Test", current_price = -100.0, sector = sector, minimal_unit = 200)
+    fun `stock with negative currentPrice should be allowed`() {
+        val stock = Stock(code = "1234", name = "Test", currentPrice = -100.0, sector = sector, minimalUnit = 200)
         val violations = validator.validate(stock)
-        // current_priceにバリデーションは無いので違反0
+        // currentPriceにバリデーションは無いので違反0
         assertEquals(0, violations.size)
     }
 
@@ -117,8 +117,8 @@ class StockTest {
     }
 
     @Test
-    fun `stock with custom minimal_unit should be set correctly`() {
-        val stock = Stock(code = "1234", name = "Test", minimal_unit = 1, sector = sector)
-        assertEquals(1, stock.minimal_unit)
+    fun `stock with custom minimalUnit should be set correctly`() {
+        val stock = Stock(code = "1234", name = "Test", minimalUnit = 1, sector = sector)
+        assertEquals(1, stock.minimalUnit)
     }
 }

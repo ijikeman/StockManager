@@ -31,18 +31,18 @@ data class Stock(
     val name: String = "", // 銘柄名
 
     @Column(name = "current_price", nullable = false)
-    val current_price: Double = 0.0, // 現在の株価
+    val currentPrice: Double = 0.0, // 現在の株価
 
     @Column(name = "incoming", nullable = false)
     val incoming: Double = 0.0, // 配当金
 
     @Column(name = "earnings_date")
-    val earnings_date: java.time.LocalDate? = null, // 業績発表日
+    val earningsDate: java.time.LocalDate? = null, // 業績発表日
 
     @ManyToOne
     @JoinColumn(name = "sector_id")
     var sector: Sector? = null, // セクター
 
     @Column(name = "minimal_unit", nullable = false)
-    val minimal_unit: Int = 100 // 最低単元数
+    val minimalUnit: Int = 100 // 最低単元数
 )

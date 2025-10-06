@@ -16,34 +16,34 @@ class BuyTransactionModelTest {
             code = "1234",
             name = "Test Stock",
             sector = sector,
-            current_price = 1000.0,
+            currentPrice = 1000.0,
             incoming = 10.0,
-            earnings_date = LocalDate.now(),
-            minimal_unit = 100
+            earningsDate = LocalDate.now(),
+            minimalUnit = 100
         )
         val stockLot = StockLot(
             id = 1,
             owner = owner,
             stock = stock,
-            current_unit = 100
+            currentUnit = 100
         )
         val buyTransactionDate = LocalDate.of(2023, 1, 1)
         val buyTransaction = BuyTransaction(
             id = 1,
-            stock_lot = stockLot,
+            stockLot = stockLot,
             unit = 100,
             price = BigDecimal("1000.50"),
             fee = BigDecimal("10.50"),
-            is_nisa = true,
-            transaction_date = buyTransactionDate
+            isNisa = true,
+            transactionDate = buyTransactionDate
         )
 
         assertEquals(1, buyTransaction.id)
-        assertEquals(stockLot, buyTransaction.stock_lot)
+        assertEquals(stockLot, buyTransaction.stockLot)
         assertEquals(100, buyTransaction.unit)
         assertEquals(BigDecimal("1000.50"), buyTransaction.price)
         assertEquals(BigDecimal("10.50"), buyTransaction.fee)
-        assertEquals(true, buyTransaction.is_nisa)
-        assertEquals(buyTransactionDate, buyTransaction.transaction_date)
+        assertEquals(true, buyTransaction.isNisa)
+        assertEquals(buyTransactionDate, buyTransaction.transactionDate)
     }
 }
