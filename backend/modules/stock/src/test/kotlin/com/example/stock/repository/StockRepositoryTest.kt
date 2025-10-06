@@ -1,7 +1,7 @@
 package com.example.stock.repository
 
-import com.example.stock.model.Stock
 import com.example.stock.model.Sector
+import com.example.stock.model.Stock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -24,8 +24,15 @@ class StockRepositoryTest {
     fun `findById should return stock when stock exists`() {
         // given
         val sector = Sector(name = "test sector")
-        val persistedSector = entityManager.persist(sector)
-    val stock = Stock(code = "9999", name = "test stock", currentPrice = 1000.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
+        val persistedSector = entityManager.persist(sector) // persistしてsector_idを取得する必要がある
+        val stock = Stock(
+            code = "9999",
+            name = "test stock",
+            currentPrice = 1000.0,
+            incoming = 10.0,
+            earningsDate = java.time.LocalDate.of(2025, 1, 1),
+            sector = persistedSector)
+
         // persistした結果、自動採番されたIDを含むインスタンスが返る
         val persistedStock = entityManager.persist(stock)
         entityManager.flush()
