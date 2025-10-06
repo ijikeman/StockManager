@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
  * オーナー情報に関するRESTful APIを提供します。
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/owner")
 class OwnerController(
     private val ownerService: OwnerService
 ) {
@@ -19,7 +19,7 @@ class OwnerController(
      * すべてのオーナーのリストを取得します。
      * @return オーナーのリスト
      */
-    @GetMapping("/owner")
+    @GetMapping
     fun getOwners(): List<Owner> {
         // オーナーサービスを通じて全オーナー情報を取得し、返す
         return ownerService.findAll()
@@ -30,7 +30,7 @@ class OwnerController(
      * @param id 取得するオーナーのID
      * @return 見つかったオーナー。見つからない場合は404 Not Found。
      */
-    @GetMapping("/owner/{id}")
+    @GetMapping("/{id}")
     fun getOwner(@PathVariable id: Int): ResponseEntity<Owner> {
         val owner = ownerService.findById(id)
         return if (owner != null) {
@@ -45,7 +45,7 @@ class OwnerController(
      * @param owner 作成するオーナーの情報
      * @return 作成されたオーナーの情報
      */
-    @PostMapping("/owner")
+    @PostMapping
     fun createOwner(@Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
         // リクエストボディで受け取ったオーナー情報を保存
         val savedOwner = ownerService.save(owner)
@@ -59,7 +59,7 @@ class OwnerController(
      * @param owner 更新後のオーナーの情報
      * @return 更新されたオーナーの情報
      */
-    @PutMapping("/owner/{id}")
+    @PutMapping("/{id}")
     fun updateOwner(@PathVariable id: Int, @Validated @RequestBody owner: Owner): ResponseEntity<Owner> {
         // パス変数で受け取ったIDをオーナー情報に設定
         val ownerToUpdate = owner.copy(id = id)
@@ -74,7 +74,7 @@ class OwnerController(
      * @param id 削除するオーナーのID
      * @return レスポンスエンティティ
      */
-    @DeleteMapping("/owner/{id}")
+    @DeleteMapping("/{id}")
     fun deleteOwner(@PathVariable id: Int): ResponseEntity<Void> {
         // 指定されたIDのオーナー情報を削除
         ownerService.deleteById(id)

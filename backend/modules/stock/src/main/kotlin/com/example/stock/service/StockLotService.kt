@@ -21,7 +21,7 @@ class StockLotService(
      * すべての株式ロットを取得します。
      * @return StockLotのリスト
      */
-    fun findAllStockLots(): List<StockLot> {
+    open fun findAll(): List<StockLot> {
         return stockLotRepository.findAll()
     }
 
@@ -35,13 +35,12 @@ class StockLotService(
     }
 
     /**
-     * 指定されたIDの株式ロットを取得します。
-     * @param lotId ロットのID
-     * @return StockLot
+     * IDに基づいてStockLotを検索します。
+     * @param id 検索するStockLotのID
+     * @return 見つかったStockLot。存在しない場合はnull。
      */
-    fun findStockLotById(lotId: Int): StockLot {
-        return stockLotRepository.findById(lotId)
-            .orElseThrow { jakarta.persistence.EntityNotFoundException("StockLot not found with id: $lotId") }
+    open fun findById(id: Int): StockLot? {
+        return stockLotRepository.findById(id).orElse(null)
     }
 
     /**

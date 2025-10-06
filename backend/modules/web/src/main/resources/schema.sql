@@ -2,10 +2,10 @@
 -- Be cautious when running this in a production environment.
 
 -- Drop existing tables in reverse order of dependency
+DROP TABLE IF EXISTS benefit_history;
+DROP TABLE IF EXISTS incoming_history;
 DROP TABLE IF EXISTS sell_transaction;
 DROP TABLE IF EXISTS buy_transaction;
-DROP TABLE IF EXISTS incoming_history;
-DROP TABLE IF EXISTS benefit_history;
 DROP TABLE IF EXISTS stock_lot;
 DROP TABLE IF EXISTS stock;
 DROP TABLE IF EXISTS sector;
