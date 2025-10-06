@@ -11,9 +11,9 @@ export default {
     const csvColumns = {
       code: { label: 'コード' },
       name: { label: '名前' },
-      current_price: { label: '現在の株価' },
-      dividend: { label: '配当金' },
-      earnings_date: { label: '業績発表日' },
+      current_price: { label: '現在の株価', formatter: (value, stock) => stock.stock_price.current_price },
+      dividend: { label: '配当金', formatter: (value, stock) => stock.stock_price.dividend },
+      earnings_date: { label: '業績発表日', formatter: (value, stock) => stock.stock_price.earnings_date },
       sector: { label: 'セクター', formatter: (value) => value.name },
     };
 
@@ -88,7 +88,7 @@ export default {
         return this.selectedCsvColumns.map(key => {
           const column = this.csvColumns[key];
           const value = stock[key];
-          return column.formatter ? column.formatter(value) : value;
+          return column.formatter ? column.formatter(value, stock) : value;
         }).join(delimiter);
       });
 
