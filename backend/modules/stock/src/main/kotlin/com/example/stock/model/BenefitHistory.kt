@@ -35,12 +35,12 @@ data class BenefitHistory(
     val benefit: BigDecimal, // 利益
 
     @Column(name = "payment_date", nullable = false)
-    var paymentDate: java.time.LocalDate // 支払日
+    var payment_date: java.time.LocalDate // 支払日
 )
 {
     init {
-        // stockLotとsellTransactionのどちらか一方のみがセットされていること
-        if ((stockLot == null && sellTransaction == null) || (stockLot != null && sellTransaction != null)) {
+        // stock_lotとsell_transactionのどちらか一方のみがセットされていること
+        if ((stock_lot == null && sell_transaction == null) || (stock_lot != null && sell_transaction != null)) {
             throw IllegalArgumentException("stock_lotとsell_transactionのどちらか一方のみを指定してください")
         }
     }
