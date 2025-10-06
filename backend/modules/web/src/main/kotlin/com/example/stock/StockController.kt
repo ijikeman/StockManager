@@ -8,19 +8,19 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/stock")
 class StockController(
     private val stockService: StockService
 ) {
     /* 全てのStockを渡す */
-    @GetMapping("/stock")
+    @GetMapping
     fun getStocks(): ResponseEntity<List<Stock>> {
         val stocks = stockService.findAll()
         return ResponseEntity(stocks, HttpStatus.OK)
     }
 
     /* 特定のStockを渡す */
-    @GetMapping("/stock/{id}")
+    @GetMapping("/{id}")
     fun getStockById(@PathVariable id: Int): ResponseEntity<Stock> {
         val stock = stockService.findById(id)
         return if (stock != null) {
@@ -31,14 +31,14 @@ class StockController(
     }
 
     /* Stockを登録する */
-    @PostMapping("/stock")
+    @PostMapping
     fun createStock(@Validated @RequestBody stock: Stock): ResponseEntity<Stock> {
         val savedStock = stockService.save(stock)
         return ResponseEntity(savedStock, HttpStatus.CREATED)
     }
 
     /* 特定のStockを更新する */
-    @PutMapping("/stock/{id}")
+    @PutMapping("/{id}")
     fun updateStock(@PathVariable id: Int, @Validated @RequestBody stock: Stock): ResponseEntity<Stock> {
         val stockToUpdate = stock.copy(id = id)
         val updatedStock = stockService.save(stockToUpdate)
@@ -46,14 +46,14 @@ class StockController(
     }
 
     /* 特定のStockを削除する */
-    @DeleteMapping("/stock/{id}")
+    @DeleteMapping("/{id}")
     fun deleteStock(@PathVariable id: Int): ResponseEntity<Void> {
         stockService.deleteById(id)
         return ResponseEntity.noContent().build()
     }
 
     /* 特定のStockを更新する */
-    @PostMapping("/stock/{code}/update")
+    @PostMapping("/{code}/update")
     fun updateStockPrice(@PathVariable code: String): ResponseEntity<Stock> {
         val updatedStock = stockService.updateStockPrice(code)
         return if (updatedStock != null) {
@@ -64,7 +64,7 @@ class StockController(
     }
 
     /* 全てのStockを更新する */
-    @PostMapping("/stock/update-all")
+    @PostMapping("/update-all")
     fun updateAllStockPrices(): ResponseEntity<List<Stock>> {
         val updatedStocks = stockService.updateAllStockPrices()
         return ResponseEntity.ok(updatedStocks)
@@ -76,7 +76,7 @@ class StockController(
      * @param code 株式コード。
      * @return 銘柄名。見つからない場合は404 Not Found。
      */
-    @GetMapping("/stock/name/{code}")
+    @GetMapping("/name/{code}")
     fun getStockName(@PathVariable code: String): ResponseEntity<String> {
         val stockName = stockService.fetchStockName(code)
         return if (stockName != null) {

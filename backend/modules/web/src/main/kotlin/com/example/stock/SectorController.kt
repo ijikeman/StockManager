@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
  * セクター情報に関するRESTful APIを提供します。
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/sector")
 class SectorController(
     private val sectorService: SectorService
 ) {
@@ -19,7 +19,7 @@ class SectorController(
      * すべてのセクターのリストを取得します。
      * @return セクターのリスト
      */
-    @GetMapping("/sector")
+    @GetMapping
     fun getSectors(): List<Sector> {
         return sectorService.findAll()
     }
@@ -29,7 +29,7 @@ class SectorController(
      * @param id 取得するセクターのID
      * @return 見つかったセクター。見つからない場合は404 Not Found。
      */
-    @GetMapping("/sector/{id}")
+    @GetMapping("/{id}")
     fun getSector(@PathVariable id: Int): ResponseEntity<Sector> {
         val sector = sectorService.findById(id)
         return if (sector != null) {
@@ -44,7 +44,7 @@ class SectorController(
      * @param sector 作成するセクターの情報
      * @return 作成されたセクターの情報
      */
-    @PostMapping("/sector")
+    @PostMapping
     fun createSector(@Validated @RequestBody sector: Sector): ResponseEntity<Sector> {
         val savedSector = sectorService.save(sector)
         return ResponseEntity(savedSector, HttpStatus.CREATED)
@@ -56,7 +56,7 @@ class SectorController(
      * @param sector 更新後のセクターの情報
      * @return 更新されたセクターの情報
      */
-    @PutMapping("/sector/{id}")
+    @PutMapping("/{id}")
     fun updateSector(@PathVariable id: Int, @Validated @RequestBody sector: Sector): ResponseEntity<Sector> {
         val sectorToUpdate = sector.copy(id = id)
         val updatedSector = sectorService.save(sectorToUpdate)
@@ -68,7 +68,7 @@ class SectorController(
      * @param id 削除するセクターのID
      * @return レスポンスエンティティ
      */
-    @DeleteMapping("/sector/{id}")
+    @DeleteMapping("/{id}")
     fun deleteSector(@PathVariable id: Int): ResponseEntity<Void> {
         sectorService.deleteById(id)
         return ResponseEntity.noContent().build()
