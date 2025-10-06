@@ -49,4 +49,42 @@ class StockLotServiceTest {
         assertThat(capturedStockLot.owner).isEqualTo(owner)
         assertThat(capturedStockLot.stock).isEqualTo(stock)
     }
+
+    @Test
+    fun `findAllStockLots should return all lots`() {
+        val lots = listOf(
+            StockLot(id = 1, owner = Owner(1, "A"), stock = Stock(1, "1111", "S1", 100), unit = 1, isNisa = false),
+            StockLot(id = 2, owner = Owner(2, "B"), stock = Stock(2, "2222", "S2", 100), unit = 2, isNisa = true)
+        )
+        mockitoWhen(stockLotRepository.findAll()).thenReturn(lots)
+        val result = stockLotService.findAllStockLots()
+        assertThat(result).hasSize(2).containsAll(lots)
+    }
+
+    @Test
+    fun `findByOwnerId should return lots for owner`() {
+        val owner = Owner(1, "A")
+        val lots = listOf(
+            StockLot(id = 1, owner = owner, stock = Stock(1, "1111", "S1", 100), unit = 1, isNisa = false)
+        )
+        mockitoWhen(stockLotRepository.findByOwnerId(1)).thenReturn(lots)
+        val result = stockLotService.findByOwnerId(1)
+        assertThat(result).hasSize(1).containsAll(lots)
+    }
+
+    @Test
+    fun `findStockLotById should return lot if exists`() {
+        val lot = StockLot(id = 1, owner = Owner(1, "A"), stock = Stock(1, "1111", "S1", 100), unit = 1, isNisa = false)
+        mockitoWhen(stockLotRepository.findById(1)).thenReturn(java.util.Optional.of(lot))
+        val result = stockLotService.findStockLotById(1)
+        assertThat(result).isEqualTo(lot)
+    }
+
+    @Test
+    fun `findStockLotById should throw if not exists`() {
+        mockitoWhen(stockLotRepository.findById(1)).thenReturn(java.util.Optional.empty())
+        org.junit.jupiter.api.Assertions.assertThrows(jakarta.persistence.EntityNotFoundException::class.java) {
+            stockLotService.findStockLotById(1)
+        }
+    }
 }
