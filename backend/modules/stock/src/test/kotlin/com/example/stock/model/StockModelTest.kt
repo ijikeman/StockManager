@@ -28,7 +28,7 @@ class StockTest {
             incoming = 150.0,
             earnings_date = java.time.LocalDate.of(2025, 8, 27),
             sector = sector,
-            minimalUnit = 200
+            minimal_unit = 200
         )
         val violations = validator.validate(stock)
         assertEquals(0, violations.size)
@@ -74,7 +74,7 @@ class StockTest {
     // 異常系: code
     @Test
     fun `stock with blank code should have two violations`() {
-    val stock = Stock(code = "", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
+    val stock = Stock(code = "", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
         val violations = validator.validate(stock)
         assertEquals(2, violations.size)
         val messages = violations.map { it.message }
@@ -84,7 +84,7 @@ class StockTest {
 
     @Test
     fun `stock with invalid pattern code should have violation`() {
-    val stock = Stock(code = "123-", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
+    val stock = Stock(code = "123-", name = "Test", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("銘柄コードは数字あるいはアルファベットのみで構成される必要があります", violations.first().message)
@@ -93,16 +93,16 @@ class StockTest {
     // 異常系: name
     @Test
     fun `stock with blank name should have violation`() {
-    val stock = Stock(code = "1234", name = "", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimalUnit = 200)
+    val stock = Stock(code = "1234", name = "", earnings_date = java.time.LocalDate.of(2025, 8, 27), sector = sector, minimal_unit = 200)
         val violations = validator.validate(stock)
         assertEquals(1, violations.size)
         assertEquals("銘柄名は必須です", violations.first().message)
     }
 
-    // current_price, incoming, minimalUnit の値テスト
+    // current_price, incoming, minimal_unit の値テスト
     @Test
     fun `stock with negative current_price should be allowed`() {
-        val stock = Stock(code = "1234", name = "Test", current_price = -100.0, sector = sector, minimalUnit = 200)
+        val stock = Stock(code = "1234", name = "Test", current_price = -100.0, sector = sector, minimal_unit = 200)
         val violations = validator.validate(stock)
         // current_priceにバリデーションは無いので違反0
         assertEquals(0, violations.size)
@@ -117,8 +117,8 @@ class StockTest {
     }
 
     @Test
-    fun `stock with custom minimalUnit should be set correctly`() {
-        val stock = Stock(code = "1234", name = "Test", minimalUnit = 1, sector = sector)
-        assertEquals(1, stock.minimalUnit)
+    fun `stock with custom minimal_unit should be set correctly`() {
+        val stock = Stock(code = "1234", name = "Test", minimal_unit = 1, sector = sector)
+        assertEquals(1, stock.minimal_unit)
     }
 }

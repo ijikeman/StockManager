@@ -44,5 +44,5 @@ data class Stock(
     var sector: Sector? = null, // セクター
 
     @Column(name = "minimal_unit", nullable = false)
-    val minimalUnit: Int = 100 // 最低単元数
+    val minimal_unit: Int = 100 // 最低単元数
 )

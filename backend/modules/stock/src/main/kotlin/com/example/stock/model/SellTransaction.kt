@@ -25,7 +25,7 @@ data class SellTransaction(
 
     @ManyToOne
     @JoinColumn(name = "buy_transaction_id")
-    val buyTransaction: BuyTransaction, // 購入取引
+    val buy_transaction: BuyTransaction, // 購入取引
 
     @Column(name = "unit", nullable = false)
     val unit: Int, // 単元数

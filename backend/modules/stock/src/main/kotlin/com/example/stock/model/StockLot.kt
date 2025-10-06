@@ -27,5 +27,5 @@ data class StockLot(
     val stock: Stock, // 銘柄
 
     @Column(name = "current_unit", nullable = false)
-    val currentUnit: Int, // 現在の単元数
+    val current_unit: Int, // 現在の単元数
 )
