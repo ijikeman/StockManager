@@ -1,41 +1,71 @@
 package com.example.stock.repository
 
-import com.example.stock.model.BuyTransaction
 import com.example.stock.model.Owner
+import com.example.stock.model.Sector
 import com.example.stock.model.Stock
+import com.example.stock.model.StockLot
+import com.example.stock.model.BuyTransaction
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import java.math.BigDecimal
-import java.time.LocalDate
 
 @DataJpaTest
-class BuyTransactionRepositoryTest @Autowired constructor(
-    val buyTransactionRepository: BuyTransactionRepository,
-    val ownerRepository: OwnerRepository,
-    val stockRepository: StockRepository
-) {
+class BuyTransactionRepositoryTest {
+
+    @Autowired
+    private lateinit var entityManager: TestEntityManager
+
+    @Autowired
+    private lateinit var buyTransactionRepository: BuyTransactionRepository
+
+    // 正しく保存できるか
     @Test
     fun `save and find BuyTransaction`() {
         // Arrange: 依存エンティティを保存
-        val owner = ownerRepository.save(Owner(name = "Test Owner"))
-        val stock = stockRepository.save(Stock(name = "Test Stock", code = "0000"))
-        val buyTransaction = BuyTransaction(
-            owner = owner,
-            stock = stock,
-            unit = 10,
-            price = BigDecimal(1000),
-            fee = BigDecimal(10),
-            transaction_date = LocalDate.now()
+        val sector = Sector(name = "test sector")
+        val persistedSector = entityManager.persist(sector)
+
+        val stock = Stock(
+            code = "9999",
+            name = "test stock",
+            currentPrice = 1000.0,
+            incoming = 10.0,
+            earningsDate = java.time.LocalDate.of(2025, 1, 1),
+            sector = persistedSector)
+        val persistedStock = entityManager.persist(stock)
+
+        val owner = Owner(name = "testuser")
+        val persistedOwner = entityManager.persist(owner)
+    
+        val stockLot = StockLot(
+            owner = persistedOwner,
+            stock = persistedStock,
+            currentUnit = 100,
         )
-        // Act: 保存
-        val saved = buyTransactionRepository.save(buyTransaction)
-        // Assert: 検索
-        val found = buyTransactionRepository.findById(saved.id)
-        assertEquals(true, found.isPresent)
-        assertEquals(owner.id, found.get().owner.id)
-        assertEquals(stock.id, found.get().stock.id)
-        assertEquals(10, found.get().unit)
+        val persistedStockLot = entityManager.persist(stockLot)
+
+        // 正しく保存できるか
+        val buyTransaction = BuyTransaction(
+            stockLot = persistedStockLot,
+            unit = 10,
+            price = BigDecimal("1000.0"),
+            fee = BigDecimal("100.0"),
+            isNisa = true,
+            transactionDate = java.time.LocalDate.now()
+        )
+        val persistedBuyTransaction = entityManager.persist(buyTransaction)
+
+        // 検索できるか
+        val found = buyTransactionRepository.findById(persistedBuyTransaction.id)
+        assertThat(found).isPresent
+        assertEquals(found.get().unit, buyTransaction.unit)
+        assertEquals(found.get().price, buyTransaction.price)
+        assertEquals(found.get().fee, buyTransaction.fee)
+        assertEquals(found.get().isNisa, buyTransaction.isNisa)
+        assertEquals(found.get().transactionDate, buyTransaction.transactionDate)
     }
 }

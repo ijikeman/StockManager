@@ -32,7 +32,6 @@ data class IncomingHistory(
     @JoinColumn(name = "sell_transaction_id")
     var sellTransaction: SellTransaction? = null, // 売却取引（通常はnull）
 
-
     @Column(name = "incoming", nullable = false)
     var incoming: BigDecimal, // 入金額
 
