@@ -60,12 +60,12 @@ CREATE TABLE buy_transaction (
     fee DECIMAL(10, 2) NOT NULL,
     transaction_date DATE NOT NULL,
     is_nisa BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (owner_id) REFERENCES owner(id)
+    FOREIGN KEY (owner_id) REFERENCES owner(id),
     FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
 );
 
 -- sell_transactionテーブル
-CREATE TABLE cell_transaction (
+CREATE TABLE sell_transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
     buy_transaction_id INT,
     unit INT NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE incoming_history (
     sell_transaction_id INT,
     incoming DECIMAL(10, 2) NOT NULL,
     payment_date DATE NOT NULL,
-    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id),
     FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );
 
@@ -92,6 +92,6 @@ CREATE TABLE benefit_history (
     stock_lot_id INT,
     sell_transaction_id INT,
     benefit DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
+    FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id),
     FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );
