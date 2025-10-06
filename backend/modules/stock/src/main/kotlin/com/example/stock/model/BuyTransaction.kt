@@ -24,15 +24,11 @@ data class BuyTransaction(
     val id: Int = 0, // ID
 
     @ManyToOne
-    @JoinColumn(name = "owner_id")
-    val owner: Owner, // 所有者
-
-    @ManyToOne
-    @JoinColumn(name = "stock_id")
-    val stock: Stock, // 銘柄
+    @JoinColumn(name = "stock_lot_id")
+    val stockLot: StockLot, // 株式ロット
 
     @Column(name = "unit", nullable = false)
-    val unit: Int, // 単元数
+    val unit: Int, // 購入単元数
 
     @Column(name = "price", nullable = false)
     val price: BigDecimal, // 価格
@@ -42,4 +38,7 @@ data class BuyTransaction(
 
     @Column(name = "transaction_date", nullable = false)
     val transaction_date: LocalDate // 取引日
+
+    @Column(name = "is_nisa", nullable = false)
+    val isNisa: Boolean = false // NISAかどうか
 )

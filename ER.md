@@ -29,17 +29,16 @@ erDiagram
         UUID id PK "ロットID"
         UUID owner_id FK "オーナーID"
         UUID stock_id FK "銘柄ID" 
-        boolean is_nisa "NISA口座フラグ"
-        decimal unit "単元数"
+        decimal current_unit "現在の単元数"
     }
     
     buy_transaction {
         UUID id PK
-        UUID owner_id FK "オーナーID"
-        UUID stock_id FK "ストックID"
+        UUID stock_lot_id FK "ストックロットID"
         decimal unit "購入単元数"
         decimal price "単価"
         decimal fee "手数料"
+        boolean is_nisa "NISA口座フラグ"
         timestamp transaction_date "取引日"
     }
 
@@ -78,13 +77,12 @@ erDiagram
         string name UK "セクター名"
     }
     owner ||--o{ stock_lot : "保有"
-    stock ||--o{ stock_lot : "銘柄"
-    stock ||--o{ buy_transaction : "購入履歴"
+stock ||--o{ stock_lot : "銘柄"
+    stock_lot ||--o{ buy_transaction : "購入履歴"
     stock_lot ||--o{ incoming_history : "配当履歴"
-    buy_transaction ||--o{ sell_transaction : "売却履歴"
-    sell_transaction_lot ||--o{ incoming_history : "配当履歴"
+    sell_transaction ||--o{ incoming_history : "配当履歴"
     stock_lot ||--o{ benefit_history : "優待履歴"
-    sell_transaction_lot ||--o{ benefit_history : "優待履歴"
+    sell_transaction ||--o{ benefit_history : "優待履歴"
+    buy_transaction ||--o{ sell_transaction : "売却履歴"
     sector ||--o{ stock : "分類"
-    buy_transaction ||--o{ stock_lot : "購入"
 ```

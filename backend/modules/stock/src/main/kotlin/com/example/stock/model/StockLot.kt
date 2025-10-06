@@ -26,9 +26,6 @@ data class StockLot(
     @JoinColumn(name = "stock_id")
     val stock: Stock, // 銘柄
 
-    @Column(name = "unit", nullable = false)
-    val unit: Int, // 単元数
-
-    @Column(name = "is_nisa", nullable = false)
-    val isNisa: Boolean = false // NISAかどうか
+    @Column(name = "current_unit", nullable = false)
+    val currentUnit: Int, // 現在の単元数
 )
