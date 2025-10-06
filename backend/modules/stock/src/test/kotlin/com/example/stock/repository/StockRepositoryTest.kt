@@ -51,7 +51,14 @@ class StockRepositoryTest {
         // given
         val sector = Sector(name = "test sector")
         val persistedSector = entityManager.persist(sector)
-    val stock = Stock(code = "9999", name = "test stock", currentPrice = 1000.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 1), sector = persistedSector)
+        val stock = Stock(
+            code = "9999",
+            name = "test stock",
+            currentPrice = 1000.0,
+            incoming = 10.0,
+            earningsDate = java.time.LocalDate.of(2025, 1, 1),
+            sector = persistedSector
+        )
         entityManager.persist(stock)
         entityManager.flush()
 
