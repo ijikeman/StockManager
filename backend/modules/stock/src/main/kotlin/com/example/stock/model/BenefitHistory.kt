@@ -22,13 +22,14 @@ data class BenefitHistory(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0, // ID
 
+
     @ManyToOne
     @JoinColumn(name = "stock_lot_id")
-    var stockLot: StockLot, // 株式ロット
+    var stock_lot: StockLot? = null, // 株式ロット（売却時はnull）
 
     @ManyToOne
     @JoinColumn(name = "sell_transaction_id")
-    var sellTransaction: SellTransaction, // 売却取引
+    var sell_transaction: SellTransaction? = null, // 売却取引（通常はnull）
 
     @Column(name = "benefit", nullable = false)
     val benefit: BigDecimal, // 利益
@@ -36,3 +37,11 @@ data class BenefitHistory(
     @Column(name = "payment_date", nullable = false)
     var paymentDate: java.time.LocalDate // 支払日
 )
+{
+    init {
+        // stockLotとsellTransactionのどちらか一方のみがセットされていること
+        if ((stockLot == null && sellTransaction == null) || (stockLot != null && sellTransaction != null)) {
+            throw IllegalArgumentException("stock_lotとsell_transactionのどちらか一方のみを指定してください")
+        }
+    }
+}

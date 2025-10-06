@@ -23,13 +23,15 @@ data class IncomingHistory(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0, // ID
 
+
     @ManyToOne
     @JoinColumn(name = "stock_lot_id")
-    var stockLot: StockLot, // 株式ロット
+    var stock_lot: StockLot? = null, // 株式ロット（売却時はnull）
 
     @ManyToOne
     @JoinColumn(name = "sell_transaction_id")
-    var sellTransaction: SellTransaction, // 売却取引
+    var sell_transaction: SellTransaction? = null, // 売却取引（通常はnull）
+
 
     @Column(name = "incoming", nullable = false)
     var incoming: BigDecimal, // 入金額
@@ -37,3 +39,11 @@ data class IncomingHistory(
     @Column(name = "payment_date", nullable = false)
     var payment_date: LocalDate // 支払日
 )
+{
+    init {
+        // stock_lotとsell_transactionのどちらか一方のみがセットされていること
+        if ((stock_lot == null && sell_transaction == null) || (stock_lot != null && sell_transaction != null)) {
+            throw IllegalArgumentException("stock_lotとsell_transactionのどちらか一方のみを指定してください")
+        }
+    }
+}
