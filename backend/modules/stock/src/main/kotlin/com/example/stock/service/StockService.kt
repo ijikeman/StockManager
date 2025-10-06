@@ -70,9 +70,9 @@ class StockService(
             val stock = stockRepository.findByCode(code)
             if (stock != null) {
                 val updatedStock = stock.copy(
-                    current_price = stockInfo.price ?: stock.current_price,
+                    currentPrice = stockInfo.price ?: stock.currentPrice,
                     incoming = stockInfo.incoming ?: stock.incoming,
-                    earnings_date = stockInfo.earnings_date ?: stock.earnings_date
+                    earningsDate = stockInfo.earningsDate ?: stock.earningsDate
                 )
                 return stockRepository.save(updatedStock)
             }
