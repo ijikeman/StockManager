@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class StockLotService(
-    private val stockLotRepository: StockLotRepository
+    private val stockLotRepository: StockLotRepository,
+    private val buyTransactionService: BuyTransactionService
 ) {
     /**
      * すべての株式ロットを取得します。
@@ -58,5 +59,32 @@ class StockLotService(
             currentUnit = currentUnit
         )
         return stockLotRepository.save(stockLot)
+    }
+
+    /**
+     * 単一の株式ロットを作成し、同時に購入取引も作成します。
+     *
+     * @param owner 所有者
+     * @param stock 株式
+     * @param currentUnit 現在の単元数
+     * @param buyTransaction 作成する購入取引（stockLotは無視される）
+     * @return 作成されたStockLot
+     */
+    fun createStockLotAndBuyTransaction(
+        owner: Owner,
+        stock: Stock,
+        currentUnit: Int,
+        buyTransaction: com.example.stock.model.BuyTransaction
+    ): StockLot {
+        val stockLot = StockLot(
+            owner = owner,
+            stock = stock,
+            currentUnit = currentUnit
+        )
+        val savedStockLot = stockLotRepository.save(stockLot)
+        // BuyTransactionのstockLotを保存したものに差し替えて作成
+        val transactionToSave = buyTransaction.copy(stockLot = savedStockLot)
+        buyTransactionService.create(transactionToSave)
+        return savedStockLot
     }
 }

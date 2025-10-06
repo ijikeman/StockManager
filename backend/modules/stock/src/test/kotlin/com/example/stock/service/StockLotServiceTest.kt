@@ -26,6 +26,9 @@ class StockLotServiceTest {
     @Mock
     private lateinit var stockLotRepository: StockLotRepository
 
+    @Mock
+    private lateinit var buyTransactionService: BuyTransactionService
+
     @Captor
     private lateinit var stockLotCaptor: ArgumentCaptor<StockLot>
 
@@ -58,5 +61,47 @@ class StockLotServiceTest {
         assertThat(capturedStockLot.currentUnit).isEqualTo(2)
         assertThat(capturedStockLot.owner).isEqualTo(owner)
         assertThat(capturedStockLot.stock).isEqualTo(stock)
+    }
+
+    @Test
+    fun `createStockLotAndBuyTransaction should create lot and buy transaction`() {
+        // given
+        val owner = Owner(id = 1, name = "TestUser")
+        val sector = Sector(id = 1, name = "Test Sector")
+        val stock = Stock(
+            id = 1,
+            code = "9999",
+            name = "test stock",
+            currentPrice = 1000.0,
+            incoming = 10.0,
+            earningsDate = java.time.LocalDate.of(2025, 1, 1),
+            sector = sector
+        )
+        val currentUnit = 2
+        val dummyStockLot = StockLot(id = 99, owner = owner, stock = stock, currentUnit = currentUnit)
+        mockitoWhen(stockLotRepository.save(any(StockLot::class.java))).thenReturn(dummyStockLot)
+
+        val buyTransaction = com.example.stock.model.BuyTransaction(
+            id = 0,
+            stockLot = dummyStockLot, // 仮の値
+            unit = 2,
+            price = java.math.BigDecimal("1000.0"),
+            fee = java.math.BigDecimal("10.0"),
+            isNisa = false,
+            transactionDate = java.time.LocalDate.of(2025, 10, 6)
+        )
+        // buyTransactionService.createのスタブは不要
+
+        // when
+        val result = stockLotService.createStockLotAndBuyTransaction(owner, stock, currentUnit, buyTransaction)
+
+        // then
+        verify(stockLotRepository).save(any(StockLot::class.java))
+        verify(buyTransactionService).create(
+            org.mockito.kotlin.argThat { 
+                this.copy(id = 0) == buyTransaction.copy(stockLot = dummyStockLot, id = 0)
+            }
+        )
+        assertThat(result).isEqualTo(dummyStockLot)
     }
 }
