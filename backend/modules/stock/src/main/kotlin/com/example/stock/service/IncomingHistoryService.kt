@@ -2,8 +2,10 @@ package com.example.stock.service
 
 import com.example.stock.model.IncomingHistory
 import com.example.stock.repository.IncomingHistoryRepository
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 
+@Service
 class IncomingHistoryService(
 	private val incomingHistoryRepository: IncomingHistoryRepository
 ) {
@@ -22,8 +24,9 @@ class IncomingHistoryService(
 	 * @return 見つかった配当履歴
 	 * @throws EntityNotFoundException 指定されたIDの配当履歴が見つからない場合
 	 */
-    open fun findById(id: Int): IncomingHistory? {
-        return incomingHistoryRepository.findById(id).orElse(null)
+    fun findById(id: Int): IncomingHistory {
+        return incomingHistoryRepository.findById(id)
+			.orElseThrow { EntityNotFoundException("IncomingHistory not found with id: $id") }
     }
 
 	/**
