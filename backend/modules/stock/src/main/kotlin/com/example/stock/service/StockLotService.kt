@@ -48,40 +48,15 @@ class StockLotService(
      *
      * @param owner 所有者
      * @param stock 株式
-     * @param isNisa NISA口座かどうか
-     * @param unit 単元数
+     * @param currentUnit 現在の単元数
      * @return 作成されたStockLot
      */
-    fun createStockLot(owner: Owner, stock: Stock, isNisa: Boolean, unit: Int): StockLot {
+    fun createStockLot(owner: Owner, stock: Stock, currentUnit: Int): StockLot {
         val stockLot = StockLot(
             owner = owner,
             stock = stock,
-            isNisa = isNisa,
-            unit = unit
+            currentUnit = currentUnit
         )
         return stockLotRepository.save(stockLot)
-    }
-
-    fun getStockLot(id: Long): StockLotDetailResponse {
-        val stockLot = stockLotRepository.findById(id.toInt())
-            .orElseThrow { jakarta.persistence.EntityNotFoundException("StockLot not found with id: $id") }
-
-        val buyTransaction = transactionRepository.findByStockLotAndType(stockLot, TransactionType.BUY)
-            .firstOrNull() ?: throw IllegalStateException("Buy transaction not found for lot id: $id")
-
-        return StockLotDetailResponse(
-            id = stockLot.id.toLong(),
-            unit = stockLot.unit,
-            price = buyTransaction.price,
-            is_nisa = stockLot.isNisa,
-            stock = StockLotDetailResponse.StockInfo(
-                code = stockLot.stock.code,
-                name = stockLot.stock.name,
-            ),
-            owner = StockLotDetailResponse.OwnerInfo(
-                id = stockLot.owner.id.toLong(),
-                name = stockLot.owner.name,
-            ),
-        )
     }
 }
