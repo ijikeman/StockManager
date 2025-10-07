@@ -6,6 +6,7 @@ import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
 import StockLotList from '../views/stocklot/StockLotList.vue';
+import StockLotAdd from '../views/stocklot/Add.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAdd from '../views/income/Add.vue';
 import IncomeEdit from '../views/income/Edit.vue';
@@ -19,6 +20,11 @@ const routes = [
     path: '/stocklot',
     name: 'StockLotList',
     component: StockLotList
+  },
+  {
+    path: '/stocklot/add',
+    name: 'StockLotAdd',
+    component: StockLotAdd
   },
   {
     path: '/income',
