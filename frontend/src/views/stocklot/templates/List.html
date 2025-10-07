@@ -13,7 +13,8 @@
         <th>オーナー</th>
         <th>銘柄名</th>
         <th>単元数</th>
-        <th>価格</th>
+        <th>購入価格</th>
+        <th>現在価格</th>
         <th>手数料</th>
       </tr>
     </thead>
@@ -26,6 +27,7 @@
         <td>{{ lot.stock.name }}</td>
         <td>{{ lot.unit }}</td>
         <td>{{ lot.price }}</td>
+        <td>{{ lot.stock.price }}</td>
         <td>{{ lot.fees }}</td>
       </tr>
     </tbody>
