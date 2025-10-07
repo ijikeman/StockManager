@@ -1,6 +1,9 @@
 package com.example.stock
 
+import com.example.stock.dto.OwnerDto
+import com.example.stock.dto.StockDto
 import com.example.stock.dto.StockLotAddDto
+import com.example.stock.dto.StockLotResponseDto
 import com.example.stock.model.BuyTransaction
 import com.example.stock.model.StockLot
 import com.example.stock.service.OwnerService
@@ -22,8 +25,8 @@ class StockLotController(
     private val stockService: StockService,
 ) {
     @GetMapping
-    fun getStockLots(): List<StockLot> {
-        return stockLotService.findAll()
+    fun getStockLots(): List<StockLotResponseDto> {
+        return stockLotService.findAll().map { it.toResponseDto() }
     }
 
     /**
@@ -32,10 +35,10 @@ class StockLotController(
      * @return 見つかったStockLot。見つからない場合は404 Not Found。
      */
     @GetMapping("/{id}")
-    fun getStockLot(@PathVariable id: Int): ResponseEntity<StockLot> {
+    fun getStockLot(@PathVariable id: Int): ResponseEntity<StockLotResponseDto> {
         val stockLot = stockLotService.findById(id)
         return if (stockLot != null) {
-            ResponseEntity.ok(stockLot)
+            ResponseEntity.ok(stockLot.toResponseDto())
         } else {
             ResponseEntity.notFound().build()
         }
@@ -66,6 +69,15 @@ class StockLotController(
             buyTransaction = buyTransaction,
         )
 
-        return ResponseEntity.ok(createdStockLot)
+        return ResponseEntity.ok(createdStockLot.toResponseDto())
+    }
+
+    private fun StockLot.toResponseDto(): StockLotResponseDto {
+        return StockLotResponseDto(
+            id = this.id,
+            owner = OwnerDto(id = this.owner.id, name = this.owner.name),
+            stock = StockDto(id = this.stock.id, code = this.stock.code, name = this.stock.name, currentPrice = this.stock.currentPrice),
+            currentUnit = this.currentUnit
+        )
     }
 }

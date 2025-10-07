@@ -4,7 +4,6 @@ import com.example.stock.dto.StockLotAddDto
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
-import com.example.stock.model.BuyTransaction
 import com.example.stock.service.OwnerService
 import com.example.stock.service.StockLotService
 import com.example.stock.service.StockService
@@ -17,11 +16,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Optional
 
 @WebMvcTest(StockLotController::class)
 class StockLotControllerTest {
@@ -40,6 +41,35 @@ class StockLotControllerTest {
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
+
+    @Test
+    fun `getStockLots should return a list of stock lots`() {
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val stockLots = listOf(StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10))
+
+        whenever(stockLotService.findAll()).thenReturn(stockLots)
+
+        mockMvc.perform(get("/api/stocklot"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].owner.name").value("Test Owner"))
+            .andExpect(jsonPath("$[0].stock.name").value("Test Stock"))
+    }
+
+    @Test
+    fun `getStockLot should return a single stock lot`() {
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10)
+
+        whenever(stockLotService.findById(1)).thenReturn(stockLot)
+
+        mockMvc.perform(get("/api/stocklot/1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.owner.name").value("Test Owner"))
+    }
 
     @Test
     fun `addStockLot should create stock lot and return it`() {
@@ -68,7 +98,9 @@ class StockLotControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(createdStockLot.id))
             .andExpect(jsonPath("$.owner.id").value(owner.id))
+            .andExpect(jsonPath("$.owner.name").value(owner.name))
             .andExpect(jsonPath("$.stock.id").value(stock.id))
+            .andExpect(jsonPath("$.stock.name").value(stock.name))
             .andExpect(jsonPath("$.currentUnit").value(createdStockLot.currentUnit))
     }
 
