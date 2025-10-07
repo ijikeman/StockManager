@@ -5,9 +5,7 @@ import StockList from '../views/stock/List.vue';
 import StockAddEdit from '../views/stock/AddEdit.vue';
 import SectorList from '../views/sector/List.vue';
 import SectorAddEdit from '../views/sector/AddEdit.vue';
-import TransactionList from '../views/transaction/List.vue';
-import BuyTransaction from '../views/transaction/Buy.vue';
-import SellTransaction from '../views/transaction/Sell.vue';
+import StockLotList from '../views/stocklot/StockLotList.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAdd from '../views/income/Add.vue';
 import IncomeEdit from '../views/income/Edit.vue';
@@ -18,20 +16,9 @@ const routes = [
     redirect: '/sector'
   },
   {
-    path: '/transaction',
-    name: 'TransactionList',
-    component: TransactionList
-  },
-  {
-    path: '/transaction/add',
-    name: 'TransactionAdd',
-    component: BuyTransaction
-  },
-  {
-    path: '/transaction/sell/:lot_id',
-    name: 'TransactionSell',
-    component: SellTransaction,
-    props: true
+    path: '/stocklot',
+    name: 'StockLotList',
+    component: StockLotList
   },
   {
     path: '/income',
