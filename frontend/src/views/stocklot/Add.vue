@@ -15,6 +15,7 @@ export default {
         unit: 0,
         price: 0,
         fees: 0,
+        isNisa: false,
       },
       stocks: [],
       owners: [],
@@ -39,7 +40,16 @@ export default {
     },
     async submitForm() {
       try {
-        await axios.post("/api/stocklot", this.lot);
+        const payload = {
+          ownerId: this.lot.owner_id,
+          stockId: this.lot.stock_id,
+          unit: this.lot.unit,
+          price: this.lot.price,
+          fee: this.lot.fees,
+          isNisa: this.lot.isNisa,
+          transactionDate: this.lot.date,
+        };
+        await axios.post("/api/stocklot/add", payload);
         this.$router.push("/stocklot");
       } catch (error) {
         console.error("Error creating stock lot:", error);
