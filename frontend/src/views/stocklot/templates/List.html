@@ -8,27 +8,27 @@
     <thead>
       <tr>
         <th>日付</th>
-        <th>種類</th>
         <th>銘柄コード</th>
         <th>オーナー</th>
         <th>銘柄名</th>
         <th>単元数</th>
         <th>購入価格</th>
         <th>現在価格</th>
+        <th>NISA</th>
         <th>手数料</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="lot in stockLots" :key="lot.id">
         <td>{{ lot.date }}</td>
-        <td>{{ lot.type }}</td>
         <td>{{ lot.stock.code }}</td>
         <td>{{ lot.owner_name }}</td>
         <td>{{ lot.stock.name }}</td>
         <td>{{ lot.unit }}</td>
         <td>{{ lot.price }}</td>
         <td>{{ lot.stock.price }}</td>
-        <td>{{ lot.fees }}</td>
+        <td>{{ lot.isNisa }}</td>
+        <td>{{ lot.free }}</td>
       </tr>
     </tbody>
   </table>
