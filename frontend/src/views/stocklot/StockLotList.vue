@@ -19,6 +19,9 @@ export default {
         console.error('Error fetching stock lots:', error);
       }
     },
+    goToAddStock() {
+      this.$router.push('/stocklot/add');
+    },
   },
   mounted() {
     this.fetchStockLots();

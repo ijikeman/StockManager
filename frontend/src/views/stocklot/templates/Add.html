@@ -1,0 +1,76 @@
+<div>
+  <div class="page-header">
+    <h1 class="page-title">ストックロット新規登録</h1>
+  </div>
+  <form @submit.prevent="submitForm">
+    <table class="common-table">
+      <tbody>
+        <tr>
+          <th>日付</th>
+          <td>
+            <input type="date" v-model="lot.date" required />
+          </td>
+        </tr>
+        <tr>
+          <th>種類</th>
+          <td>
+            <select v-model="lot.type">
+              <option value="buy">購入</option>
+              <option value="sell">売却</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>銘柄</th>
+          <td>
+            <select v-model="lot.stock_id" required>
+              <option
+                v-for="stock in stocks"
+                :key="stock.id"
+                :value="stock.id"
+              >
+                {{ stock.name }}
+              </option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>オーナー</th>
+          <td>
+            <select v-model="lot.owner_id" required>
+              <option
+                v-for="owner in owners"
+                :key="owner.id"
+                :value="owner.id"
+              >
+                {{ owner.name }}
+              </option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>単元数</th>
+          <td>
+            <input type="number" v-model.number="lot.unit" required />
+          </td>
+        </tr>
+        <tr>
+          <th>価格</th>
+          <td>
+            <input type="number" v-model.number="lot.price" required />
+          </td>
+        </tr>
+        <tr>
+          <th>手数料</th>
+          <td>
+            <input type="number" v-model.number="lot.fees" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">登録</button>
+      <router-link to="/stocklot" class="btn">キャンセル</router-link>
+    </div>
+  </form>
+</div>
