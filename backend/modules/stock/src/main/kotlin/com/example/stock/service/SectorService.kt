@@ -5,7 +5,9 @@ import com.example.stock.repository.SectorRepository
 import org.springframework.stereotype.Service
 
 @Service
-open class SectorService(private val sectorRepository: SectorRepository) {
+open class SectorService(
+    private val sectorRepository: SectorRepository
+) {
     open fun findAll(): List<Sector> {
         return sectorRepository.findAll()
     }

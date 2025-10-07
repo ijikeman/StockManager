@@ -3,6 +3,7 @@ package com.example.stock.service
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.model.BuyTransaction
 import com.example.stock.repository.StockLotRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,6 +45,23 @@ class StockLotService(
     }
 
     /**
+     * すべての株式ロットからcurrentUnitが0以外の株式ロットを抽出します。
+     * @return currentUnitが0以外のStockLotリスト
+     */
+    fun findAllWithUnit(): List<StockLot> {
+        return stockLotRepository.findAll().filter { it.currentUnit != 0 }
+    }
+
+    /**
+     * 指定した所有者IDのうち、currentUnitが0以外の株式ロットを抽出します。
+     * @param ownerId 所有者ID
+     * @return currentUnitが0以外のStockLotリスト
+     */
+    fun findByOwnerIdWithUnit(ownerId: Int): List<StockLot> {
+        return stockLotRepository.findByOwnerId(ownerId).filter { it.currentUnit != 0 }
+    }
+
+    /**
      * 単一の株式ロットを作成します。
      *
      * @param owner 所有者
@@ -73,7 +91,7 @@ class StockLotService(
         owner: Owner,
         stock: Stock,
         currentUnit: Int,
-        buyTransaction: com.example.stock.model.BuyTransaction
+        buyTransaction: BuyTransaction
     ): StockLot {
         val stockLot = StockLot(
             owner = owner,

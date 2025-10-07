@@ -5,7 +5,9 @@ import com.example.stock.repository.OwnerRepository
 import org.springframework.stereotype.Service
 
 @Service
-open class OwnerService(private val ownerRepository: OwnerRepository) {
+open class OwnerService(
+    private val ownerRepository: OwnerRepository
+) {
     open fun findAll(): List<Owner> {
         return ownerRepository.findAll()
     }

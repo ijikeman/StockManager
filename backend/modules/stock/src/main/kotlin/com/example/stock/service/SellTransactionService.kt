@@ -15,6 +15,23 @@ class SellTransactionService(
 	private val sellTransactionRepository: SellTransactionRepository,
 	private val stockLotRepository: StockLotRepository
 ) {
+    /**
+     * すべての売却取引を取得します。
+     * @return SellTransactionのリスト
+     */
+    open fun findAll(): List<SellTransaction> {
+        return sellTransactionRepository.findAll()
+    }
+
+    /**
+     * BuyTransactionIDによって株式ロットを検索します。
+     * @param buyTransactionId 所有者ID
+     * @return SellTransactionのリスト
+     */
+    fun findByBuyTransactionId(buyTransactionId: Int): List<SellTransaction> {
+        return sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
+    }
+
 	/**
 	 * 売却取引を作成します（StockLotの単元数は変更しません）。
 	 * @param sellTransaction 作成する取引エンティティ
@@ -30,7 +47,7 @@ class SellTransactionService(
 	 * @return 保存された取引エンティティ
 	 * @throws IllegalArgumentException 単元数が不足している場合
 	 */
-	fun createSellTransactionAndUpdateStockLot(sellTransaction: SellTransaction): SellTransaction {
+	fun createAndUpdateStockLot(sellTransaction: SellTransaction): SellTransaction {
 		val stockLot = sellTransaction.buyTransaction.stockLot
 		val newUnit = stockLot.currentUnit - sellTransaction.unit
 		if (newUnit < 0) {
