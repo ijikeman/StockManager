@@ -73,7 +73,7 @@ class SellTransactionServiceTest {
     }
 
     @Test
-    fun `createSellTransactionAndUpdateStockLot should decrease unit and save when enough units`() {
+    fun `createAndUpdateStockLot should decrease unit and save when enough units`() {
         // Arrange
         val owner = Owner(id = 1, name = "testOwner")
         val stock = Stock(id = 1, code = "TST", name = "testStock")
@@ -101,7 +101,7 @@ class SellTransactionServiceTest {
         org.mockito.Mockito.`when`(sellTransactionRepository.save(any(SellTransaction::class.java))).thenReturn(savedTransaction)
 
         // Act
-        val result = sellTransactionService.createSellTransactionAndUpdateStockLot(sellTransaction)
+        val result = sellTransactionService.createAndUpdateStockLot(sellTransaction)
 
         // Assert
         verify(stockLotRepository).save(org.mockito.kotlin.argThat { currentUnit == 6 })
@@ -110,7 +110,7 @@ class SellTransactionServiceTest {
     }
 
     @Test
-    fun `createSellTransactionAndUpdateStockLot should throw if not enough units`() {
+    fun `createAndUpdateStockLot should throw if not enough units`() {
         // Arrange
         val owner = Owner(id = 1, name = "testOwner")
         val stock = Stock(id = 1, code = "TST", name = "testStock")
@@ -135,7 +135,7 @@ class SellTransactionServiceTest {
 
         // Act & Assert
         assertThatThrownBy {
-            sellTransactionService.createSellTransactionAndUpdateStockLot(sellTransaction)
+            sellTransactionService.createAndUpdateStockLot(sellTransaction)
         }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("Not enough units")
     }
