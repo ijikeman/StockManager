@@ -2,7 +2,7 @@ import { MockMethod } from 'vite-plugin-mock';
 import Mock from 'mockjs';
 
 // モックデータを生成
-const transactions = Mock.mock({
+const stocklots = Mock.mock({
   'list|20-30': [{
     'id|+1': 1,
     'date': '@date("yyyy-MM-dd")',
@@ -21,28 +21,28 @@ const transactions = Mock.mock({
 
 export default [
   {
-    url: '/api/transaction',
+    url: '/api/stocklot',
     method: 'get',
     response: () => {
-      return transactions;
+      return stocklots;
     },
   },
   {
-    url: '/api/transaction',
+    url: '/api/stocklot',
     method: 'post',
     response: ({ body }) => {
-      const newTransaction = { ...body, id: Mock.Random.integer(100, 1000) };
-      transactions.push(newTransaction);
-      return newTransaction;
+      const newStocklot = { ...body, id: Mock.Random.integer(100, 1000) };
+      stocklots.push(newStocklot);
+      return newStocklot;
     }
   },
   {
-    url: '/api/transaction/:id',
+    url: '/api/stocklot/:id',
     method: 'get',
     response: ({ url }) => {
       const id = parseInt(url.split('/').pop());
-      const transaction = transactions.find(t => t.id === id);
-      return transaction;
+      const stocklot = stocklots.find(t => t.id === id);
+      return stocklot;
     }
   }
 ];
