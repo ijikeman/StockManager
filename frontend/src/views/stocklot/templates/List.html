@@ -11,7 +11,9 @@
         <th>オーナー</th>
         <th>銘柄名</th>
         <th>単元数</th>
+        <th>購入価格</th>
         <th>現在価格</th>
+        <th>評価損益</th>
       </tr>
     </thead>
     <tbody>
@@ -20,7 +22,9 @@
         <td>{{ lot.owner.name }}</td>
         <td>{{ lot.stock.name }}</td>
         <td>{{ lot.currentUnit }}</td>
+        <td>{{ lot.price }}</td>
         <td>{{ lot.stock.currentPrice }}</td>
+        <td>{{ lot.currentUnit * (lot.price - lot.stock.currentPrice) }}</td>
       </tr>
     </tbody>
   </table>
