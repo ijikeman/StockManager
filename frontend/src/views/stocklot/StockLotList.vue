@@ -8,7 +8,26 @@ export default {
   data() {
     return {
       stockLots: [],
+      selectedOwner: '',
     };
+  },
+  computed: {
+    // ユニット数が1以上のストックロットのみをフィルタリング
+    filteredStockLots() {
+      return this.stockLots.filter(lot => lot.unit > 0);
+    },
+    // オーナーの重複しないリストを作成
+    owners() {
+      const ownerNames = this.filteredStockLots.map(lot => lot.owner_name);
+      return [...new Set(ownerNames)];
+    },
+    // 選択されたオーナーに基づいてストックロットをフィルタリング
+    displayStockLots() {
+      if (!this.selectedOwner) {
+        return this.filteredStockLots;
+      }
+      return this.filteredStockLots.filter(lot => lot.owner_name === this.selectedOwner);
+    }
   },
   methods: {
     async fetchStockLots() {
@@ -22,6 +41,10 @@ export default {
     goToAddStock() {
       this.$router.push('/stocklot/add');
     },
+    // フィルタをクリア
+    clearFilter() {
+      this.selectedOwner = '';
+    }
   },
   mounted() {
     this.fetchStockLots();
