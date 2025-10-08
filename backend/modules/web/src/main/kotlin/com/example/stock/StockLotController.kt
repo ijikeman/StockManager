@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -23,8 +24,12 @@ class StockLotController(
     private val stockService: StockService,
 ) {
     @GetMapping
-    fun getStockLots(): List<StockLotResponseDto> {
-        return stockLotService.findAllWithAveragePrice()
+    fun getStockLots(@RequestParam(required = false) ownerId: Int?): List<StockLotResponseDto> {
+        return if (ownerId != null) {
+            stockLotService.findByOwnerIdWithAveragePrice(ownerId)
+        } else {
+            stockLotService.findAllWithAveragePrice()
+        }
     }
 
     /**

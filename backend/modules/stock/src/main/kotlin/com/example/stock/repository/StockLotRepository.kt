@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface StockLotRepository : JpaRepository<StockLot, Int> {
     fun findByOwnerId(ownerId: Int): List<StockLot>
+
+    fun findByOwnerIdAndCurrentUnitGreaterThan(ownerId: Int, currentUnit: Int): List<StockLot>
+
+    fun findAllByCurrentUnitGreaterThan(currentUnit: Int): List<StockLot>
 }

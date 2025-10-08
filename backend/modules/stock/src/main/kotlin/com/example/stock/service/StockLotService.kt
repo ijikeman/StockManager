@@ -52,7 +52,14 @@ class StockLotService(
     }
 
     fun findAllWithAveragePrice(): List<StockLotResponseDto> {
-        val stockLots = stockLotRepository.findAll()
+        val stockLots = stockLotRepository.findAllByCurrentUnitGreaterThan(0)
+        return stockLots.map { stockLot ->
+            createDtoWithAveragePrice(stockLot)
+        }
+    }
+
+    fun findByOwnerIdWithAveragePrice(ownerId: Int): List<StockLotResponseDto> {
+        val stockLots = stockLotRepository.findByOwnerIdAndCurrentUnitGreaterThan(ownerId, 0)
         return stockLots.map { stockLot ->
             createDtoWithAveragePrice(stockLot)
         }
@@ -94,22 +101,6 @@ class StockLotService(
         )
     }
 
-    /**
-     * すべての株式ロットからcurrentUnitが0以外の株式ロットを抽出します。
-     * @return currentUnitが0以外のStockLotリスト
-     */
-    fun findAllWithUnit(): List<StockLot> {
-        return stockLotRepository.findAll().filter { it.currentUnit != 0 }
-    }
-
-    /**
-     * 指定した所有者IDのうち、currentUnitが0以外の株式ロットを抽出します。
-     * @param ownerId 所有者ID
-     * @return currentUnitが0以外のStockLotリスト
-     */
-    fun findByOwnerIdWithUnit(ownerId: Int): List<StockLot> {
-        return stockLotRepository.findByOwnerId(ownerId).filter { it.currentUnit != 0 }
-    }
 
     /**
      * 単一の株式ロットを作成します。
