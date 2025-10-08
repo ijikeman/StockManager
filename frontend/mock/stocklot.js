@@ -16,6 +16,7 @@ const stocklots = Mock.mock({
       currentPrice: '@float(1000, 5000, 2, 2)',
     },
     'currentUnit': '@integer(100, 1000)',
+    'averagePrice': '@float(800, 4500, 2, 2)',
   }]
 }).list;
 
@@ -36,6 +37,7 @@ export default [
         owner: { id: body.ownerId, name: 'Mock Owner' }, // Assuming a mock owner name
         stock: { id: body.stockId, name: 'Mock Stock', code: 'MSFT', currentPrice: 450.0 }, // Assuming mock stock details
         currentUnit: body.unit,
+        averagePrice: body.price, // Use the purchase price as the initial average price
       };
       stocklots.push(newStocklot);
       return newStocklot;

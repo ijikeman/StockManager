@@ -29,6 +29,9 @@ class StockLotServiceTest {
     @Mock
     private lateinit var buyTransactionService: BuyTransactionService
 
+    @Mock
+    private lateinit var buyTransactionRepository: com.example.stock.repository.BuyTransactionRepository
+
     @Captor
     private lateinit var stockLotCaptor: ArgumentCaptor<StockLot>
 

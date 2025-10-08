@@ -1,12 +1,18 @@
 package com.example.stock.service
 
+import com.example.stock.dto.OwnerDto
+import com.example.stock.dto.StockDto
+import com.example.stock.dto.StockLotResponseDto
+import com.example.stock.model.BuyTransaction
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
-import com.example.stock.model.BuyTransaction
+import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.StockLotRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * 株式ロットのサービス。
@@ -16,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class StockLotService(
     private val stockLotRepository: StockLotRepository,
-    private val buyTransactionService: BuyTransactionService
+    private val buyTransactionService: BuyTransactionService,
+    private val buyTransactionRepository: BuyTransactionRepository,
 ) {
     /**
      * すべての株式ロットを取得します。
@@ -44,6 +51,48 @@ class StockLotService(
         return stockLotRepository.findById(id).orElse(null)
     }
 
+    fun findAllWithAveragePrice(): List<StockLotResponseDto> {
+        val stockLots = stockLotRepository.findAll()
+        return stockLots.map { stockLot ->
+            createDtoWithAveragePrice(stockLot)
+        }
+    }
+
+    fun findByIdWithAveragePrice(id: Int): StockLotResponseDto? {
+        val stockLot = stockLotRepository.findById(id).orElse(null)
+        return stockLot?.let { createDtoWithAveragePrice(it) }
+    }
+
+    private fun createDtoWithAveragePrice(stockLot: StockLot): StockLotResponseDto {
+        val transactions = buyTransactionRepository.findByStockLotId(stockLot.id)
+        val averagePrice = if (transactions.isNotEmpty()) {
+            val totalCost = transactions.fold(BigDecimal.ZERO) { acc, tx ->
+                acc.add(tx.price.multiply(BigDecimal(tx.unit))).add(tx.fee)
+            }
+            val totalUnits = transactions.sumOf { it.unit }
+            if (totalUnits > 0) {
+                totalCost.divide(BigDecimal(totalUnits), 2, RoundingMode.HALF_UP)
+            } else {
+                BigDecimal.ZERO
+            }
+        } else {
+            BigDecimal.ZERO
+        }
+
+        return StockLotResponseDto(
+            id = stockLot.id,
+            owner = OwnerDto(id = stockLot.owner.id, name = stockLot.owner.name),
+            stock = StockDto(
+                id = stockLot.stock.id,
+                code = stockLot.stock.code,
+                name = stockLot.stock.name,
+                currentPrice = stockLot.stock.currentPrice,
+            ),
+            currentUnit = stockLot.currentUnit,
+            averagePrice = averagePrice,
+        )
+    }
+
     /**
      * すべての株式ロットからcurrentUnitが0以外の株式ロットを抽出します。
      * @return currentUnitが0以外のStockLotリスト
@@ -69,11 +118,15 @@ class StockLotService(
      * @param currentUnit 現在の単元数
      * @return 作成されたStockLot
      */
-    fun createStockLot(owner: Owner, stock: Stock, currentUnit: Int): StockLot {
+    fun createStockLot(
+        owner: Owner,
+        stock: Stock,
+        currentUnit: Int,
+    ): StockLot {
         val stockLot = StockLot(
             owner = owner,
             stock = stock,
-            currentUnit = currentUnit
+            currentUnit = currentUnit,
         )
         return stockLotRepository.save(stockLot)
     }
@@ -91,12 +144,12 @@ class StockLotService(
         owner: Owner,
         stock: Stock,
         currentUnit: Int,
-        buyTransaction: BuyTransaction
+        buyTransaction: BuyTransaction,
     ): StockLot {
         val stockLot = StockLot(
             owner = owner,
             stock = stock,
-            currentUnit = currentUnit
+            currentUnit = currentUnit,
         )
         val savedStockLot = stockLotRepository.save(stockLot)
         // BuyTransactionのstockLotを保存したものに差し替えて作成

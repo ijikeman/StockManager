@@ -1,6 +1,9 @@
 package com.example.stock
 
+import com.example.stock.dto.OwnerDto
+import com.example.stock.dto.StockDto
 import com.example.stock.dto.StockLotAddDto
+import com.example.stock.dto.StockLotResponseDto
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
@@ -22,7 +25,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.Optional
 
 @WebMvcTest(StockLotController::class)
 class StockLotControllerTest {
@@ -42,39 +44,42 @@ class StockLotControllerTest {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
+    private val ownerDto = OwnerDto(id = 1, name = "Test Owner")
+    private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0)
+
     @Test
     fun `getStockLots should return a list of stock lots`() {
-        val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
-        val stockLots = listOf(StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10))
+        val stockLotsDto = listOf(
+            StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"))
+        )
 
-        whenever(stockLotService.findAll()).thenReturn(stockLots)
+        whenever(stockLotService.findAllWithAveragePrice()).thenReturn(stockLotsDto)
 
         mockMvc.perform(get("/api/stocklot"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].id").value(1))
             .andExpect(jsonPath("$[0].owner.name").value("Test Owner"))
             .andExpect(jsonPath("$[0].stock.name").value("Test Stock"))
+            .andExpect(jsonPath("$[0].averagePrice").value(1000.00))
     }
 
     @Test
     fun `getStockLot should return a single stock lot`() {
-        val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
-        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10)
+        val stockLotDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"))
 
-        whenever(stockLotService.findById(1)).thenReturn(stockLot)
+        whenever(stockLotService.findByIdWithAveragePrice(1)).thenReturn(stockLotDto)
 
         mockMvc.perform(get("/api/stocklot/1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.owner.name").value("Test Owner"))
+            .andExpect(jsonPath("$.averagePrice").value(1000.00))
     }
 
     @Test
     fun `addStockLot should create stock lot and return it`() {
         val owner = Owner(id = 1, name = "Test Owner")
-        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100)
+        val stock = Stock(id = 1, code = "1234", name = "Test Stock", minimalUnit = 100, currentPrice = 1200.0)
         val stockLotAddDto = StockLotAddDto(
             ownerId = 1,
             stockId = 1,
@@ -85,10 +90,12 @@ class StockLotControllerTest {
             transactionDate = LocalDate.now()
         )
         val createdStockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 1)
+        val responseDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 1, averagePrice = BigDecimal("1100.00"))
 
         whenever(ownerService.findById(1)).thenReturn(owner)
         whenever(stockService.findById(1)).thenReturn(stock)
         whenever(stockLotService.createStockLotAndBuyTransaction(any(), any(), any(), any())).thenReturn(createdStockLot)
+        whenever(stockLotService.findByIdWithAveragePrice(createdStockLot.id)).thenReturn(responseDto)
 
         mockMvc.perform(
             post("/api/stocklot/add")
@@ -96,12 +103,11 @@ class StockLotControllerTest {
                 .content(objectMapper.writeValueAsString(stockLotAddDto))
         )
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.id").value(createdStockLot.id))
-            .andExpect(jsonPath("$.owner.id").value(owner.id))
-            .andExpect(jsonPath("$.owner.name").value(owner.name))
-            .andExpect(jsonPath("$.stock.id").value(stock.id))
-            .andExpect(jsonPath("$.stock.name").value(stock.name))
-            .andExpect(jsonPath("$.currentUnit").value(createdStockLot.currentUnit))
+            .andExpect(jsonPath("$.id").value(responseDto.id))
+            .andExpect(jsonPath("$.owner.name").value(responseDto.owner.name))
+            .andExpect(jsonPath("$.stock.name").value(responseDto.stock.name))
+            .andExpect(jsonPath("$.currentUnit").value(responseDto.currentUnit))
+            .andExpect(jsonPath("$.averagePrice").value(1100.00))
     }
 
     @Test

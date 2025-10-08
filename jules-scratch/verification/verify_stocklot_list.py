@@ -16,6 +16,7 @@ def run():
         expect(page.get_by_role("cell", name="銘柄コード")).to_be_visible()
         expect(page.get_by_role("cell", name="オーナー")).to_be_visible()
         expect(page.get_by_role("cell", name="単元数")).to_be_visible()
+        expect(page.get_by_role("cell", name="平均購入価格")).to_be_visible()
         expect(page.get_by_role("cell", name="現在価格")).to_be_visible()
 
         # Take a screenshot of the list page

@@ -1,7 +1,5 @@
 package com.example.stock
 
-import com.example.stock.dto.OwnerDto
-import com.example.stock.dto.StockDto
 import com.example.stock.dto.StockLotAddDto
 import com.example.stock.dto.StockLotResponseDto
 import com.example.stock.model.BuyTransaction
@@ -26,7 +24,7 @@ class StockLotController(
 ) {
     @GetMapping
     fun getStockLots(): List<StockLotResponseDto> {
-        return stockLotService.findAll().map { it.toResponseDto() }
+        return stockLotService.findAllWithAveragePrice()
     }
 
     /**
@@ -36,9 +34,9 @@ class StockLotController(
      */
     @GetMapping("/{id}")
     fun getStockLot(@PathVariable id: Int): ResponseEntity<StockLotResponseDto> {
-        val stockLot = stockLotService.findById(id)
-        return if (stockLot != null) {
-            ResponseEntity.ok(stockLot.toResponseDto())
+        val stockLotDto = stockLotService.findByIdWithAveragePrice(id)
+        return if (stockLotDto != null) {
+            ResponseEntity.ok(stockLotDto)
         } else {
             ResponseEntity.notFound().build()
         }
@@ -69,15 +67,10 @@ class StockLotController(
             buyTransaction = buyTransaction,
         )
 
-        return ResponseEntity.ok(createdStockLot.toResponseDto())
-    }
+        // 作成したStockLotを元に、平均価格を含むDTOを生成して返す
+        val responseDto = stockLotService.findByIdWithAveragePrice(createdStockLot.id)
+            ?: return ResponseEntity.internalServerError().body("Could not retrieve created stock lot with average price")
 
-    private fun StockLot.toResponseDto(): StockLotResponseDto {
-        return StockLotResponseDto(
-            id = this.id,
-            owner = OwnerDto(id = this.owner.id, name = this.owner.name),
-            stock = StockDto(id = this.stock.id, code = this.stock.code, name = this.stock.name, currentPrice = this.stock.currentPrice),
-            currentUnit = this.currentUnit
-        )
+        return ResponseEntity.ok(responseDto)
     }
 }
