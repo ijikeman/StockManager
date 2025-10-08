@@ -45,7 +45,6 @@ CREATE TABLE stock_lot (
     owner_id INT,
     stock_id INT,
     current_unit INT NOT NULL,
-    status VARCHAR(255) NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES owner(id),
     FOREIGN KEY (stock_id) REFERENCES stock(id)
 );

@@ -13,6 +13,7 @@
         <th>単元数</th>
         <th>平均購入価格</th>
         <th>現在価格</th>
+        <th>評価損益</th>
       </tr>
     </thead>
     <tbody>
@@ -21,8 +22,11 @@
         <td>{{ lot.owner.name }}</td>
         <td>{{ lot.stock.name }}</td>
         <td>{{ lot.currentUnit }}</td>
-        <td>{{ lot.averagePrice }}</td>
-        <td>{{ lot.stock.currentPrice }}</td>
+        <td>{{ fmt(lot.averagePrice ?? lot.price) }}</td>
+        <td>{{ fmt(lot.stock && lot.stock.currentPrice) }}</td>
+        <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
+          {{ fmt(evaluation(lot)) }}
+        </td>
       </tr>
     </tbody>
   </table>

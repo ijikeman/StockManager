@@ -4,5 +4,6 @@ data class StockDto(
     val id: Int,
     val code: String,
     val name: String,
-    val currentPrice: Double
+    val currentPrice: Double,
+    val minimalUnit: Int
 )
