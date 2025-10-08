@@ -26,7 +26,7 @@ dependencies {
     // データベース設定
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") // webでも使う(DB(H2)が有効にならないので追加する必要あり)
     // 開発環境用: H2データベースドライバ
-    runtimeOnly("com.h2database:h2")
+    implementation("com.h2database:h2")
 
      // webからsubmodule stockの機能を利用する為、読み込む
     implementation(project(":modules:stock"))
