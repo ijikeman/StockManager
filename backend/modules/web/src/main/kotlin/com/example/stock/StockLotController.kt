@@ -48,9 +48,12 @@ class StockLotController(
     }
 
     @PostMapping("/add")
+    // 引数はStockLotAddDtoの型で取得
     fun addStockLot(@RequestBody stockLotAddDto: StockLotAddDto): ResponseEntity<Any> {
+        // ownerIDからownerを取得
         val owner = ownerService.findById(stockLotAddDto.ownerId)
             ?: return ResponseEntity.badRequest().body("Owner not found with id: ${stockLotAddDto.ownerId}")
+        // stockIDからstockを取得
         val stock = stockService.findById(stockLotAddDto.stockId)
             ?: return ResponseEntity.badRequest().body("Stock not found with id: ${stockLotAddDto.stockId}")
 
@@ -64,7 +67,7 @@ class StockLotController(
             isNisa = stockLotAddDto.isNisa,
             transactionDate = stockLotAddDto.transactionDate,
         )
-
+        // stockLotを作成する
         val createdStockLot = stockLotService.createStockLotAndBuyTransaction(
             owner = owner,
             stock = stock,

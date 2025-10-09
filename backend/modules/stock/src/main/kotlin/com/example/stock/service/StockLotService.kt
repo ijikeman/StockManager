@@ -51,6 +51,17 @@ class StockLotService(
         return stockLotRepository.findById(id).orElse(null)
     }
 
+    /**
+     * 現在保有単元が0より大きいすべての株式ロットを取得し、
+     * 各ロットについて購入取引履歴から平均取得単価を計算したDTOに変換して返します。
+     *
+     * 平均取得単価の計算:
+     * - 各購入取引について price * unit を集計し、fee を加算した総コストを算出します。
+     * - 総単元数で総コストを割り、小数点以下2桁で四捨五入(HALF_UP)します。
+     * - 取引が無い、または総単元数が0の場合は BigDecimal.ZERO を返します。
+     *
+     * @return 平均取得単価を含む `StockLotResponseDto` のリスト
+     */
     fun findAllWithAveragePrice(): List<StockLotResponseDto> {
         val stockLots = stockLotRepository.findAllByCurrentUnitGreaterThan(0)
         return stockLots.map { stockLot ->
@@ -58,6 +69,13 @@ class StockLotService(
         }
     }
 
+    /**
+     * 指定した所有者IDに紐づく、現在保有単元が0より大きい株式ロットを取得し、
+     * 平均取得単価を計算したDTOに変換して返します。
+     *
+     * @param ownerId 所有者のID
+     * @return 平均取得単価を含む `StockLotResponseDto` のリスト
+     */
     fun findByOwnerIdWithAveragePrice(ownerId: Int): List<StockLotResponseDto> {
         val stockLots = stockLotRepository.findByOwnerIdAndCurrentUnitGreaterThan(ownerId, 0)
         return stockLots.map { stockLot ->
@@ -65,11 +83,29 @@ class StockLotService(
         }
     }
 
+    /**
+     * 指定したIDの株式ロットを取得し、該当ロットが存在する場合は平均取得単価を計算したDTOを返します。
+     *
+     * @param id 検索するStockLotのID
+     * @return `StockLotResponseDto`（存在しない場合はnull）
+     */
     fun findByIdWithAveragePrice(id: Int): StockLotResponseDto? {
         val stockLot = stockLotRepository.findById(id).orElse(null)
         return stockLot?.let { createDtoWithAveragePrice(it) }
     }
 
+    /**
+     * 指定した `StockLot` から `StockLotResponseDto` を作成します。
+     * DTOにはロット情報に加えて、当該ロットに紐づく購入取引から算出した平均取得単価が含まれます。
+     *
+     * 平均取得単価の算出詳細:
+     * - 取引ごとに (price * unit) を合算し、各取引の fee を加えて総コストを求めます。
+     * - 総単元数で総コストを割り、小数点以下2桁で四捨五入(HALF_UP)します。
+     * - 取引が無い、または総単元数が0の場合は BigDecimal.ZERO を平均価格とします。
+     *
+     * @param stockLot 平均価格を計算してDTOに変換する対象の `StockLot`
+     * @return 平均価格を埋めた `StockLotResponseDto`
+     */
     private fun createDtoWithAveragePrice(stockLot: StockLot): StockLotResponseDto {
         val transactions = buyTransactionRepository.findByStockLotId(stockLot.id)
         val averagePrice = if (transactions.isNotEmpty()) {

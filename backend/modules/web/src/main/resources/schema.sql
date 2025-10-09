@@ -57,8 +57,8 @@ CREATE TABLE buy_transaction (
     unit INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     fee DECIMAL(10, 2) NOT NULL,
-    transaction_date DATE NOT NULL,
     is_nisa BOOLEAN NOT NULL DEFAULT FALSE,
+    transaction_date DATE NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES owner(id),
     FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
 );
