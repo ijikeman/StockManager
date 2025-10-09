@@ -1,34 +1,40 @@
 <div>
   <div class="page-header">
     <h1 class="page-title">ストックロット一覧</h1>
+    <div class="header-actions">
+      <select v-model="selectedOwner" class="owner-filter">
+        <option value="">すべてのオーナー</option>
+        <option v-for="owner in owners" :key="owner.id" :value="owner.id">
+          {{ owner.name }}
+        </option>
+      </select>
       <button @click="goToAddStock" class="btn btn-primary">新規登録</button>
+    </div>
   </div>
   <!-- ページヘッダー -->
   <table v-if="stockLots.length > 0" class="common-table">
     <thead>
       <tr>
-        <th>日付</th>
         <th>銘柄コード</th>
         <th>オーナー</th>
         <th>銘柄名</th>
         <th>単元数</th>
-        <th>購入価格</th>
+        <th>平均購入価格</th>
         <th>現在価格</th>
-        <th>NISA</th>
-        <th>手数料</th>
+        <th>評価損益</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="lot in stockLots" :key="lot.id">
-        <td>{{ lot.date }}</td>
         <td>{{ lot.stock.code }}</td>
-        <td>{{ lot.owner_name }}</td>
+        <td>{{ lot.owner.name }}</td>
         <td>{{ lot.stock.name }}</td>
-        <td>{{ lot.unit }}</td>
-        <td>{{ lot.price }}</td>
-        <td>{{ lot.stock.price }}</td>
-        <td>{{ lot.isNisa }}</td>
-        <td>{{ lot.free }}</td>
+        <td>{{ lot.currentUnit }}</td>
+        <td>{{ fmt(lot.averagePrice ?? lot.price) }}</td>
+        <td>{{ fmt(lot.stock && lot.stock.currentPrice) }}</td>
+        <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
+          {{ fmt(evaluation(lot)) }}
+        </td>
       </tr>
     </tbody>
   </table>

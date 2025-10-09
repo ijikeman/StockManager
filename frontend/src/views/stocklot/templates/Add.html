@@ -12,15 +12,6 @@
           </td>
         </tr>
         <tr>
-          <th>種類</th>
-          <td>
-            <select v-model="lot.type">
-              <option value="buy">購入</option>
-              <option value="sell">売却</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
           <th>銘柄</th>
           <td>
             <select v-model="lot.stock_id" required>
@@ -64,6 +55,12 @@
           <th>手数料</th>
           <td>
             <input type="number" v-model.number="lot.fees" />
+          </td>
+        </tr>
+        <tr>
+          <th>NISA</th>
+          <td>
+            <input type="checkbox" v-model="lot.isNisa" />
           </td>
         </tr>
       </tbody>

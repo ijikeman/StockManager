@@ -5,17 +5,18 @@ import Mock from 'mockjs';
 const stocklots = Mock.mock({
   'list|20-30': [{
     'id|+1': 1,
-    'date': '@date("yyyy-MM-dd")',
-    'type|1': ['BUY', 'SELL'],
-    'stock': {
-      'code': '@string("number", 4)',
-      'name': '@ctitle(3, 6)'
+    owner: {
+      'id|+1': 1,
+      name: '@cname',
     },
-    'owner_name': '@cname',
-    'unit': '@integer(100, 1000)',
-    'price': '@float(1000, 5000, 2, 2)',
-    'fees': '@integer(100, 500)',
-    'lot_id': '@integer(1, 20)'
+    stock: {
+      'id|+1': 1,
+      code: '@string("number", 4)',
+      name: '@ctitle(3, 6)',
+      currentPrice: '@float(1000, 5000, 2, 2)',
+    },
+    'currentUnit': '@integer(100, 1000)',
+    'averagePrice': '@float(800, 4500, 2, 2)',
   }]
 }).list;
 
@@ -28,10 +29,16 @@ export default [
     },
   },
   {
-    url: '/api/stocklot',
+    url: '/api/stocklot/add',
     method: 'post',
     response: ({ body }) => {
-      const newStocklot = { ...body, id: Mock.Random.integer(100, 1000) };
+      const newStocklot = {
+        id: Mock.Random.integer(100, 1000),
+        owner: { id: body.ownerId, name: 'Mock Owner' }, // Assuming a mock owner name
+        stock: { id: body.stockId, name: 'Mock Stock', code: 'MSFT', currentPrice: 450.0 }, // Assuming mock stock details
+        currentUnit: body.unit,
+        averagePrice: body.price, // Use the purchase price as the initial average price
+      };
       stocklots.push(newStocklot);
       return newStocklot;
     }
