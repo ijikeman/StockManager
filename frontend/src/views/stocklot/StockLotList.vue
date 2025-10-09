@@ -8,15 +8,29 @@ export default {
   data() {
     return {
       stockLots: [],
+      owners: [],
+      selectedOwner: '',
     };
   },
   methods: {
     async fetchStockLots() {
       try {
-        const response = await axios.get('/api/stocklot');
+        let url = '/api/stocklot';
+        if (this.selectedOwner) {
+          url += `?ownerId=${this.selectedOwner}`;
+        }
+        const response = await axios.get(url);
         this.stockLots = response.data;
       } catch (error) {
         console.error('Error fetching stock lots:', error);
+      }
+    },
+    async fetchOwners() {
+      try {
+        const response = await axios.get('/api/owner');
+        this.owners = response.data;
+      } catch (error) {
+        console.error('Error fetching owners:', error);
       }
     },
     // Compute evaluation (profit/loss) for a lot.
@@ -40,8 +54,14 @@ export default {
       this.$router.push('/stocklot/add');
     },
   },
+  watch: {
+    selectedOwner() {
+      this.fetchStockLots();
+    }
+  },
   mounted() {
     this.fetchStockLots();
+    this.fetchOwners();
   }
 };
 </script>

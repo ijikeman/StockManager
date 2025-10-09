@@ -45,7 +45,7 @@ class StockLotControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     private val ownerDto = OwnerDto(id = 1, name = "Test Owner")
-    private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0)
+    private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0, minimalUnit = 100)
 
     @Test
     fun `getStockLots should return a list of stock lots`() {

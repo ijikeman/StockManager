@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -23,8 +24,12 @@ class StockLotController(
     private val stockService: StockService,
 ) {
     @GetMapping
-    fun getStockLots(): List<StockLotResponseDto> {
-        return stockLotService.findAllWithAveragePrice()
+    fun getStockLots(@RequestParam(required = false) ownerId: Int?): List<StockLotResponseDto> {
+        return if (ownerId != null) {
+            stockLotService.findByOwnerIdWithAveragePrice(ownerId)
+        } else {
+            stockLotService.findAllWithAveragePrice()
+        }
     }
 
     /**
@@ -43,9 +48,12 @@ class StockLotController(
     }
 
     @PostMapping("/add")
+    // 引数はStockLotAddDtoの型で取得
     fun addStockLot(@RequestBody stockLotAddDto: StockLotAddDto): ResponseEntity<Any> {
+        // ownerIDからownerを取得
         val owner = ownerService.findById(stockLotAddDto.ownerId)
             ?: return ResponseEntity.badRequest().body("Owner not found with id: ${stockLotAddDto.ownerId}")
+        // stockIDからstockを取得
         val stock = stockService.findById(stockLotAddDto.stockId)
             ?: return ResponseEntity.badRequest().body("Stock not found with id: ${stockLotAddDto.stockId}")
 
@@ -59,7 +67,7 @@ class StockLotController(
             isNisa = stockLotAddDto.isNisa,
             transactionDate = stockLotAddDto.transactionDate,
         )
-
+        // stockLotを作成する
         val createdStockLot = stockLotService.createStockLotAndBuyTransaction(
             owner = owner,
             stock = stock,
