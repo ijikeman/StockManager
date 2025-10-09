@@ -18,6 +18,7 @@ export default {
         name: '',
         sectorId: null,
         currentPrice: null,
+        incoming: null
       },
       sectors: [],
       stock: null
@@ -52,7 +53,8 @@ export default {
           code: this.stock.code,
           name: this.stock.name,
           sectorId: this.stock.sector ? this.stock.sector.id : null,
-          currentPrice: this.stock.currentPrice
+          currentPrice: this.stock.currentPrice,
+          incoming: this.stock.incoming
         };
       } catch (error) {
         console.error('銘柄の取得中にエラーが発生しました:', error);
@@ -69,7 +71,8 @@ export default {
             // バックエンドでsectorIdからsectorオブジェクトを構築することを期待
           }
           ,
-          currentPrice: this.formData.currentPrice
+          currentPrice: this.formData.currentPrice,
+          incoming: this.formData.incoming
         };
 
         if (this.isEditing) {

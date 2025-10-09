@@ -25,6 +25,13 @@
       placeholder="現在の株価"
       class="form-control"
     >
+    <input
+      type="number"
+      step="0.01"
+      v-model.number="formData.incoming"
+      placeholder="配当金"
+      class="form-control"
+    >
     <select v-model="formData.sectorId" required class="form-control">
       <option :value="null" disabled>セクターを選択</option>
       <option v-for="sector in sectors" :key="sector.id" :value="sector.id">
