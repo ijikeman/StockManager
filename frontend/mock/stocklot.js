@@ -7,16 +7,17 @@ const stocklots = Mock.mock({
     'id|+1': 1,
     owner: {
       'id|+1': 1,
-      name: '@cname',
+      name: '@name', // Using a more generic name generator
     },
     stock: {
       'id|+1': 1,
       code: '@string("number", 4)',
-      name: '@ctitle(3, 6)',
+      name: '@word(3, 6)', // Using a more generic word generator
       currentPrice: '@float(1000, 5000, 2, 2)',
     },
     'currentUnit': '@integer(100, 1000)',
     'averagePrice': '@float(800, 4500, 2, 2)',
+    'purchaseDate': '@date("yyyy-MM-dd")',
   }]
 }).list;
 
