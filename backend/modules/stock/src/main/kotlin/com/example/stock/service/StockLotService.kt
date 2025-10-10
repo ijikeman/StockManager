@@ -122,6 +122,9 @@ class StockLotService(
             BigDecimal.ZERO
         }
 
+        val earliestTransaction = buyTransactionRepository.findFirstByStockLotOrderByTransactionDateAsc(stockLot)
+        val purchaseDate = earliestTransaction?.transactionDate
+
         return StockLotResponseDto(
             id = stockLot.id,
             owner = OwnerDto(id = stockLot.owner.id, name = stockLot.owner.name),
@@ -134,6 +137,7 @@ class StockLotService(
             ),
             currentUnit = stockLot.currentUnit,
             averagePrice = averagePrice,
+            purchaseDate = purchaseDate,
         )
     }
 

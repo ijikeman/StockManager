@@ -46,11 +46,12 @@ class StockLotControllerTest {
 
     private val ownerDto = OwnerDto(id = 1, name = "Test Owner")
     private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0, minimalUnit = 100)
+    private val purchaseDate = LocalDate.now()
 
     @Test
     fun `getStockLots should return a list of stock lots`() {
         val stockLotsDto = listOf(
-            StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"))
+            StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"), purchaseDate = purchaseDate)
         )
 
         whenever(stockLotService.findAllWithAveragePrice()).thenReturn(stockLotsDto)
@@ -61,11 +62,12 @@ class StockLotControllerTest {
             .andExpect(jsonPath("$[0].owner.name").value("Test Owner"))
             .andExpect(jsonPath("$[0].stock.name").value("Test Stock"))
             .andExpect(jsonPath("$[0].averagePrice").value(1000.00))
+            .andExpect(jsonPath("$[0].purchaseDate").value(purchaseDate.toString()))
     }
 
     @Test
     fun `getStockLot should return a single stock lot`() {
-        val stockLotDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"))
+        val stockLotDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 10, averagePrice = BigDecimal("1000.00"), purchaseDate = purchaseDate)
 
         whenever(stockLotService.findByIdWithAveragePrice(1)).thenReturn(stockLotDto)
 
@@ -74,6 +76,7 @@ class StockLotControllerTest {
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.owner.name").value("Test Owner"))
             .andExpect(jsonPath("$.averagePrice").value(1000.00))
+            .andExpect(jsonPath("$.purchaseDate").value(purchaseDate.toString()))
     }
 
     @Test
@@ -90,7 +93,7 @@ class StockLotControllerTest {
             transactionDate = LocalDate.now()
         )
         val createdStockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 1)
-        val responseDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 1, averagePrice = BigDecimal("1100.00"))
+        val responseDto = StockLotResponseDto(id = 1, owner = ownerDto, stock = stockDto, currentUnit = 1, averagePrice = BigDecimal("1100.00"), purchaseDate = stockLotAddDto.transactionDate)
 
         whenever(ownerService.findById(1)).thenReturn(owner)
         whenever(stockService.findById(1)).thenReturn(stock)
@@ -108,6 +111,7 @@ class StockLotControllerTest {
             .andExpect(jsonPath("$.stock.name").value(responseDto.stock.name))
             .andExpect(jsonPath("$.currentUnit").value(responseDto.currentUnit))
             .andExpect(jsonPath("$.averagePrice").value(1100.00))
+            .andExpect(jsonPath("$.purchaseDate").value(responseDto.purchaseDate.toString()))
     }
 
     @Test
