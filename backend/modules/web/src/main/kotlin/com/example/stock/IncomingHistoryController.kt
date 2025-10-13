@@ -28,4 +28,11 @@ class IncomingHistoryController(
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
+    @PostMapping
+    fun createIncomingHistory(@Validated @RequestBody incomingHistory: IncomingHistory): ResponseEntity<IncomingHistory> {
+        // service 側で新規作成のチェック（id == 0）を行っている
+        val created = incomingHistoryService.create(incomingHistory)
+        return ResponseEntity(created, HttpStatus.CREATED)
+    }
 }
