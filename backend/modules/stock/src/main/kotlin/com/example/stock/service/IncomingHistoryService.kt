@@ -1,13 +1,16 @@
 package com.example.stock.service
 
+import com.example.stock.dto.IncomingHistoryAddDto
 import com.example.stock.model.IncomingHistory
 import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.StockLotRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
 class IncomingHistoryService(
-	private val incomingHistoryRepository: IncomingHistoryRepository
+	private val incomingHistoryRepository: IncomingHistoryRepository,
+	private val stockLotRepository: StockLotRepository
 ) {
 
 	/**
@@ -37,6 +40,24 @@ class IncomingHistoryService(
 	fun create(incomingHistory: IncomingHistory): IncomingHistory {
 		// IDが0またはnullであることを保証して新規作成する
 		require(incomingHistory.id == 0) { "ID must be 0 for a new entity." }
+		return incomingHistoryRepository.save(incomingHistory)
+	}
+
+	/**
+	 * DTOから配当履歴を作成します。
+	 * @param dto 作成するためのDTO
+	 * @return 保存されたエンティティ
+	 */
+	fun create(dto: IncomingHistoryAddDto): IncomingHistory {
+		val stockLot = stockLotRepository.findById(dto.lotId)
+			.orElseThrow { EntityNotFoundException("StockLot not found with id: ${dto.lotId}") }
+
+		val incomingHistory = IncomingHistory(
+			paymentDate = dto.paymentDate,
+			stockLot = stockLot,
+			incoming = dto.incoming
+		)
+
 		return incomingHistoryRepository.save(incomingHistory)
 	}
 }
