@@ -8,29 +8,28 @@
       required
       class="form-control"
     >
-    <select v-model="formData.lot_id" required class="form-control">
-      <option :value="null" disabled>ロットを選択</option>
-      <option v-for="lot in stockLots" :key="lot.id" :value="lot.id">
-        {{ lot.stock_name }} ({{ lot.unit }}株)
-      </option>
-    </select>
-    <input
-      type="number"
-      v-model="dividend_per_unit"
-      placeholder="単元あたり配当"
-      required
-      class="form-control"
-    >
-    <div v-if="formData.lot_id">
-      単元数: {{ stockLots.find(lot => lot.id === formData.lot_id).unit }}
-    </div>
-    <div v-if="formData.lot_id">
-      最低単元数: {{ stockLots.find(lot => lot.id === formData.lot_id).minimalUnit }}
-    </div>
-    <div v-if="formData.incoming">
-      総配当金: {{ formData.incoming }}
+
+    <div class="form-group">
+      <label for="lot-select">ロット名</label>
+      <select id="lot-select" v-model="formData.lot_id" required class="form-control">
+        <option :value="null" disabled>ロットを選択</option>
+        <option v-for="lot in stockLots" :key="lot.id" :value="lot.id">
+          {{ lot.stock.name }} ({{ lot.currentUnit }}株)
+        </option>
+      </select>
     </div>
 
+    <div class="form-group">
+      <label for="dividend-per-unit">単元数当たりの配当金</label>
+      <input
+        id="dividend-per-unit"
+        type="number"
+        v-model="dividend_per_unit"
+        placeholder="単元あたり配当"
+        required
+        class="form-control"
+      >
+    </div>
     <div class="form-actions">
       <button type="submit" class="btn btn-success">保存</button>
       <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
