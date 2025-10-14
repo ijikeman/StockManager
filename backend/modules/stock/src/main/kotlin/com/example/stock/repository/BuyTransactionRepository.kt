@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository
 interface BuyTransactionRepository : JpaRepository<BuyTransaction, Int> {
     fun findByStockLotId(stockLotId: Int): List<BuyTransaction>
 
+    fun findByStockLotIdOrderByTransactionDateAsc(stockLotId: Int): List<BuyTransaction>
+
     fun findFirstByStockLotOrderByTransactionDateAsc(stockLot: StockLot): BuyTransaction?
 }

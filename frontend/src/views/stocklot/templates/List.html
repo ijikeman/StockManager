@@ -23,6 +23,7 @@
         <th>平均購入価格</th>
         <th>現在価格</th>
         <th>評価損益</th>
+        <th>アクション</th>
       </tr>
     </thead>
     <tbody>
@@ -36,6 +37,9 @@
         <td>{{ fmt(lot.stock && lot.stock.currentPrice) }}</td>
         <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
           {{ fmt(evaluation(lot)) }}
+        </td>
+        <td>
+          <button @click="goToSellPage(lot.id)" class="btn btn-success">売却</button>
         </td>
       </tr>
     </tbody>
