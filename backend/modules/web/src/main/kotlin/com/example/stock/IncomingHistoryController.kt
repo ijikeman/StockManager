@@ -1,5 +1,6 @@
 package com.example.stock
 
+import com.example.stock.dto.IncomingHistoryAddDto
 import com.example.stock.model.IncomingHistory
 import com.example.stock.service.IncomingHistoryService
 import org.springframework.http.HttpStatus
@@ -30,9 +31,8 @@ class IncomingHistoryController(
     }
 
     @PostMapping
-    fun createIncomingHistory(@Validated @RequestBody incomingHistory: IncomingHistory): ResponseEntity<IncomingHistory> {
-        // service 側で新規作成のチェック（id == 0）を行っている
-        val created = incomingHistoryService.create(incomingHistory)
+    fun createIncomingHistory(@Validated @RequestBody incomingHistoryDto: IncomingHistoryAddDto): ResponseEntity<IncomingHistory> {
+        val created = incomingHistoryService.create(incomingHistoryDto)
         return ResponseEntity(created, HttpStatus.CREATED)
     }
 }

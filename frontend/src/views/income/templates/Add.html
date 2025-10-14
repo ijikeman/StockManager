@@ -11,7 +11,7 @@
 
     <div class="form-group">
       <label for="lot-select">ロット名</label>
-      <select id="lot-select" v-model="formData.lot_id" required class="form-control">
+      <select id="lot-select" v-model="formData.lotId" required class="form-control">
         <option :value="null" disabled>ロットを選択</option>
         <option v-for="lot in stockLots" :key="lot.id" :value="lot.id">
           {{ lot.stock.name }} ({{ lot.currentUnit }}株)
