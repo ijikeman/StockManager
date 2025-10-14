@@ -4,6 +4,7 @@ import com.example.stock.dto.OwnerDto
 import com.example.stock.dto.StockDto
 import com.example.stock.dto.StockLotAddDto
 import com.example.stock.dto.StockLotResponseDto
+import com.example.stock.dto.StockLotSellDto
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
@@ -156,6 +157,42 @@ class StockLotControllerTest {
             post("/api/stocklot/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(stockLotAddDto))
+        )
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `sellStockLot should return ok on success`() {
+        val sellDto = StockLotSellDto(
+            unit = 5,
+            price = BigDecimal("1200"),
+            fee = BigDecimal("120"),
+            transactionDate = LocalDate.now()
+        )
+
+        mockMvc.perform(
+            post("/api/stocklot/1/sell")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sellDto))
+        )
+            .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `sellStockLot should return bad request on failure`() {
+        val sellDto = StockLotSellDto(
+            unit = 15, // Assume this is more than available
+            price = BigDecimal("1200"),
+            fee = BigDecimal("120"),
+            transactionDate = LocalDate.now()
+        )
+
+        whenever(stockLotService.sellStockLot(any(), any())).thenThrow(IllegalArgumentException("Not enough units"))
+
+        mockMvc.perform(
+            post("/api/stocklot/1/sell")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sellDto))
         )
             .andExpect(status().isBadRequest)
     }

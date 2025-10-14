@@ -2,6 +2,7 @@ package com.example.stock
 
 import com.example.stock.dto.StockLotAddDto
 import com.example.stock.dto.StockLotResponseDto
+import com.example.stock.dto.StockLotSellDto
 import com.example.stock.model.BuyTransaction
 import com.example.stock.model.StockLot
 import com.example.stock.service.OwnerService
@@ -80,5 +81,15 @@ class StockLotController(
             ?: return ResponseEntity.internalServerError().body("Could not retrieve created stock lot with average price")
 
         return ResponseEntity.ok(responseDto)
+    }
+
+    @PostMapping("/{id}/sell")
+    fun sellStockLot(@PathVariable id: Int, @RequestBody sellDto: StockLotSellDto): ResponseEntity<Any> {
+        return try {
+            stockLotService.sellStockLot(id, sellDto)
+            ResponseEntity.ok().build()
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity.badRequest().body(e.message)
+        }
     }
 }

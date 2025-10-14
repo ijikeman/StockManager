@@ -53,6 +53,9 @@ export default {
     goToAddStock() {
       this.$router.push('/stocklot/add');
     },
+    goToSellPage(id) {
+      this.$router.push(`/stocklot/sell/${id}`);
+    },
   },
   watch: {
     selectedOwner() {

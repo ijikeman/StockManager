@@ -7,6 +7,8 @@ import com.example.stock.model.BuyTransaction
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.dto.StockLotSellDto
+import com.example.stock.model.SellTransaction
 import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.StockLotRepository
 import org.springframework.stereotype.Service
@@ -23,6 +25,7 @@ import java.math.RoundingMode
 class StockLotService(
     private val stockLotRepository: StockLotRepository,
     private val buyTransactionService: BuyTransactionService,
+    private val sellTransactionService: SellTransactionService,
     private val buyTransactionRepository: BuyTransactionRepository,
 ) {
     /**
@@ -188,5 +191,55 @@ class StockLotService(
         val transactionToSave = buyTransaction.copy(stockLot = savedStockLot)
         buyTransactionService.create(transactionToSave)
         return savedStockLot
+    }
+
+    /**
+     * 株式ロットを一部または全部売却します。
+     * 売却はFIFO（先入れ先出し）方式で行われ、最も古い購入取引から順に売却が割り当てられます。
+     *
+     * @param stockLotId 売却対象のStockLotのID
+     * @param sellDto 売却情報（単元数、価格、手数料、取引日）を含むDTO
+     * @throws IllegalArgumentException 指定されたIDのStockLotが存在しない場合
+     * @throws IllegalArgumentException 売却単元数が現在の保有単元数を超えている場合
+     */
+    fun sellStockLot(stockLotId: Int, sellDto: StockLotSellDto) {
+        val stockLot = stockLotRepository.findById(stockLotId)
+            .orElseThrow { IllegalArgumentException("StockLot not found with id: $stockLotId") }
+
+        if (sellDto.unit > stockLot.currentUnit) {
+            throw IllegalArgumentException("Sell unit cannot be greater than current unit.")
+        }
+
+        val buyTransactions = buyTransactionRepository.findByStockLotIdOrderByTransactionDateAsc(stockLotId)
+        var remainingSellUnit = sellDto.unit
+
+        for (buyTx in buyTransactions) {
+            if (remainingSellUnit == 0) break
+
+            val soldUnitsForBuyTx = sellTransactionService.findByBuyTransactionId(buyTx.id)
+                .sumOf { it.unit }
+            val availableUnit = buyTx.unit - soldUnitsForBuyTx
+
+            if (availableUnit > 0) {
+                val sellUnitForThisTx = minOf(remainingSellUnit, availableUnit)
+
+                val sellTransaction = SellTransaction(
+                    buyTransaction = buyTx,
+                    unit = sellUnitForThisTx,
+                    price = sellDto.price,
+                    fee = sellDto.fee,
+                    transactionDate = sellDto.transactionDate
+                )
+                sellTransactionService.create(sellTransaction)
+                remainingSellUnit -= sellUnitForThisTx
+            }
+        }
+
+        val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
+        if (updatedStockLot.currentUnit == 0) {
+            stockLotRepository.delete(updatedStockLot)
+        } else {
+            stockLotRepository.save(updatedStockLot)
+        }
     }
 }
