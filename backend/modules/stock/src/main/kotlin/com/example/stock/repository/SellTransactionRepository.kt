@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SellTransactionRepository : JpaRepository<SellTransaction, Int> {
+    /* 買い取引IDから売り取引を検索 */
     fun findByBuyTransactionId(buyTransactionId: Int): List<SellTransaction>
 }

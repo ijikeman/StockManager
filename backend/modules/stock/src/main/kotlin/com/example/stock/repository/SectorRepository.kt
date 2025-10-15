@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface SectorRepository : JpaRepository<Sector, Int> {
+    /* 名前からセクターを検索 */
     fun findByName(name: String): Sector?
 }
