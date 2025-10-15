@@ -8,11 +8,19 @@ import org.springframework.stereotype.Service
 open class OwnerService(
     private val ownerRepository: OwnerRepository
 ) {
-    open fun findAll(): List<Owner> {
+    /**
+     * すべての所有者を取得します。
+     */
+    fun findAll(): List<Owner> {
         return ownerRepository.findAll()
     }
 
-    open fun findByName(name: String): Owner? {
+    /**
+     * 名前に基づいて所有者を検索します。
+     * @param name 検索する所有者の名前
+     * @return 見つかった所有者。存在しない場合はnull。
+     */
+    fun findByName(name: String): Owner? {
         return ownerRepository.findByName(name)
     }
 
@@ -21,16 +29,23 @@ open class OwnerService(
      * @param id 検索する所有者のID
      * @return 見つかった所有者。存在しない場合はnull。
      */
-    open fun findById(id: Int): Owner? {
+    fun findById(id: Int): Owner? {
         return ownerRepository.findById(id).orElse(null)
     }
 
-    // 追加する
-    open fun save(owner: Owner): Owner {
+    /**
+     * 所有者を保存します。
+     * @param owner 保存する所有者
+     * @return 保存された所有者
+     */
+    fun save(owner: Owner): Owner {
         return ownerRepository.save(owner)
     }
 
-    // 削除する
+    /**
+     * 所有者を削除します。
+     * @param id 削除する所有者のID
+     */
     open fun deleteById(id: Int) {
         ownerRepository.deleteById(id)
     }

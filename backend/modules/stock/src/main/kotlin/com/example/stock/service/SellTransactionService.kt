@@ -19,7 +19,7 @@ class SellTransactionService(
      * すべての売却取引を取得します。
      * @return SellTransactionのリスト
      */
-    open fun findAll(): List<SellTransaction> {
+    fun findAll(): List<SellTransaction> {
         return sellTransactionRepository.findAll()
     }
 

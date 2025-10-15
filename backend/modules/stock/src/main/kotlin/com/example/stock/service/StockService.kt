@@ -49,12 +49,12 @@ class StockService(
 
     
     // 追加する
-    open fun save(stock: Stock): Stock {
+    fun save(stock: Stock): Stock {
         return stockRepository.save(stock)
     }
 
     // 削除する
-    open fun deleteById(id: Int) {
+    fun deleteById(id: Int) {
         stockRepository.deleteById(id)
     }
 
