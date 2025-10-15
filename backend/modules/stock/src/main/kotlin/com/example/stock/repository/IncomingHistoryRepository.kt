@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface IncomingHistoryRepository : JpaRepository<IncomingHistory, Int> {
-    /* 株式ロットIDから入庫履歴を検索 */
+    /* 株式ロットIDから配当履歴を検索 */
     fun findByStockLotId(stockLotId: Int): List<IncomingHistory>
 
-    /* 売り取引IDから入庫履歴を検索 */
+    /* 売り取引IDから配当履歴を検索 */
     fun findBySellTransactionId(sellTransactionId: Int): List<IncomingHistory>
 }

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface BenefitHistoryRepository : JpaRepository<BenefitHistory, Int> {
+    /* 株式ロットIDから優待利益履歴を検索 */
     fun findByStockLotId(stockLotId: Int): List<BenefitHistory>
+
+    /* 売り取引IDから優待利益履歴を検索 */
     fun findBySellTransactionId(sellTransactionId: Int): List<BenefitHistory>
 }
