@@ -6,6 +6,10 @@ services:
       - "8080:8080"
     volumes:
       - h2-data:/data
+    environment:
+      # Ensure Spring Boot prints logs to stdout and enables colored output in many terminals
+      - SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
+      - SPRING_PROFILES_ACTIVE=default
     networks:
       - app-network
 
