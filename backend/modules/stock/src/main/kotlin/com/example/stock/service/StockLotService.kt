@@ -3,16 +3,20 @@ package com.example.stock.service
 import com.example.stock.dto.OwnerDto
 import com.example.stock.dto.StockDto
 import com.example.stock.dto.StockLotResponseDto
+import com.example.stock.dto.StockLotSellDto
 import com.example.stock.model.BuyTransaction
+import com.example.stock.model.SellTransaction
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
-import com.example.stock.dto.StockLotSellDto
-import com.example.stock.model.SellTransaction
 import com.example.stock.repository.BuyTransactionRepository
+import com.example.stock.repository.SellTransactionRepository
 import com.example.stock.repository.StockLotRepository
+import com.example.stock.service.BuyTransactionService
+import com.example.stock.service.SellTransactionService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -24,10 +28,13 @@ import java.math.RoundingMode
 @Transactional
 class StockLotService(
     private val stockLotRepository: StockLotRepository,
+    private val buyTransactionRepository: BuyTransactionRepository,
+    private val sellTransactionRepository: SellTransactionRepository,
     private val buyTransactionService: BuyTransactionService,
     private val sellTransactionService: SellTransactionService,
-    private val buyTransactionRepository: BuyTransactionRepository,
 ) {
+    
+
     /**
      * すべての株式ロットを取得します。
      * @return StockLotのリスト
@@ -166,6 +173,36 @@ class StockLotService(
         return stockLotRepository.save(stockLot)
     }
 
+    // StockLotServiceで実装する場合
+    fun createNewStockLot(
+        owner: Owner,
+        stock: Stock,
+        unit: Int,
+        price: BigDecimal,
+        fee: BigDecimal,
+        isNisa: Boolean,
+        transactionDate: LocalDate
+    ): StockLot {
+        // トランザクション内で一括処理
+        val stockLot = StockLot(
+            owner = owner,
+            stock = stock,
+            currentUnit = unit
+        )
+        stockLotRepository.save(stockLot)
+        
+        val buyTransaction = BuyTransaction(
+            stockLot = stockLot,
+            unit = unit,
+            price = price,
+            fee = fee,
+            isNisa = isNisa,
+            transactionDate = transactionDate
+        )
+        buyTransactionRepository.save(buyTransaction)
+        
+        return stockLot
+    }
     /**
      * 単一の株式ロットを作成し、同時に購入取引も作成します。
      *

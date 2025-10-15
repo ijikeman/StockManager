@@ -52,14 +52,12 @@ CREATE TABLE stock_lot (
 -- buy_transactionテーブル
 CREATE TABLE buy_transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    owner_id INT,
     stock_lot_id INT,
     unit INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
     fee DECIMAL(10, 2) NOT NULL,
     is_nisa BOOLEAN NOT NULL DEFAULT FALSE,
     transaction_date DATE NOT NULL,
-    FOREIGN KEY (owner_id) REFERENCES owner(id),
     FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id)
 );
 

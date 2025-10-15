@@ -58,34 +58,50 @@ class StockLotController(
     fun addStockLot(@RequestBody stockLotAddDto: StockLotAddDto): ResponseEntity<Any> {
         // ownerIDからownerを取得
         val owner = ownerService.findById(stockLotAddDto.ownerId)
+            // ownerが見つからない場合、400 Bad Requestを返す
             ?: return ResponseEntity.badRequest().body("Owner not found with id: ${stockLotAddDto.ownerId}")
         // stockIDからstockを取得
         val stock = stockService.findById(stockLotAddDto.stockId)
+            // stockが見つからない場合、400 Bad Requestを返す
             ?: return ResponseEntity.badRequest().body("Stock not found with id: ${stockLotAddDto.stockId}")
 
-        // StockLotServiceのcreateStockLotAndBuyTransactionがBuyTransactionを要求するため、
-        // 仮のStockLotを持つBuyTransactionを作成する
-        val buyTransaction = BuyTransaction(
-            stockLot = StockLot(owner = owner, stock = stock, currentUnit = stockLotAddDto.unit),
+        val createdStockLot = stockLotService.createNewStockLot(
+            owner = owner,
+            stock = stock,
             unit = stockLotAddDto.unit,
             price = stockLotAddDto.price,
             fee = stockLotAddDto.fee,
             isNisa = stockLotAddDto.isNisa,
-            transactionDate = stockLotAddDto.transactionDate,
+            transactionDate = stockLotAddDto.transactionDate
         )
-        // stockLotを作成する
-        val createdStockLot = stockLotService.createStockLotAndBuyTransaction(
-            owner = owner,
-            stock = stock,
-            currentUnit = stockLotAddDto.unit,
-            buyTransaction = buyTransaction,
-        )
-
-        // 作成したStockLotを元に、平均価格を含むDTOを生成して返す
         val responseDto = stockLotService.findByIdWithAveragePrice(createdStockLot.id)
             ?: return ResponseEntity.internalServerError().body("Could not retrieve created stock lot with average price")
 
         return ResponseEntity.ok(responseDto)
+
+        // // StockLotServiceのcreateStockLotAndBuyTransactionがBuyTransactionを要求するため、
+        // // 仮のStockLotを持つBuyTransactionを作成する
+        // val buyTransaction = BuyTransaction(
+        //     stockLot = StockLot(owner = owner, stock = stock, currentUnit = stockLotAddDto.unit),
+        //     unit = stockLotAddDto.unit,
+        //     price = stockLotAddDto.price,
+        //     fee = stockLotAddDto.fee,
+        //     isNisa = stockLotAddDto.isNisa,
+        //     transactionDate = stockLotAddDto.transactionDate,
+        // )
+        // // stockLotを作成する
+        // val createdStockLot = stockLotService.createStockLotAndBuyTransaction(
+        //     owner = owner,
+        //     stock = stock,
+        //     currentUnit = stockLotAddDto.unit,
+        //     buyTransaction = buyTransaction,
+        // )
+
+        // // 作成したStockLotを元に、平均価格を含むDTOを生成して返す
+        // val responseDto = stockLotService.findByIdWithAveragePrice(createdStockLot.id)
+        //     ?: return ResponseEntity.internalServerError().body("Could not retrieve created stock lot with average price")
+
+        // return ResponseEntity.ok(responseDto)
     }
 
     /**
