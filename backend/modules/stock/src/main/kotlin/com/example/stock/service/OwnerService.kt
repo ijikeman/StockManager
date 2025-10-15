@@ -16,15 +16,6 @@ open class OwnerService(
     }
 
     /**
-     * 名前に基づいて所有者を検索します。
-     * @param name 検索する所有者の名前
-     * @return 見つかった所有者。存在しない場合はnull。
-     */
-    fun findByName(name: String): Owner? {
-        return ownerRepository.findByName(name)
-    }
-
-    /**
      * IDに基づいて所有者を検索します。
      * @param id 検索する所有者のID
      * @return 見つかった所有者。存在しない場合はnull。
