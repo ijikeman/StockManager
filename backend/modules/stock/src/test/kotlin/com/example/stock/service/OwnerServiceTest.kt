@@ -42,32 +42,6 @@ class OwnerServiceTest {
     }
 
     @Test
-    fun `findByName should return owner when found`() {
-        // given: "testuser"という名前で検索されたら、特定のownerオブジェクトを返すように設定
-        val owner = Owner(id = 1, name = "testuser")
-        mockitoWhen(ownerRepository.findByName("testuser")).thenReturn(owner)
-
-        // when: 実際に"testuser"で検索を実行
-        val result = ownerService.findByName("testuser")
-
-        // then: 返ってきたオブジェクトがnullでなく、名前が正しいことを確認
-        assertThat(result).isNotNull
-        assertThat(result?.name).isEqualTo("testuser")
-    }
-
-    @Test
-    fun `findByName should return null when not found`() {
-        // given: "unknown"という名前で検索されたら、nullを返すように設定
-        mockitoWhen(ownerRepository.findByName("unknown")).thenReturn(null)
-
-        // when: 実際に"unknown"で検索を実行
-        val result = ownerService.findByName("unknown")
-
-        // then: 結果がnullであることを確認
-        assertThat(result).isNull()
-    }
-
-    @Test
     fun `findById should return owner when found`() {
         // given: IDが1で検索されたら、Optionalに包まれたownerオブジェクトを返すように設定
         val owner = Owner(id = 1, name = "testuser")

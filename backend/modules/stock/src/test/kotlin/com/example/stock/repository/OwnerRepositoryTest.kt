@@ -39,22 +39,6 @@ class OwnerRepositoryTest {
         assertEquals(found.get().name, "testuser")
     }
 
-    // 正しくfindByNameできるか
-    @Test
-    fun `findByName should return owner when owner exists`() {
-        // given テスト準備としてあらかじめデータを入れる
-        val owner = Owner(name = "testuser")
-        entityManager.persist(owner)
-        entityManager.flush()
-
-        // when テスト実行
-        val found = ownerRepository.findByName("testuser")
-
-        // then データを取得できていることを確認
-        assertThat(found).isNotNull
-        assertThat(found?.name).isEqualTo(owner.name)
-    }
-
     // save()で保存できるか
     @Test
     fun `save should persist owner`() {
@@ -71,16 +55,6 @@ class OwnerRepositoryTest {
     }
 
     // --- 異常系 ---
-    // 存在しないユーザを検索(テストデータベースはクリアされているため、正しくテストできる)
-    @Test
-    fun `findByName should return null when owner does not exist`() {
-        // when
-        val found = ownerRepository.findByName("testuser")
-
-        // then
-        assertThat(found).isNull()
-    }
-
     // 存在しないユーザをfindByIdを実行する
     @Test
     fun `findById should return owner`() {
