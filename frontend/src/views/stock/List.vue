@@ -11,9 +11,9 @@ export default {
     const csvColumns = {
       code: { label: 'コード' },
       name: { label: '名前' },
-      currentPrice: { label: '現在の株価' },
-      incoming: { label: '配当金' },
-      earningsDate: { label: '業績発表日' },
+      currentPrice: { label: '現在の株価', path: 'stock_price.current_price' },
+      dividend: { label: '配当金', path: 'stock_price.dividend' },
+      earningsDate: { label: '業績発表日', path: 'stock_price.earnings_date' },
       sector: { label: 'セクター', formatter: (value) => value.name },
     };
 
@@ -87,7 +87,8 @@ export default {
       const csvRows = this.stocks.map(stock => {
         return this.selectedCsvColumns.map(key => {
           const column = this.csvColumns[key];
-          const value = stock[key];
+          // 'path'を使用してネストされたプロパティにアクセス
+          const value = column.path ? column.path.split('.').reduce((o, i) => o[i], stock) : stock[key];
           return column.formatter ? column.formatter(value) : value;
         }).join(delimiter);
       });
