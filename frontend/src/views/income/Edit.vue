@@ -25,7 +25,7 @@ export default {
   watch: {
     dividend_per_unit(newValue) {
       if (this.formData.stockLot && newValue) {
-        this.formData.incoming = newValue * this.formData.stockLot.unit * this.formData.stockLot.minimalUnit;
+        this.formData.incoming = newValue;
       } else {
         this.formData.incoming = null;
       }
@@ -37,7 +37,7 @@ export default {
         const response = await axios.get(`/api/incominghistory/${this.id}`);
         this.formData = response.data;
         if (this.formData.incoming && this.formData.stockLot) {
-          this.dividend_per_unit = this.formData.incoming / this.formData.stockLot.unit / this.formData.stockLot.minimalUnit;
+          this.dividend_per_unit = this.formData.incoming;
         }
       } catch (error) {
         console.error('Error fetching income:', error);
@@ -45,6 +45,11 @@ export default {
     },
     async saveIncome() {
       try {
+        // Override `incoming` with raw per-unit value if provided
+        if (this.dividend_per_unit != null) {
+          this.formData.incoming = Number(this.dividend_per_unit);
+        }
+
         await axios.put(`/api/incominghistory/${this.id}`, this.formData);
         this.$router.push('/income');
       } catch (error) {
