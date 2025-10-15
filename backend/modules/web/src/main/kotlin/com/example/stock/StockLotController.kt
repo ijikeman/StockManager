@@ -25,6 +25,11 @@ class StockLotController(
     private val stockService: StockService,
 ) {
     @GetMapping
+    /**
+     * 在庫ロット（StockLot）の一覧を取得します。
+     * @param ownerId 所有者ID（オプション）。指定された場合は、その所有者の在庫ロットのみを取得します。
+     * @return 平均価格情報を含む在庫ロットのリスト。ownerIdが指定された場合は、そのオーナーの在庫ロットのみ返します。
+     */
     fun getStockLots(@RequestParam(required = false) ownerId: Int?): List<StockLotResponseDto> {
         return if (ownerId != null) {
             stockLotService.findByOwnerIdWithAveragePrice(ownerId)
@@ -83,6 +88,13 @@ class StockLotController(
         return ResponseEntity.ok(responseDto)
     }
 
+    /**
+     * 指定されたIDの在庫ロット（StockLot）を売却します。
+     * @param id 売却する在庫ロットのID
+     * @param sellDto 売却情報（売却単位数、価格、手数料など）を含むDTO
+     * @return 成功時は200 OK、失敗時（在庫不足など）は400 Bad Request
+     * @throws IllegalArgumentException 売却できない条件の場合（在庫不足など）にスローされます
+     */
     @PostMapping("/{id}/sell")
     fun sellStockLot(@PathVariable id: Int, @RequestBody sellDto: StockLotSellDto): ResponseEntity<Any> {
         return try {
