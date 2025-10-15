@@ -4,7 +4,7 @@
   <form @submit.prevent="saveIncome" class="form-inline">
     <input
       type="date"
-      v-model="formData.payment_date"
+      v-model="formData.paymentDate"
       required
       class="form-control"
     >
@@ -24,7 +24,7 @@
       <input
         id="income-per-unit"
         type="number"
-        v-model="income_per_unit"
+        v-model="dividend_per_unit"
         placeholder="単元あたり配当"
         required
         class="form-control"
