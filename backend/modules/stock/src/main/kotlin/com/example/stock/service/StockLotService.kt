@@ -273,10 +273,6 @@ class StockLotService(
         }
 
         val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
-        if (updatedStockLot.currentUnit == 0) {
-            stockLotRepository.delete(updatedStockLot)
-        } else {
-            stockLotRepository.save(updatedStockLot)
-        }
+        stockLotRepository.save(updatedStockLot)
     }
 }
