@@ -33,6 +33,9 @@ class StockLotServiceTest {
     private lateinit var buyTransactionRepository: com.example.stock.repository.BuyTransactionRepository
 
     @Mock
+    private lateinit var sellTransactionRepository: com.example.stock.repository.SellTransactionRepository
+
+    @Mock
     private lateinit var sellTransactionService: SellTransactionService
 
     @Captor
@@ -52,15 +55,21 @@ class StockLotServiceTest {
             earningsDate = java.time.LocalDate.of(2025, 1, 1),
             sector = sector
         )
-        val currentUnit = 2
+        val unit = 2
+        val price = java.math.BigDecimal("1000.0")
+        val fee = java.math.BigDecimal("10.0")
+        val isNisa = false
+        val transactionDate = java.time.LocalDate.of(2025, 10, 6)
 
         mockitoWhen(stockLotRepository.save(any(StockLot::class.java))).thenAnswer { it.getArgument(0) }
+        mockitoWhen(buyTransactionRepository.save(any(com.example.stock.model.BuyTransaction::class.java))).thenAnswer { it.getArgument(0) }
 
         // when
-        val result = stockLotService.createStockLot(owner, stock, currentUnit)
+        val result = stockLotService.createStockLot(owner, stock, unit, price, fee, isNisa, transactionDate)
 
         // then
         verify(stockLotRepository).save(stockLotCaptor.capture())
+        verify(buyTransactionRepository).save(any(com.example.stock.model.BuyTransaction::class.java))
         val capturedStockLot = stockLotCaptor.value
 
         assertThat(result).isNotNull

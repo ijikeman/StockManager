@@ -98,7 +98,7 @@ class StockLotControllerTest {
 
         whenever(ownerService.findById(1)).thenReturn(owner)
         whenever(stockService.findById(1)).thenReturn(stock)
-        whenever(stockLotService.createStockLotAndBuyTransaction(any(), any(), any(), any())).thenReturn(createdStockLot)
+        whenever(stockLotService.createStockLot(any(), any(), any(), any(), any(), any(), any())).thenReturn(createdStockLot)
         whenever(stockLotService.findByIdWithAveragePrice(createdStockLot.id)).thenReturn(responseDto)
 
         mockMvc.perform(

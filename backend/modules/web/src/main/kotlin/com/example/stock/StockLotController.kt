@@ -65,7 +65,7 @@ class StockLotController(
             // stockが見つからない場合、400 Bad Requestを返す
             ?: return ResponseEntity.badRequest().body("Stock not found with id: ${stockLotAddDto.stockId}")
 
-        val createdStockLot = stockLotService.createNewStockLot(
+        val createdStockLot = stockLotService.createStockLot(
             owner = owner,
             stock = stock,
             unit = stockLotAddDto.unit,
