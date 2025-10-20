@@ -35,4 +35,25 @@ class IncomingHistoryController(
         val created = incomingHistoryService.create(incomingHistoryDto)
         return ResponseEntity(created, HttpStatus.CREATED)
     }
+
+    /**
+     * 配当情報を更新します
+     * @param id 更新対象の配当情報ID
+     * @param incomingHistoryDto 更新する配当情報
+     * @return 更新された配当情報
+     */
+    @PutMapping("/{id}")
+    fun updateIncomingHistory(
+        @PathVariable id: Int,
+        @Validated @RequestBody incomingHistoryDto: IncomingHistoryAddDto
+    ): ResponseEntity<IncomingHistory> {
+        return try {
+            val updated = incomingHistoryService.update(id, incomingHistoryDto)
+            ResponseEntity(updated, HttpStatus.OK)
+        } catch (e: NoSuchElementException) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+    }
 }

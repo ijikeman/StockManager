@@ -10,7 +10,8 @@
     <thead>
       <tr>
         <th>日付</th>
-        <th>ストックロットID</th>
+        <th>ロット番号</th>
+        <th>銘柄名</th>
         <th>配当金</th>
         <th>アクション</th>
       </tr>
@@ -19,6 +20,7 @@
       <tr v-for="income in incomes" :key="income.id">
         <td>{{ income.paymentDate }}</td>
         <td>{{ income.stockLot?.id }}</td>
+        <td>{{ income.stockLot?.stock?.name }}</td>
         <td>{{ income.incoming }}</td>
         <td>
           <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>

@@ -14,8 +14,7 @@ export default {
   data() {
     return {
       formData: {
-        payment_date: '',
-        lot_id: null,
+        paymentDate: '',
         incoming: null,
         stockLot: null
       },
@@ -35,26 +34,34 @@ export default {
     async fetchIncome() {
       try {
         const response = await axios.get(`/api/incominghistory/${this.id}`);
-        this.formData = response.data;
-        if (this.formData.incoming && this.formData.stockLot) {
+        this.formData = {
+          paymentDate: response.data.paymentDate,
+          incoming: response.data.incoming,
+          stockLot: response.data.stockLot
+        };
+        if (this.formData.incoming) {
           this.dividend_per_unit = this.formData.incoming;
         }
       } catch (error) {
         console.error('Error fetching income:', error);
+        alert('配当情報の取得に失敗しました。');
       }
     },
-    async saveIncome() {
+    async updateIncome() {
       try {
-        // Override `incoming` with raw per-unit value if provided
-        if (this.dividend_per_unit != null) {
-          this.formData.incoming = Number(this.dividend_per_unit);
-        }
+        // データを更新用に整形
+        const updateData = {
+          id: this.id,
+          paymentDate: this.formData.paymentDate,
+          lotId: this.formData.stockLot.id,
+          incoming: Number(this.dividend_per_unit)
+        };
 
-        await axios.put(`/api/incominghistory/${this.id}`, this.formData);
+        await axios.put(`/api/incominghistory/${this.id}`, updateData);
         this.$router.push('/income');
       } catch (error) {
-        console.error('Error saving income:', error);
-        alert('Failed to save income.');
+        console.error('Error updating income:', error);
+        alert('配当情報の更新に失敗しました。');
       }
     },
     cancel() {

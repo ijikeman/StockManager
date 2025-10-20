@@ -1,16 +1,16 @@
 <div class="form-container">
   <h3 class="form-title">配当編集</h3>
 
-  <form @submit.prevent="saveIncome" class="form-inline">
+  <form @submit.prevent="updateIncome" class="form-inline">
     <input
       type="date"
-      v-model="formData.payment_date"
+      v-model="formData.paymentDate"
       required
       class="form-control"
     >
     <input
       type="text"
-      :value="formData.stockLot ? formData.stockLot.stock_name : ''"
+      :value="formData.stockLot && formData.stockLot.stock ? formData.stockLot.stock.name : ''"
       readonly
       class="form-control"
     >
@@ -22,10 +22,7 @@
       class="form-control"
     >
     <div v-if="formData.stockLot">
-      単元数: {{ formData.stockLot.unit }}
-    </div>
-    <div v-if="formData.stockLot">
-      最低単元数: {{ formData.stockLot.minimalUnit }}
+      単元数: {{ formData.stockLot.currentUnit }}
     </div>
     <div v-if="formData.incoming">
       総配当金: {{ formData.incoming }}
