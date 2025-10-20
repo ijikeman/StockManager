@@ -72,7 +72,7 @@ class IncomingHistoryService(
 		val existing = findById(id)
 		
 		// 既存のStockLotと異なる場合はエラー
-		if (existing.stockLot.id != dto.lotId) {
+		if (existing.stockLot?.id != dto.lotId) {
 			throw IllegalArgumentException("Cannot change stockLot for existing income history")
 		}
 
