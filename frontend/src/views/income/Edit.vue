@@ -51,7 +51,6 @@ export default {
       try {
         // データを更新用に整形
         const updateData = {
-          id: this.id,
           paymentDate: this.formData.paymentDate,
           lotId: this.formData.stockLot.id,
           incoming: Number(this.dividend_per_unit)

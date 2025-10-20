@@ -97,4 +97,46 @@ class IncomingHistoryServiceTest {
         assertThat(captured.incoming).isEqualByComparingTo(dto.incoming)
         assertThat(captured.paymentDate).isEqualTo(dto.paymentDate)
     }
+
+    @Test
+    fun `update should update and return IncomingHistory`() {
+        // Arrange
+        val owner = Owner(id = 1, name = "testOwner")
+        val stock = Stock(id = 1, code = "TST", name = "testStock")
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 100)
+        
+        val existing = IncomingHistory(
+            id = 123,
+            stockLot = stockLot,
+            sellTransaction = null,
+            incoming = BigDecimal("500.00"),
+            paymentDate = LocalDate.of(2025, 10, 6)
+        )
+        
+        val updateDto = IncomingHistoryAddDto(
+            paymentDate = LocalDate.of(2025, 10, 8),
+            lotId = 1,
+            incoming = BigDecimal("600.00")
+        )
+        
+        val updatedHistory = existing.copy(
+            paymentDate = updateDto.paymentDate,
+            incoming = updateDto.incoming
+        )
+        
+        mockitoWhen(incomingHistoryRepository.findById(123)).thenReturn(Optional.of(existing))
+        mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(updatedHistory)
+        
+        // Act
+        val result = incomingHistoryService.update(123, updateDto)
+        
+        // Assert
+        verify(incomingHistoryRepository).save(incomingHistoryCaptor.capture())
+        val captured = incomingHistoryCaptor.value
+        
+        assertThat(result).isEqualTo(updatedHistory)
+        assertThat(captured.paymentDate).isEqualTo(updateDto.paymentDate)
+        assertThat(captured.incoming).isEqualByComparingTo(updateDto.incoming)
+        assertThat(captured.stockLot).isEqualTo(stockLot)
+    }
 }
