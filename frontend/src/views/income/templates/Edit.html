@@ -1,5 +1,5 @@
 <div class="form-container">
-  <h3 class="form-title">配当情報編集</h3>
+  <h3 class="form-title">配当編集</h3>
 
   <form @submit.prevent="updateIncome" class="form-inline">
     <input
@@ -8,119 +8,29 @@
       required
       class="form-control"
     >
-
-    <div class="form-group">
-      <label>ロット名</label>
-      <div class="form-control-static">
-        {{ formData.stockLot ? `${formData.stockLot.stock.name} (${formData.stockLot.currentUnit}株)` : '-' }}
-      </div>
+    <input
+      type="text"
+      :value="formData.stockLot && formData.stockLot.stock ? formData.stockLot.stock.name : ''"
+      readonly
+      class="form-control"
+    >
+    <input
+      type="number"
+      v-model="dividend_per_unit"
+      placeholder="単元あたり配当"
+      required
+      class="form-control"
+    >
+    <div v-if="formData.stockLot">
+      単元数: {{ formData.stockLot.currentUnit }}
     </div>
-
-    <div class="form-group">
-      <label for="income-per-unit">単元数当たりの配当金</label>
-      <input
-        id="income-per-unit"
-        type="number"
-        v-model="dividend_per_unit"
-        placeholder="単元あたり配当"
-        required
-        class="form-control"
-      >
-    </div>
-
-    <div class="info-container" v-if="formData.stockLot">
-      <div class="info-item">
-        <label>単元数:</label>
-        <span>{{ formData.stockLot.unit }}</span>
-      </div>
+    <div v-if="formData.incoming">
+      総配当金: {{ formData.incoming }}
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">更新</button>
+      <button type="submit" class="btn btn-success">保存</button>
       <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
     </div>
   </form>
 </div>
-
-<style scoped>
-.form-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.form-title {
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-  width: 100%;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #495057;
-}
-
-.form-control-static {
-  padding: 8px 12px;
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  min-height: 38px;
-  line-height: 1.5;
-}
-
-.form-control {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-
-.info-container {
-  margin: 20px 0;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 5px;
-}
-
-.info-item {
-  margin-bottom: 10px;
-}
-
-.info-item label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.form-actions {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-}
-</style>
