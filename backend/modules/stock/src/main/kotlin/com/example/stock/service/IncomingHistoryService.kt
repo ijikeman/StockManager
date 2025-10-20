@@ -60,4 +60,27 @@ class IncomingHistoryService(
 
 		return incomingHistoryRepository.save(incomingHistory)
 	}
+
+	/**
+	 * 配当履歴を更新します。
+	 * @param id 更新対象の配当履歴ID
+	 * @param dto 更新内容を含むDTO
+	 * @return 更新された配当履歴
+	 * @throws NoSuchElementException 指定されたIDの配当履歴が存在しない場合
+	 */
+	fun update(id: Int, dto: IncomingHistoryAddDto): IncomingHistory {
+		val existing = findById(id)
+		
+		// 既存のStockLotと異なる場合はエラー
+		if (existing.stockLot.id != dto.lotId) {
+			throw IllegalArgumentException("Cannot change stockLot for existing income history")
+		}
+
+		val updated = existing.copy(
+			paymentDate = dto.paymentDate,
+			incoming = dto.incoming
+		)
+
+		return incomingHistoryRepository.save(updated)
+	}
 }
