@@ -14,6 +14,7 @@ import com.example.stock.service.StockService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -98,7 +99,15 @@ class StockLotControllerTest {
 
         whenever(ownerService.findById(1)).thenReturn(owner)
         whenever(stockService.findById(1)).thenReturn(stock)
-        whenever(stockLotService.createStockLotAndBuyTransaction(any(), any(), any(), any())).thenReturn(createdStockLot)
+        whenever(stockLotService.createStockLot(
+            owner = eq(owner),
+            stock = eq(stock),
+            unit = eq(stockLotAddDto.unit),
+            price = eq(stockLotAddDto.price),
+            fee = eq(stockLotAddDto.fee),
+            isNisa = eq(stockLotAddDto.isNisa),
+            transactionDate = eq(stockLotAddDto.transactionDate)
+        )).thenReturn(createdStockLot)
         whenever(stockLotService.findByIdWithAveragePrice(createdStockLot.id)).thenReturn(responseDto)
 
         mockMvc.perform(

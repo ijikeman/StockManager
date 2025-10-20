@@ -8,6 +8,9 @@ import java.time.LocalDate
 class StockLotModelTest {
 
     @Test
+    /**
+     * StockLotモデルの基本的な作成とプロパティの検証を行います。
+     */
     fun testStockLotCreation() {
         val owner = Owner(id = 1, name = "TestOwner")
         val sector = Sector(id = 1, name = "Test Sector")

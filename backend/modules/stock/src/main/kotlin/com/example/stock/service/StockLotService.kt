@@ -153,28 +153,19 @@ class StockLotService(
 
 
     /**
-     * 単一の株式ロットを作成します。
+     * 単一の株式ロットを作成し、同時に購入取引を作成します。
      *
      * @param owner 所有者
      * @param stock 株式
-     * @param currentUnit 現在の単元数
+     * @param unit 初期保有単元数
+     * @param price 購入価格（購入取引に使用）
+     * @param fee 手数料（購入取引に使用）
+     * @param isNisa NISAフラグ
+     * @param transactionDate 取引日（購入取引に使用）
      * @return 作成されたStockLot
      */
-    fun createStockLot(
-        owner: Owner,
-        stock: Stock,
-        currentUnit: Int,
-    ): StockLot {
-        val stockLot = StockLot(
-            owner = owner,
-            stock = stock,
-            currentUnit = currentUnit,
-        )
-        return stockLotRepository.save(stockLot)
-    }
-
     // StockLotServiceで実装する場合
-    fun createNewStockLot(
+    fun createStockLot(
         owner: Owner,
         stock: Stock,
         unit: Int,
