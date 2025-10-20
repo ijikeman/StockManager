@@ -4,7 +4,12 @@ import com.example.stock.model.Owner
 import com.example.stock.model.Sector
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.model.BuyTransaction
 import com.example.stock.repository.StockLotRepository
+import com.example.stock.repository.BuyTransactionRepository
+import com.example.stock.repository.SellTransactionRepository
+import com.example.stock.service.BuyTransactionService
+import com.example.stock.service.SellTransactionService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -13,6 +18,8 @@ import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.verify
+import java.math.BigDecimal
+import java.time.LocalDate
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.Mockito.`when` as mockitoWhen
 import org.mockito.ArgumentMatchers.any
@@ -27,10 +34,13 @@ class StockLotServiceTest {
     private lateinit var stockLotRepository: StockLotRepository
 
     @Mock
-    private lateinit var buyTransactionService: BuyTransactionService
+    private lateinit var buyTransactionRepository: BuyTransactionRepository
 
     @Mock
-    private lateinit var buyTransactionRepository: com.example.stock.repository.BuyTransactionRepository
+    private lateinit var sellTransactionRepository: SellTransactionRepository
+
+    @Mock
+    private lateinit var buyTransactionService: BuyTransactionService
 
     @Mock
     private lateinit var sellTransactionService: SellTransactionService
@@ -39,7 +49,7 @@ class StockLotServiceTest {
     private lateinit var stockLotCaptor: ArgumentCaptor<StockLot>
 
     @Test
-    fun `createStockLot should create a single lot with correct unit`() {
+    fun `createStockLot should create a single lot with correct unit and buy transaction`() {
         // given
         val owner = Owner(id = 1, name = "TestUser")
         val sector = Sector(id = 1, name = "Test Sector")
@@ -53,20 +63,45 @@ class StockLotServiceTest {
             sector = sector
         )
         val currentUnit = 2
+        val price = java.math.BigDecimal("1000.0")
+        val fee = java.math.BigDecimal("10.0")
+        val isNisa = false
+        val transactionDate = java.time.LocalDate.now()
 
         mockitoWhen(stockLotRepository.save(any(StockLot::class.java))).thenAnswer { it.getArgument(0) }
+        mockitoWhen(buyTransactionRepository.save(any(com.example.stock.model.BuyTransaction::class.java))).thenAnswer { it.getArgument(0) }
 
         // when
-        val result = stockLotService.createStockLot(owner, stock, currentUnit)
+        val result = stockLotService.createStockLot(
+            owner = owner,
+            stock = stock,
+            unit = currentUnit,
+            price = price,
+            fee = fee,
+            isNisa = isNisa,
+            transactionDate = transactionDate
+        )
 
         // then
         verify(stockLotRepository).save(stockLotCaptor.capture())
         val capturedStockLot = stockLotCaptor.value
 
         assertThat(result).isNotNull
-        assertThat(capturedStockLot.currentUnit).isEqualTo(2)
+        assertThat(capturedStockLot.currentUnit).isEqualTo(currentUnit)
         assertThat(capturedStockLot.owner).isEqualTo(owner)
         assertThat(capturedStockLot.stock).isEqualTo(stock)
+
+        // BuyTransactionの検証
+        val buyTransactionCaptor = ArgumentCaptor.forClass(com.example.stock.model.BuyTransaction::class.java)
+        verify(buyTransactionRepository).save(buyTransactionCaptor.capture())
+        val capturedBuyTransaction = buyTransactionCaptor.value
+
+        assertThat(capturedBuyTransaction.stockLot).isEqualTo(result)
+        assertThat(capturedBuyTransaction.unit).isEqualTo(currentUnit)
+        assertThat(capturedBuyTransaction.price).isEqualTo(price)
+        assertThat(capturedBuyTransaction.fee).isEqualTo(fee)
+        assertThat(capturedBuyTransaction.isNisa).isEqualTo(isNisa)
+        assertThat(capturedBuyTransaction.transactionDate).isEqualTo(transactionDate)
     }
 
     @Test
