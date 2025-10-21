@@ -9,9 +9,13 @@ import com.example.stock.model.SellTransaction
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.model.IncomingHistory
+import com.example.stock.model.BenefitHistory
 import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.SellTransactionRepository
 import com.example.stock.repository.StockLotRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.BenefitHistoryRepository
 import com.example.stock.service.BuyTransactionService
 import com.example.stock.service.SellTransactionService
 import org.springframework.stereotype.Service
@@ -32,6 +36,8 @@ class StockLotService(
     private val sellTransactionRepository: SellTransactionRepository,
     private val buyTransactionService: BuyTransactionService,
     private val sellTransactionService: SellTransactionService,
+    private val incomingHistoryRepository: IncomingHistoryRepository,
+    private val benefitHistoryRepository: BenefitHistoryRepository,
 ) {
     
 
@@ -224,6 +230,9 @@ class StockLotService(
     /**
      * 株式ロットを一部または全部売却します。
      * 売却はFIFO（先入れ先出し）方式で行われ、最も古い購入取引から順に売却が割り当てられます。
+     * 
+     * 売却時には、株式ロットに紐づくIncomingHistoryとBenefitHistoryのレコードを複製し、
+     * 複製したレコードのstockLotIdをnullに設定し、sellTransactionIdを設定します。
      *
      * @param stockLotId 売却対象のStockLotのID
      * @param sellDto 売却情報（単元数、価格、手数料、取引日）を含むDTO
@@ -240,6 +249,10 @@ class StockLotService(
 
         val buyTransactions = buyTransactionRepository.findByStockLotIdOrderByTransactionDateAsc(stockLotId)
         var remainingSellUnit = sellDto.unit
+
+        // IncomingHistoryとBenefitHistoryのレコードを取得
+        val incomingHistories = incomingHistoryRepository.findByStockLotId(stockLotId)
+        val benefitHistories = benefitHistoryRepository.findByStockLotId(stockLotId)
 
         for (buyTx in buyTransactions) {
             if (remainingSellUnit == 0) break
@@ -258,7 +271,32 @@ class StockLotService(
                     fee = sellDto.fee,
                     transactionDate = sellDto.transactionDate
                 )
-                sellTransactionService.create(sellTransaction)
+                val savedSellTransaction = sellTransactionService.create(sellTransaction)
+                
+                // IncomingHistoryレコードを複製し、sellTransactionIdを設定
+                incomingHistories.forEach { history ->
+                    val duplicatedHistory = IncomingHistory(
+                        id = 0, // 新規レコードとして作成
+                        stockLot = null,
+                        sellTransaction = savedSellTransaction,
+                        incoming = history.incoming,
+                        paymentDate = history.paymentDate
+                    )
+                    incomingHistoryRepository.save(duplicatedHistory)
+                }
+                
+                // BenefitHistoryレコードを複製し、sellTransactionIdを設定
+                benefitHistories.forEach { history ->
+                    val duplicatedHistory = BenefitHistory(
+                        id = 0, // 新規レコードとして作成
+                        stockLot = null,
+                        sellTransaction = savedSellTransaction,
+                        benefit = history.benefit,
+                        paymentDate = history.paymentDate
+                    )
+                    benefitHistoryRepository.save(duplicatedHistory)
+                }
+                
                 remainingSellUnit -= sellUnitForThisTx
             }
         }
