@@ -72,7 +72,10 @@ class StockService(
                 val updatedStock = stock.copy(
                     currentPrice = stockInfo.price ?: stock.currentPrice,
                     incoming = stockInfo.incoming ?: stock.incoming,
-                    earningsDate = stockInfo.earningsDate ?: stock.earningsDate
+                    earningsDate = stockInfo.earningsDate ?: stock.earningsDate,
+                    previousPrice = stockInfo.previousPrice ?: stock.previousPrice,
+                    priceChange = stockInfo.priceChange ?: stock.priceChange,
+                    priceChangeRate = stockInfo.priceChangeRate ?: stock.priceChangeRate
                 )
                 return stockRepository.save(updatedStock)
             }

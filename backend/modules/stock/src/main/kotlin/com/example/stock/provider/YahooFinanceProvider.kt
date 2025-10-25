@@ -28,9 +28,12 @@ class YahooFinanceProvider(
             val price = extractPrice(doc)
             val incoming = extractIncoming(doc)
             val earnings_date = extractEarningsDate(doc)
+            val previousPrice = extractPreviousPrice(doc)
+            val priceChange = extractPriceChange(doc)
+            val priceChangeRate = extractPriceChangeRate(doc)
 
             // 取得したデータをStockInfoに格納しreturnする
-            StockInfo(price, incoming, earnings_date)
+            StockInfo(price, incoming, earnings_date, previousPrice, priceChange, priceChangeRate)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -88,5 +91,44 @@ class YahooFinanceProvider(
         } else {
             null
         }
+    }
+
+    private fun extractPreviousPrice(doc: org.jsoup.nodes.Document): Double? {
+        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
+        if (scriptContent != null) {
+            val pattern = Pattern.compile(""""previousPrice":"([0-9,]+(?:\.[0-9]+)?)"""")
+            val matcher = pattern.matcher(scriptContent)
+            if (matcher.find()) {
+                val priceText = matcher.group(1).replace(",", "")
+                return priceText.toDoubleOrNull()
+            }
+        }
+        return null
+    }
+
+    private fun extractPriceChange(doc: org.jsoup.nodes.Document): Double? {
+        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
+        if (scriptContent != null) {
+            val pattern = Pattern.compile(""""priceChange":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
+            val matcher = pattern.matcher(scriptContent)
+            if (matcher.find()) {
+                val changeText = matcher.group(1).replace(",", "")
+                return changeText.toDoubleOrNull()
+            }
+        }
+        return null
+    }
+
+    private fun extractPriceChangeRate(doc: org.jsoup.nodes.Document): Double? {
+        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
+        if (scriptContent != null) {
+            val pattern = Pattern.compile(""""priceChangeRate":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
+            val matcher = pattern.matcher(scriptContent)
+            if (matcher.find()) {
+                val rateText = matcher.group(1).replace(",", "")
+                return rateText.toDoubleOrNull()
+            }
+        }
+        return null
     }
 }

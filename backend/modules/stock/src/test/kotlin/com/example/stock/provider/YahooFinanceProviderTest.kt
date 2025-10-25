@@ -42,6 +42,9 @@ class YahooFinanceProviderTest {
         assertEquals(1234.5, stockInfo?.price)
         assertEquals(50.0, stockInfo?.incoming)
         assertEquals(LocalDate.of(2025, 10, 31), stockInfo?.earningsDate)
+        assertEquals(1204.0, stockInfo?.previousPrice)
+        assertEquals(30.5, stockInfo?.priceChange)
+        assertEquals(2.53, stockInfo?.priceChangeRate)
     }
 
     @Test
