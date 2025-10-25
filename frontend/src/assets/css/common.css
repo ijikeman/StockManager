@@ -212,6 +212,17 @@
   font-weight: 600;
 }
 
+/* 株価前日比の色付け */
+.price-up {
+  color: #1e7e34; /* green */
+  font-weight: 600;
+}
+
+.price-down {
+  color: #c82333; /* red */
+  font-weight: 600;
+}
+
 .alert-success {
   color: #155724;
   background-color: #d4edda;

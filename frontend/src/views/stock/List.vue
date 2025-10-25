@@ -12,6 +12,9 @@ export default {
       code: { label: 'コード' },
       name: { label: '名前' },
       currentPrice: { label: '現在の株価' },
+      previousPrice: { label: '前日終値' },
+      priceChange: { label: '前日比' },
+      priceChangeRate: { label: '前日比率(%)' },
       incoming: { label: '配当金' },
       earningsDate: { label: '業績発表日' },
       sector: { label: 'セクター', formatter: (value) => value.name },
@@ -112,6 +115,26 @@ export default {
       } else {
         this.selectedStocks = [];
       }
+    },
+    formatPriceChange(stock) {
+      if (stock.priceChange == null) {
+        return '---';
+      }
+      const change = stock.priceChange;
+      const rate = stock.priceChangeRate;
+      const sign = change > 0 ? '+' : '';
+      return `${sign}${change.toFixed(1)} (${sign}${rate.toFixed(2)}%)`;
+    },
+    getPriceChangeClass(stock) {
+      if (stock.priceChange == null) {
+        return '';
+      }
+      if (stock.priceChange > 0) {
+        return 'price-up';
+      } else if (stock.priceChange < 0) {
+        return 'price-down';
+      }
+      return '';
     }
   },
   
