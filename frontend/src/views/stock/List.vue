@@ -50,7 +50,8 @@ export default {
         ? stock.priceChangeRate.toFixed(2) 
         : '0.00';
       const sign = change >= 0 ? '+' : '';
-      return `${sign}${change} (${sign}${rate}%)`;
+      const arrow = change >= 0 ? '↑' : '↓';
+      return `${arrow} ${sign}${change} (${sign}${rate}%)`;
     },
     // 前日比の色を取得
     getPriceChangeClass(priceChange) {

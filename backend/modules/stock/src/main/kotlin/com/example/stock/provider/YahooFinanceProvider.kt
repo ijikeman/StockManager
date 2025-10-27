@@ -14,6 +14,9 @@ class YahooFinanceProvider(
 
     companion object {
         private const val BASE_URL = "https://finance.yahoo.co.jp/quote"
+        private val PREVIOUS_PRICE_PATTERN = Pattern.compile(""""previousPrice":"([0-9,]+(?:\.[0-9]+)?)"""")
+        private val PRICE_CHANGE_PATTERN = Pattern.compile(""""priceChange":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
+        private val PRICE_CHANGE_RATE_PATTERN = Pattern.compile(""""priceChangeRate":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
     }
 
     override fun fetchStockInfo(code: String): StockInfo? {
@@ -94,39 +97,24 @@ class YahooFinanceProvider(
     }
 
     private fun extractPreviousPrice(doc: org.jsoup.nodes.Document): Double? {
-        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
-        if (scriptContent != null) {
-            val pattern = Pattern.compile(""""previousPrice":"([0-9,]+(?:\.[0-9]+)?)"""")
-            val matcher = pattern.matcher(scriptContent)
-            if (matcher.find()) {
-                val priceText = matcher.group(1).replace(",", "")
-                return priceText.toDoubleOrNull()
-            }
-        }
-        return null
+        return extractFromPreloadedState(doc, PREVIOUS_PRICE_PATTERN)
     }
 
     private fun extractPriceChange(doc: org.jsoup.nodes.Document): Double? {
-        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
-        if (scriptContent != null) {
-            val pattern = Pattern.compile(""""priceChange":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
-            val matcher = pattern.matcher(scriptContent)
-            if (matcher.find()) {
-                val changeText = matcher.group(1).replace(",", "")
-                return changeText.toDoubleOrNull()
-            }
-        }
-        return null
+        return extractFromPreloadedState(doc, PRICE_CHANGE_PATTERN)
     }
 
     private fun extractPriceChangeRate(doc: org.jsoup.nodes.Document): Double? {
+        return extractFromPreloadedState(doc, PRICE_CHANGE_RATE_PATTERN)
+    }
+
+    private fun extractFromPreloadedState(doc: org.jsoup.nodes.Document, pattern: Pattern): Double? {
         val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
         if (scriptContent != null) {
-            val pattern = Pattern.compile(""""priceChangeRate":"([+-]?[0-9,]+(?:\.[0-9]+)?)"""")
             val matcher = pattern.matcher(scriptContent)
             if (matcher.find()) {
-                val rateText = matcher.group(1).replace(",", "")
-                return rateText.toDoubleOrNull()
+                val valueText = matcher.group(1).replace(",", "")
+                return valueText.toDoubleOrNull()
             }
         }
         return null
