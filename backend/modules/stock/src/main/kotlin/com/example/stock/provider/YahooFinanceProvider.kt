@@ -14,6 +14,7 @@ class YahooFinanceProvider(
 
     companion object {
         private const val BASE_URL = "https://finance.yahoo.co.jp/quote"
+        private val PREVIOUS_PRICE_PATTERN = Pattern.compile(""""previousPrice":"([0-9,]+(?:\.[0-9]+)?)"""")
     }
 
     override fun fetchStockInfo(code: String): StockInfo? {
@@ -28,9 +29,10 @@ class YahooFinanceProvider(
             val price = extractPrice(doc)
             val incoming = extractIncoming(doc)
             val earnings_date = extractEarningsDate(doc)
+            val previousPrice = extractPreviousPrice(doc)
 
             // 取得したデータをStockInfoに格納しreturnする
-            StockInfo(price, incoming, earnings_date)
+            StockInfo(price, incoming, earnings_date, previousPrice)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -88,5 +90,21 @@ class YahooFinanceProvider(
         } else {
             null
         }
+    }
+
+    private fun extractPreviousPrice(doc: org.jsoup.nodes.Document): Double? {
+        return extractFromPreloadedState(doc, PREVIOUS_PRICE_PATTERN)
+    }
+
+    private fun extractFromPreloadedState(doc: org.jsoup.nodes.Document, pattern: Pattern): Double? {
+        val scriptContent = doc.select("script").find { it.html().contains("__PRELOADED_STATE__") }?.html()
+        if (scriptContent != null) {
+            val matcher = pattern.matcher(scriptContent)
+            if (matcher.find()) {
+                val valueText = matcher.group(1).replace(",", "")
+                return valueText.toDoubleOrNull()
+            }
+        }
+        return null
     }
 }
