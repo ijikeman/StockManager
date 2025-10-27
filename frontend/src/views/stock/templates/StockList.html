@@ -35,6 +35,7 @@
         <th>コード</th>
         <th>名前</th>
         <th>現在の株価</th>
+        <th>前日比</th>
         <th>配当金</th>
         <th>業績発表日</th>
         <th>セクター</th>
@@ -49,6 +50,7 @@
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
         <td>{{ stock.currentPrice }}</td>
+        <td :class="getPriceChangeClass(stock.priceChange)">{{ formatPriceChange(stock) }}</td>
         <td>{{ stock.incoming }}</td>
         <td>{{ stock.earningsDate }}</td>
         <td>{{ stock.sector.name }}</td>

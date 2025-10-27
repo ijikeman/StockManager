@@ -12,6 +12,9 @@ export default {
       code: { label: 'コード' },
       name: { label: '名前' },
       currentPrice: { label: '現在の株価' },
+      previousPrice: { label: '前日終値' },
+      priceChange: { label: '前日比' },
+      priceChangeRate: { label: '前日比率(%)' },
       incoming: { label: '配当金' },
       earningsDate: { label: '業績発表日' },
       sector: { label: 'セクター', formatter: (value) => value.name },
@@ -36,6 +39,25 @@ export default {
       } catch (error) {
         console.error('銘柄の取得中にエラーが発生しました:', error);
       }
+    },
+    // 前日比のフォーマット
+    formatPriceChange(stock) {
+      if (stock.priceChange === null || stock.priceChange === undefined) {
+        return '-';
+      }
+      const change = stock.priceChange;
+      const rate = stock.priceChangeRate !== null && stock.priceChangeRate !== undefined 
+        ? stock.priceChangeRate.toFixed(2) 
+        : '0.00';
+      const sign = change >= 0 ? '+' : '';
+      return `${sign}${change} (${sign}${rate}%)`;
+    },
+    // 前日比の色を取得
+    getPriceChangeClass(priceChange) {
+      if (priceChange === null || priceChange === undefined) {
+        return '';
+      }
+      return priceChange >= 0 ? 'price-increase' : 'price-decrease';
     },
     goToAddStock() {
       this.$router.push('/stock/add');
@@ -120,3 +142,15 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.price-increase {
+  color: green;
+  font-weight: bold;
+}
+
+.price-decrease {
+  color: red;
+  font-weight: bold;
+}
+</style>

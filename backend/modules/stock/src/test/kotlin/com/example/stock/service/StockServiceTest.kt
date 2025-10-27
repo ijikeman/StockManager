@@ -128,8 +128,8 @@ class StockServiceTest {
         // given
         val code = "1301"
     val originalStock = Stock(id = 1, code = code, name = "teststock", currentPrice = 1000.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 1), sector = sector, minimalUnit = 100)
-    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2))
-    val updatedStock = originalStock.copy(currentPrice = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2))
+    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2), previousPrice = 1100.0, priceChange = 100.0, priceChangeRate = 9.09)
+    val updatedStock = originalStock.copy(currentPrice = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2), previousPrice = 1100.0, priceChange = 100.0, priceChangeRate = 9.09)
 
         mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
         mockitoWhen(stockRepository.findByCode(code)).thenReturn(originalStock)
@@ -149,7 +149,7 @@ class StockServiceTest {
     fun `updateStockPrice should return null when stock not in db`() {
         // given
         val code = "1301"
-    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2))
+    val stockInfo = StockInfo(price = 1200.0, incoming = 12.0, earningsDate = java.time.LocalDate.of(2025, 1, 2), previousPrice = null, priceChange = null, priceChangeRate = null)
 
         mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
         mockitoWhen(stockRepository.findByCode(code)).thenReturn(null)
@@ -181,11 +181,11 @@ class StockServiceTest {
     val stock2 = Stock(id = 2, code = "1302", name = "stock2", currentPrice = 2000.0, incoming = 20.0, earningsDate = java.time.LocalDate.of(2025, 2, 2), sector = sector, minimalUnit = 200)
         val stocks = listOf(stock1, stock2)
 
-    val stockInfo1 = StockInfo(price = 1100.0, incoming = 11.0, earningsDate = java.time.LocalDate.of(2025, 1, 11))
-    val stockInfo2 = StockInfo(price = 2200.0, incoming = 22.0, earningsDate = java.time.LocalDate.of(2025, 2, 12))
+    val stockInfo1 = StockInfo(price = 1100.0, incoming = 11.0, earningsDate = java.time.LocalDate.of(2025, 1, 11), previousPrice = 1050.0, priceChange = 50.0, priceChangeRate = 4.76)
+    val stockInfo2 = StockInfo(price = 2200.0, incoming = 22.0, earningsDate = java.time.LocalDate.of(2025, 2, 12), previousPrice = 2100.0, priceChange = 100.0, priceChangeRate = 4.76)
 
-    val updatedStock1 = stock1.copy(currentPrice = 1100.0, incoming = 11.0, earningsDate = java.time.LocalDate.of(2025, 1, 11))
-    val updatedStock2 = stock2.copy(currentPrice = 2200.0, incoming = 22.0, earningsDate = java.time.LocalDate.of(2025, 2, 12))
+    val updatedStock1 = stock1.copy(currentPrice = 1100.0, incoming = 11.0, earningsDate = java.time.LocalDate.of(2025, 1, 11), previousPrice = 1050.0, priceChange = 50.0, priceChangeRate = 4.76)
+    val updatedStock2 = stock2.copy(currentPrice = 2200.0, incoming = 22.0, earningsDate = java.time.LocalDate.of(2025, 2, 12), previousPrice = 2100.0, priceChange = 100.0, priceChangeRate = 4.76)
 
         mockitoWhen(stockRepository.findAll()).thenReturn(stocks)
         mockitoWhen(yahooFinanceProvider.fetchStockInfo("1301")).thenReturn(stockInfo1)
