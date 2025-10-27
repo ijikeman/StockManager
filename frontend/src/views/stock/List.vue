@@ -12,6 +12,7 @@ export default {
       code: { label: 'コード' },
       name: { label: '名前' },
       currentPrice: { label: '現在の株価' },
+      previousClose: { label: '前日終値' },
       incoming: { label: '配当金' },
       earningsDate: { label: '業績発表日' },
       sector: { label: 'セクター', formatter: (value) => value.name },

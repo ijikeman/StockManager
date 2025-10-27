@@ -28,10 +28,10 @@ class YahooFinanceProvider(
             val price = extractPrice(doc)
             val incoming = extractIncoming(doc)
             val earnings_date = extractEarningsDate(doc)
-            val previousClose = extractPreviousClose(doc) // 前日比株価
+            val previousClose = extractPreviousClose(doc)
 
             // 取得したデータをStockInfoに格納しreturnする
-            StockInfo(price, incoming, earnings_date)
+            StockInfo(price, incoming, earnings_date, previousClose)
         } catch (e: Exception) {
             e.printStackTrace()
             null

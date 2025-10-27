@@ -44,5 +44,8 @@ data class Stock(
     var sector: Sector? = null, // セクター
 
     @Column(name = "minimal_unit", nullable = false)
-    val minimalUnit: Int = 100 // 最低単元数
+    val minimalUnit: Int = 100, // 最低単元数
+
+    @Column(name = "previous_close", nullable = false)
+    val previousClose: Double = 0.0 // 前日終値
 )

@@ -11,5 +11,6 @@ import java.time.LocalDate
 data class StockInfo(
     val price: Double?,
     val incoming: Double?,
-    val earningsDate: LocalDate?
+    val earningsDate: LocalDate?,
+    val previousClose: Double?
 )
