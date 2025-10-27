@@ -47,7 +47,7 @@ class StockLotControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     private val ownerDto = OwnerDto(id = 1, name = "Test Owner")
-    private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0, minimalUnit = 100)
+    private val stockDto = StockDto(id = 1, code = "1234", name = "Test Stock", currentPrice = 1200.0, minimalUnit = 100, previousClose = 1150.0)
     private val purchaseDate = LocalDate.now()
 
     @Test
