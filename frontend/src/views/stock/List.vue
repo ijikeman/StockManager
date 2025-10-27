@@ -38,6 +38,27 @@ export default {
         console.error('銘柄の取得中にエラーが発生しました:', error);
       }
     },
+    // 前日比のフォーマット
+    formatPriceChange(stock) {
+      if (stock.previousClose === null || stock.previousClose === undefined) {
+        return '-';
+      }
+      const change = stock.currentPrice - stock.previousClose;
+      const rate = stock.previousClose !== null && stock.previousClose !== undefined
+        ? (change / stock.previousClose * 100).toFixed(2)
+        : '0.00';
+      const sign = change >= 0 ? '+' : '';
+      const arrow = change >= 0 ? '↑' : '↓';
+      return `${arrow} ${sign}${change} (${sign}${rate}%)`;
+    },
+    // 前日比の色を取得
+    getPriceChangeClass(stock) {
+      if (stock.previousClose === null || stock.previousClose === undefined) {
+        return '';
+      }
+      const change = stock.currentPrice - stock.previousClose;
+      return change >= 0 ? 'price-increase' : 'price-decrease';
+    },
     goToAddStock() {
       this.$router.push('/stock/add');
     },
@@ -121,3 +142,14 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.price-increase {
+  color: green;
+  font-weight: bold;
+}
+.price-decrease {
+  color: red;
+  font-weight: bold;
+}
+</style>

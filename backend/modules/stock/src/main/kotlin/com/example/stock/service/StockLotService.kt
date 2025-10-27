@@ -144,6 +144,7 @@ class StockLotService(
                 name = stockLot.stock.name,
                 currentPrice = stockLot.stock.currentPrice,
                 minimalUnit = stockLot.stock.minimalUnit,
+                previousClose = stockLot.stock.previousClose ?: 0.0
             ),
             currentUnit = stockLot.currentUnit,
             averagePrice = averagePrice,
