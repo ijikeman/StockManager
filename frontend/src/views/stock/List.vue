@@ -12,6 +12,9 @@ export default {
       code: { label: 'コード' },
       name: { label: '名前' },
       currentPrice: { label: '現在の株価' },
+      previousPrice: { label: '前日終値' },
+      priceChange: { label: '前日比', formatter: (value, stock) => this.calculatePriceChange(stock) },
+      priceChangeRate: { label: '前日比率(%)', formatter: (value, stock) => this.calculatePriceChangeRate(stock) },
       incoming: { label: '配当金' },
       earningsDate: { label: '業績発表日' },
       sector: { label: 'セクター', formatter: (value) => value.name },
@@ -36,6 +39,41 @@ export default {
       } catch (error) {
         console.error('銘柄の取得中にエラーが発生しました:', error);
       }
+    },
+    // 前日比を計算
+    calculatePriceChange(stock) {
+      if (stock.currentPrice && stock.previousPrice) {
+        return stock.currentPrice - stock.previousPrice;
+      }
+      return null;
+    },
+    // 前日比率を計算
+    calculatePriceChangeRate(stock) {
+      if (stock.currentPrice && stock.previousPrice && stock.previousPrice !== 0) {
+        return ((stock.currentPrice - stock.previousPrice) / stock.previousPrice) * 100;
+      }
+      return null;
+    },
+    // 前日比のフォーマット
+    formatPriceChange(stock) {
+      const change = this.calculatePriceChange(stock);
+      const rate = this.calculatePriceChangeRate(stock);
+      
+      if (change === null || rate === null) {
+        return '-';
+      }
+      
+      const sign = change >= 0 ? '+' : '';
+      const arrow = change >= 0 ? '↑' : '↓';
+      return `${arrow} ${sign}${change.toFixed(1)} (${sign}${rate.toFixed(2)}%)`;
+    },
+    // 前日比の色を取得
+    getPriceChangeClass(stock) {
+      const change = this.calculatePriceChange(stock);
+      if (change === null) {
+        return '';
+      }
+      return change >= 0 ? 'price-increase' : 'price-decrease';
     },
     goToAddStock() {
       this.$router.push('/stock/add');
@@ -88,7 +126,10 @@ export default {
         return this.selectedCsvColumns.map(key => {
           const column = this.csvColumns[key];
           const value = stock[key];
-          return column.formatter ? column.formatter(value) : value;
+          if (column.formatter) {
+            return column.formatter(value, stock);
+          }
+          return value;
         }).join(delimiter);
       });
 
@@ -120,3 +161,15 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.price-increase {
+  color: green;
+  font-weight: bold;
+}
+
+.price-decrease {
+  color: red;
+  font-weight: bold;
+}
+</style>

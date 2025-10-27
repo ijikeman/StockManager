@@ -7,9 +7,11 @@ import java.time.LocalDate
 - price: 現在の価格
 - incoming: 配当金
 - earnings_date: 業績発表日
+- previousPrice: 前日終値
 */
 data class StockInfo(
     val price: Double?,
     val incoming: Double?,
-    val earningsDate: LocalDate?
+    val earningsDate: LocalDate?,
+    val previousPrice: Double?
 )

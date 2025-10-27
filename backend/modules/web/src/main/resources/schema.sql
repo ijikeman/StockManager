@@ -36,6 +36,7 @@ CREATE TABLE stock (
     minimal_unit INT NOT NULL DEFAULT 100,
     earnings_date DATE NULL,
     sector_id INT,
+    previous_price DECIMAL(10, 2) NULL,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
 );
 
