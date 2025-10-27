@@ -8,14 +8,10 @@ import java.time.LocalDate
 - incoming: 配当金
 - earnings_date: 業績発表日
 - previousPrice: 前日終値
-- priceChange: 前日比
-- priceChangeRate: 前日比率(%)
 */
 data class StockInfo(
     val price: Double?,
     val incoming: Double?,
     val earningsDate: LocalDate?,
-    val previousPrice: Double?,
-    val priceChange: Double?,
-    val priceChangeRate: Double?
+    val previousPrice: Double?
 )

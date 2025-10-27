@@ -47,11 +47,5 @@ data class Stock(
     val minimalUnit: Int = 100, // 最低単元数
 
     @Column(name = "previous_price")
-    val previousPrice: Double? = null, // 前日終値
-
-    @Column(name = "price_change")
-    val priceChange: Double? = null, // 前日比
-
-    @Column(name = "price_change_rate")
-    val priceChangeRate: Double? = null // 前日比率(%)
+    val previousPrice: Double? = null // 前日終値
 )

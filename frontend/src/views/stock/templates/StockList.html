@@ -50,7 +50,7 @@
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
         <td>{{ stock.currentPrice }}</td>
-        <td :class="getPriceChangeClass(stock.priceChange)">{{ formatPriceChange(stock) }}</td>
+        <td :class="getPriceChangeClass(stock)">{{ formatPriceChange(stock) }}</td>
         <td>{{ stock.incoming }}</td>
         <td>{{ stock.earningsDate }}</td>
         <td>{{ stock.sector.name }}</td>
