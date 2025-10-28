@@ -37,6 +37,8 @@ CREATE TABLE stock (
     earnings_date DATE NULL,
     sector_id INT,
     previous_price DECIMAL(10, 2) NULL,
+    latest_disclosure_date DATE NULL,
+    latest_disclosure_url VARCHAR(500) NULL,
     FOREIGN KEY (sector_id) REFERENCES sector(id)
 );
 
