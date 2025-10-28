@@ -32,6 +32,10 @@ export default {
         label: '業績発表日',
         formatter: (value) => this.formatEarningsDate(value)
       },
+      latestDisclosureDate: {
+        label: '適時開示日',
+        formatter: (value) => this.formatDisclosureDate(value)
+      },
       sector: { label: 'セクター', formatter: (value) => value.name },
     };
 
@@ -155,6 +159,24 @@ export default {
       return `${formattedDate} ${suffix}`;
     },
 
+    formatDisclosureDate(date) {
+      if (!date) return '-';
+      
+      // YYYY-MM-DD形式の日付を YYYY/MM/DD に変換
+      const formattedDate = date.split('-').join('/');
+      return formattedDate;
+    },
+
+    getDisclosureUrl(stock) {
+      // URLが保存されている場合はそれを使用、なければデフォルトの開示ページへのリンクを返す
+      if (stock.latestDisclosureUrl) {
+        return stock.latestDisclosureUrl;
+      } else if (stock.code) {
+        return `https://finance.yahoo.co.jp/quote/${stock.code}.T/disclosure`;
+      }
+      return null;
+    },
+
     async updateSelectedStocks() {
       if (this.selectedStocks.length === 0) {
         alert('更新する銘柄を選択してください。');
@@ -234,5 +256,14 @@ export default {
 .price-decrease {
   color: red;
   font-weight: bold;
+}
+
+.disclosure-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.disclosure-link:hover {
+  text-decoration: underline;
 }
 </style>
