@@ -42,6 +42,7 @@ class YahooFinanceProviderTest {
         assertEquals(1234.5, stockInfo?.price)
         assertEquals(50.0, stockInfo?.incoming)
         assertEquals(LocalDate.of(2025, 10, 31), stockInfo?.earningsDate)
+        // Note: latestDisclosureDate and latestDisclosureUrl may be null in test since we don't mock disclosure page
     }
 
     @Test

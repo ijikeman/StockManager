@@ -47,5 +47,11 @@ data class Stock(
     val minimalUnit: Int = 100, // 最低単元数
 
     @Column(name = "previous_price")
-    val previousPrice: Double? = null // 前日終値
+    val previousPrice: Double? = null, // 前日終値
+
+    @Column(name = "latest_disclosure_date")
+    val latestDisclosureDate: java.time.LocalDate? = null, // 最新の適時開示日
+
+    @Column(name = "latest_disclosure_url", length = 500)
+    val latestDisclosureUrl: String? = null // 最新の適時開示URL
 )
