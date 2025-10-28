@@ -34,6 +34,7 @@
         <th><input type="checkbox" @change="toggleSelectAll"></th>
         <th>コード</th>
         <th>名前</th>
+        <th>前日終値</th>
         <th>現在の株価</th>
         <th>前日比</th>
         <th>配当金</th>
@@ -49,10 +50,11 @@
         <td><input type="checkbox" :value="stock.code" v-model="selectedStocks"></td>
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
+        <td>{{ stock.previousPrice }}</td>
         <td>{{ stock.currentPrice }}</td>
         <td :class="getPriceChangeClass(stock)">{{ formatPriceChange(stock) }}</td>
         <td>{{ stock.incoming }}</td>
-        <td>{{ stock.earningsDate }}</td>
+        <td :class="getEarningDateClass(stock.earningsDate)">{{ formatEarningsDate(stock.earningsDate) }}</td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>
