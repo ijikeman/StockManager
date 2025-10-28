@@ -23,6 +23,8 @@ erDiagram
         decimal dividend "1単元配当金"
         decimal minumal_unit "最小単元数"
         timestamp earnings_date "業績発表日"
+        timestamp latest_disclosure_date "最新適時開示日"
+        timestamp latest_disclosure_url "最新適時開示URL"
     }
     
     stock_lot {
