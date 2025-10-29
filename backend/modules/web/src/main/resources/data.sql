@@ -65,4 +65,5 @@ INSERT INTO stock(code, name, current_price, incoming, earnings_date, sector_id)
 ('3993', 'PKSHA Technorogy', 0, 0, NULL, 20),
 ('4071', 'プラスアルファコンサルティング', 0, 0, NULL, 20),
 ('2432', 'DeNa', 0, 0, NULL, 21),
-('3923', 'ラクス', 0, 0, NULL, 20);
+('3923', 'ラクス', 0, 0, NULL, 20),
+('4684', '(株)オービック', 0, 0, NULL, 20);

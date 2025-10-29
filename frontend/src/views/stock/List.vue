@@ -1,5 +1,17 @@
 <template src="./templates/StockList.html"></template>
 
+<style>
+.earnings-future {
+  color: #28a745; /* 緑色 */
+}
+.earnings-past {
+  color: #dc3545; /* 赤色 */
+}
+.earnings-today {
+  color: #007bff; /* 青色 */
+}
+</style>
+
 <script>
 import axios from 'axios';
 
@@ -16,7 +28,14 @@ export default {
       priceChange: { label: '前日比', formatter: (value, stock) => this.calculatePriceChange(stock) },
       priceChangeRate: { label: '前日比率(%)', formatter: (value, stock) => this.calculatePriceChangeRate(stock) },
       incoming: { label: '配当金' },
-      earningsDate: { label: '業績発表日' },
+      earningsDate: { 
+        label: '業績発表日',
+        formatter: (value) => this.formatEarningsDate(value)
+      },
+      latestDisclosureDate: {
+        label: '適時開示日',
+        formatter: (value) => this.formatDisclosureDate(value)
+      },
       sector: { label: 'セクター', formatter: (value) => value.name },
     };
 
@@ -92,6 +111,86 @@ export default {
         }
       }
     },
+    getEarningDateClass(date) {
+      if (!date) return '';
+      
+      const earningsDate = new Date(date);
+      const today = new Date();
+      
+      earningsDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = earningsDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        return 'earnings-future';
+      } else if (diffDays < 0) {
+        return 'earnings-past';
+      } else {
+        return 'earnings-today';
+      }
+    },
+
+    formatEarningsDate(date) {
+      if (!date) return '-';
+      
+      const earningsDate = new Date(date);
+      const today = new Date();
+      
+      // 時間を無視して日付のみを比較
+      earningsDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = earningsDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let suffix = '';
+      if (diffDays > 0) {
+        suffix = `(+${diffDays}日)`;
+      } else if (diffDays < 0) {
+        suffix = `(${diffDays}日)`;
+      } else {
+        suffix = '(当日)';
+      }
+      
+      // YYY-MM-DD形式の日付を YYYY/MM/DD に変換
+      const formattedDate = date.split('-').join('/');
+      return `${formattedDate} ${suffix}`;
+    },
+
+    formatDisclosureDate(date) {
+      if (!date) return '-';
+      
+      const disclosureDate = new Date(date);
+      const today = new Date();
+      
+      // 時間を無視して日付のみを比較
+      disclosureDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = disclosureDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let suffix = '';
+      if (diffDays > 0) {
+        suffix = `(+${diffDays}日)`;
+      } else if (diffDays < 0) {
+        suffix = `(${diffDays}日)`;
+      } else {
+        suffix = '(当日)';
+      }
+      
+      // YYYY-MM-DD形式の日付を YYYY/MM/DD に変換
+      const formattedDate = date.split('-').join('/');
+      return `${formattedDate} ${suffix}`;
+    },
+
+    getDisclosureUrl(stock) {
+      // URLはデフォルトの開示ページへのリンクを返す
+      return `https://finance.yahoo.co.jp/quote/${stock.code}.T/disclosure`;
+    },
+
     async updateSelectedStocks() {
       if (this.selectedStocks.length === 0) {
         alert('更新する銘柄を選択してください。');
@@ -171,5 +270,14 @@ export default {
 .price-decrease {
   color: red;
   font-weight: bold;
+}
+
+.disclosure-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.disclosure-link:hover {
+  text-decoration: underline;
 }
 </style>

@@ -20,6 +20,7 @@ let stocks = Mock.mock({
     'incoming': '@float(0, 10, 2, 2)', // 0〜10の浮動小数点数で配当を生成（小数点以下2桁）
     'earningsDate': '@date("yyyy-MM-dd")', // YYYY-MM-DD形式でリリース日を生成
     'sector_id|1': mockSectors.map(s => s.id), // mockSectorsからランダムにIDを選択
+    'previousPrice': '@float(100, 1000, 2, 2)', // 100〜1000の浮動小数点数で前回価格を生成（小数点以下2桁）
   }]
 }).list;
 
