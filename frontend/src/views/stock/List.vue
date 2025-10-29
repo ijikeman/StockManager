@@ -162,9 +162,28 @@ export default {
     formatDisclosureDate(date) {
       if (!date) return '-';
       
+      const disclosureDate = new Date(date);
+      const today = new Date();
+      
+      // 時間を無視して日付のみを比較
+      disclosureDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = disclosureDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let suffix = '';
+      if (diffDays > 0) {
+        suffix = `(+${diffDays}日)`;
+      } else if (diffDays < 0) {
+        suffix = `(${diffDays}日)`;
+      } else {
+        suffix = '(当日)';
+      }
+      
       // YYYY-MM-DD形式の日付を YYYY/MM/DD に変換
       const formattedDate = date.split('-').join('/');
-      return formattedDate;
+      return `${formattedDate} ${suffix}`;
     },
 
     getDisclosureUrl(stock) {

@@ -14,7 +14,7 @@ class YahooFinanceProvider(
 
     companion object {
         private const val BASE_URL = "https://finance.yahoo.co.jp/quote"
-        private val PREVIOUS_PRICE_PATTERN = Pattern.compile(""""previousPrice":"([0-9,]+(?:\.[0-9]+)?)"""")
+        private val PREVIOUS_PRICE_PATTERN = Pattern.compile("\"previousPrice\":\"([0-9,]+(?:\\.[0-9]+)?)\"")
         private const val DISCLOSURE_PATH = "/disclosure"
     }
 
