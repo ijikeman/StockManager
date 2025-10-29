@@ -39,6 +39,7 @@
         <th>前日比</th>
         <th>配当金</th>
         <th>業績発表日</th>
+        <th>適時開示日</th>
         <th>セクター</th>
         <th>アクション</th>
       </tr>
@@ -55,6 +56,16 @@
         <td :class="getPriceChangeClass(stock)">{{ formatPriceChange(stock) }}</td>
         <td>{{ stock.incoming }}</td>
         <td :class="getEarningDateClass(stock.earningsDate)">{{ formatEarningsDate(stock.earningsDate) }}</td>
+        <td>
+          <a v-if="stock.latestDisclosureDate && getDisclosureUrl(stock)" 
+             :href="getDisclosureUrl(stock)" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             class="disclosure-link">
+            {{ formatDisclosureDate(stock.latestDisclosureDate) }}
+          </a>
+          <span v-else>-</span>
+        </td>
         <td>{{ stock.sector.name }}</td>
         <td>
           <button @click="editStock(stock.id)" class="btn btn-secondary">編集</button>
