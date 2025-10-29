@@ -141,8 +141,13 @@ class YahooFinanceProvider(
                 var mmddText: String? = null
                 if (supplementLis.isNotEmpty()) {
                     val t = supplementLis[0].text().trim()
+                    // MM/DD 形式か確認
                     if (Regex("""^\d{1,2}/\d{1,2}$""").matches(t)) {
                         mmddText = t
+                    // 時間の場合(例: 16:31),当日のMM/DDを設定する
+                    } else if (Regex("""^\d{1,2}:\d{2}$""").matches(t)) {
+                        val today = LocalDate.now()
+                        mmddText = "${today.monthValue}/${today.dayOfMonth}"
                     }
                 }
 
