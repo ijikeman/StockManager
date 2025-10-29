@@ -50,8 +50,5 @@ data class Stock(
     val previousPrice: Double? = null, // 前日終値
 
     @Column(name = "latest_disclosure_date")
-    val latestDisclosureDate: java.time.LocalDate? = null, // 最新の適時開示日
-
-    @Column(name = "latest_disclosure_url", length = 500)
-    val latestDisclosureUrl: String? = null // 最新の適時開示URL
+    val latestDisclosureDate: java.time.LocalDate? = null // 最新の適時開示日
 )

@@ -9,13 +9,11 @@ import java.time.LocalDate
 - earnings_date: 業績発表日
 - previousPrice: 前日終値
 - latestDisclosureDate: 最新の適時開示日
-- latestDisclosureUrl: 最新の適時開示URL
 */
 data class StockInfo(
     val price: Double?,
     val incoming: Double?,
     val earningsDate: LocalDate?,
     val previousPrice: Double?,
-    val latestDisclosureDate: LocalDate?,
-    val latestDisclosureUrl: String?
+    val latestDisclosureDate: LocalDate?
 )

@@ -33,10 +33,10 @@ class YahooFinanceProvider(
             val previousPrice = extractPreviousPrice(doc)
             
             // 適時開示情報を取得
-            val (latestDisclosureDate, latestDisclosureUrl) = fetchLatestDisclosure(code)
+            val latestDisclosureDate = fetchLatestDisclosure(code)
 
             // 取得したデータをStockInfoに格納しreturnする
-            StockInfo(price, incoming, earnings_date, previousPrice, latestDisclosureDate, latestDisclosureUrl)
+            StockInfo(price, incoming, earnings_date, previousPrice, latestDisclosureDate)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -118,47 +118,58 @@ class YahooFinanceProvider(
      * @param code 銘柄コード
      * @return Pair(開示日, 開示URL) or (null, null)
      */
-    private fun fetchLatestDisclosure(code: String): Pair<LocalDate?, String?> {
+    private fun fetchLatestDisclosure(code: String): LocalDate? {
         // リクエスト間の遅延を挿入します。
         Thread.sleep(requestDelayMillis)
 
         return try {
             val disclosureUrl = "$BASE_URL/$code.T$DISCLOSURE_PATH"
             val doc = Jsoup.connect(disclosureUrl).get()
-            
+
+            /*
+例:
+<ul class="DisclosureItem__supplements__1NHJ">
+  <li class="DisclosureItem__supplement__2U1S"><time>10/15</time></li>
+            */
             // 適時開示のリストから最初のアイテム（最新）を取得
             val firstDisclosureItem = doc.selectFirst("div.disclosureList_list > div.disclosureList_item")
-                ?: doc.selectFirst("div[class*='disclosureList'] div[class*='item']")
-                ?: doc.selectFirst("table.disclosure tbody tr")
+                ?: doc.selectFirst("ul[class*='DisclosureItem__supplements'] li") // 代替セレクタ
             
             if (firstDisclosureItem != null) {
-                // 日付を抽出
-                val dateElement = firstDisclosureItem.selectFirst("time") 
-                    ?: firstDisclosureItem.selectFirst("span[class*='date']")
-                    ?: firstDisclosureItem.selectFirst("td:first-child")
-                
-                val dateText = dateElement?.text()
-                val disclosureDate = parseDateFromDisclosure(dateText)
-                
-                // URLを抽出
-                val linkElement = firstDisclosureItem.selectFirst("a")
-                val detailUrl = linkElement?.attr("href")?.let { href ->
-                    if (href.startsWith("http")) {
-                        href
-                    } else if (href.startsWith("/")) {
-                        "https://finance.yahoo.co.jp$href"
-                    } else {
-                        null
+                // <li class="DisclosureItem__supplement__2U1S"><time>10/15</time></li> の中の最初の MM/DD を探す
+                val supplementLis = firstDisclosureItem.select("li[class*='DisclosureItem__supplement'] time")
+                var mmddText: String? = null
+                if (supplementLis.isNotEmpty()) {
+                    val t = supplementLis[0].text().trim()
+                    if (Regex("""^\d{1,2}/\d{1,2}$""").matches(t)) {
+                        mmddText = t
                     }
                 }
-                
-                Pair(disclosureDate, detailUrl)
+
+                // MM/DD が見つかれば今年の年を使ってパース、見つからなければ従来の要素から取得してパース
+                val disclosureDate: LocalDate? = if (mmddText != null) {
+                    try {
+                        val parts = mmddText.split("/")
+                        val month = parts[0].toInt()
+                        val day = parts[1].toInt()
+                        LocalDate.of(LocalDate.now().year, month, day)
+                    } catch (e: Exception) {
+                        null
+                    }
+                } else {
+                    val dateElement = firstDisclosureItem.selectFirst("time")
+                        ?: firstDisclosureItem.selectFirst("span[class*='date']")
+                        ?: firstDisclosureItem.selectFirst("td:first-child")
+                    val dateText = dateElement?.text()
+                    parseDateFromDisclosure(dateText)
+                }               
+                return disclosureDate
             } else {
-                Pair(null, null)
+                return null
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Pair(null, null)
+            return null
         }
     }
 

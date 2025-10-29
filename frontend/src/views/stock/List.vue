@@ -168,13 +168,8 @@ export default {
     },
 
     getDisclosureUrl(stock) {
-      // URLが保存されている場合はそれを使用、なければデフォルトの開示ページへのリンクを返す
-      if (stock.latestDisclosureUrl) {
-        return stock.latestDisclosureUrl;
-      } else if (stock.code) {
-        return `https://finance.yahoo.co.jp/quote/${stock.code}.T/disclosure`;
-      }
-      return null;
+      // URLはデフォルトの開示ページへのリンクを返す
+      return `https://finance.yahoo.co.jp/quote/${stock.code}.T/disclosure`;
     },
 
     async updateSelectedStocks() {

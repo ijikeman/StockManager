@@ -74,8 +74,7 @@ class StockService(
                     incoming = stockInfo.incoming ?: stock.incoming,
                     earningsDate = stockInfo.earningsDate ?: stock.earningsDate,
                     previousPrice = stockInfo.previousPrice ?: stock.previousPrice,
-                    latestDisclosureDate = stockInfo.latestDisclosureDate ?: stock.latestDisclosureDate,
-                    latestDisclosureUrl = stockInfo.latestDisclosureUrl ?: stock.latestDisclosureUrl
+                    latestDisclosureDate = stockInfo.latestDisclosureDate ?: stock.latestDisclosureDate
                 )
                 return stockRepository.save(updatedStock)
             }
