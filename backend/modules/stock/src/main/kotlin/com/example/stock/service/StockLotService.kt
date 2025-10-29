@@ -253,39 +253,52 @@ class StockLotService(
             throw IllegalArgumentException("Sell unit cannot be greater than current unit.")
         }
 
-        val buyTransactions = buyTransactionRepository.findByStockLotIdOrderByTransactionDateAsc(stockLotId)
-        var remainingSellUnit = sellDto.unit
+        // 超えていない場合はstockLotの売却処理を行う
+        var remainingStockLotUnit = stockLot.currentUnit
 
         // IncomingHistoryとBenefitHistoryのレコードを取得
         val incomingHistories = incomingHistoryRepository.findByStockLotId(stockLotId)
         val benefitHistories = benefitHistoryRepository.findByStockLotId(stockLotId)
 
-        for (buyTx in buyTransactions) {
-            if (remainingSellUnit == 0) break
+        // buyTransactionsは通常は1件しかないはず
+        val buyTransactions = buyTransactionRepository.findByStockLotIdOrderByTransactionDateAsc(stockLotId)
+        // 売却の為、stockLotのcurrentUnitを減少させる
 
-            val soldUnitsForBuyTx = sellTransactionService.findByBuyTransactionId(buyTx.id)
-                .sumOf { it.unit }
-            val availableUnit = buyTx.unit - soldUnitsForBuyTx
+        /*
+          currentUnitと売却Unitが同じ場合
+          → IncomingHistoryとBenefitHistoryのレコードのstockLotIdをnullに設定し、sellTransactionIdを設定する
+        */
+        if (stockLot.currentUnit - sellDto.unit == 0) {
+            //--- ここからTransactionalにする
+            transactionManager.beginTransaction()
+            // stockLotのcurrentUnitを0に更新
+            val updatedStockLot = stockLot.copy(currentUnit = 0)
+            stockLotRepository.save(updatedStockLot)
 
-            // 利用可能な単元数がない場合は
-            if (availableUnit == 0) {
-                // incomingHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-                incomingHistories.forEach { history ->
-                    history.stockLot = null
-                    history.sellTransaction = null
-                    incomingHistoryRepository.save(history)
-                }
+            // incomingHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
+            incomingHistories.forEach { history ->
+                history.stockLot = null
+                history.sellTransaction = null
+                incomingHistoryRepository.save(history)
+            }
 
-                // benefitHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-                benefitHistories.forEach { history ->
-                    history.stockLot = null
-                    history.sellTransaction = null
-                    benefitHistoryRepository.save(history)
-                }
-                continue
-            // 利用可能な単元数がある場合に売却処理を行う
-            } else if (availableUnit > 0) {
-                val sellUnitForThisTx = minOf(remainingSellUnit, availableUnit)
+            // benefitHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
+            benefitHistories.forEach { history ->
+                history.stockLot = null
+                history.sellTransaction = null
+                benefitHistoryRepository.save(history)
+            }
+            transactionManager.commit()
+            //--- ここまでをTransactionalにする
+        
+        // 利用可能な単元数がある場合に売却処理を行う
+        } else {
+            //--- ここからTransactionalにする
+            transactionManager.beginTransaction()
+            // stockLotのcurrentUnitを減らして更新
+            val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
+            stockLotRepository.save(updatedStockLot)
+            
 
                 val sellTransaction = SellTransaction(
                     buyTransaction = buyTx,
