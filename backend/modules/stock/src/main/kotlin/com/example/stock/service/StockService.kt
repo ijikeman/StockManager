@@ -244,6 +244,7 @@ class StockLotService(
      * @throws IllegalArgumentException 指定されたIDのStockLotが存在しない場合
      * @throws IllegalArgumentException 売却単元数が現在の保有単元数を超えている場合
      */
+    @Transactional
     fun sellStockLot(stockLotId: Int, sellDto: StockLotSellDto) {
         // stockLotIdに基づいてStockLotを取得
         val stockLot = stockLotRepository.findById(stockLotId)
@@ -263,7 +264,12 @@ class StockLotService(
         val benefitHistories = benefitHistoryRepository.findByStockLotId(stockLotId)
 
         // stockLotに紐づくbuyTransactionを取得
-        val buyTransaction = buyTransactionRepository.findByStockLotId(stockLotId)
+        val buyTransactions = buyTransactionRepository.findByStockLotId(stockLotId)
+
+        // buyTransactionsから1つ取り出す（最も古い取引をFIFOとして選択）//ここは改修の余地あり
+        val buyTransaction = buyTransactions.minByOrNull { it.transactionDate }
+            ?: throw IllegalArgumentException("No buy transactions found for stockLot id: $stockLotId")
+
         // sellTransactionを作成する
         val sellTransaction = SellTransaction(
             buyTransaction = buyTransaction, // 紐づくbuyTransactionを設定
@@ -283,61 +289,61 @@ class StockLotService(
         */
         // 全て売却
         if (stockLot.currentUnit - sellDto.unit == 0) {
-            //--- ここからTransactionalにする
-            transactionManager.beginTransaction()
             // stockLotのcurrentUnitを減らして更新
             val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
             stockLotRepository.save(updatedStockLot)
 
             // incomingHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-            incomingHistories.forEach { history ->
-                history.stockLot = null
-                history.sellTransaction = savedSellTransaction
-                incomingHistoryRepository.save(history)
+            if (incomingHistories.isNotEmpty()) {
+                incomingHistories.forEach { history ->
+                    history.stockLot = null
+                    history.sellTransaction = savedSellTransaction
+                    incomingHistoryRepository.save(history)
+                }
             }
 
             // benefitHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-            benefitHistories.forEach { history ->
-                history.stockLot = null
-                history.sellTransaction = savedSellTransaction
-                benefitHistoryRepository.save(history)
+            if (benefitHistories.isNotEmpty()) {
+                benefitHistories.forEach { history ->
+                    history.stockLot = null
+                    history.sellTransaction = savedSellTransaction
+                    benefitHistoryRepository.save(history)
+                }
             }
-            transactionManager.commit()
-            //--- ここまでをTransactionalにする
 
         // 売却後も残単元数がある場合
         } else {
-            //--- ここからTransactionalにする
-            transactionManager.beginTransaction()
             // stockLotのcurrentUnitを減らして更新
             val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
             stockLotRepository.save(updatedStockLot)
 
             // IncomingHistoryレコードを複製し、sellTransactionIdを設定
-            incomingHistories.forEach { history ->
-                val duplicatedHistory = IncomingHistory(
-                    id = 0, // 新規レコードとして作成
-                    stockLot = null,
-                    sellTransaction = savedSellTransaction,
-                    incoming = history.incoming,
-                    paymentDate = history.paymentDate
-                )
-                incomingHistoryRepository.save(duplicatedHistory)
+            if (incomingHistories.isNotEmpty()) {
+                incomingHistories.forEach { history ->
+                    val duplicatedHistory = IncomingHistory(
+                        id = 0, // 新規レコードとして作成
+                        stockLot = null,
+                        sellTransaction = savedSellTransaction,
+                        incoming = history.incoming,
+                        paymentDate = history.paymentDate
+                    )
+                    incomingHistoryRepository.save(duplicatedHistory)
+                }
             }
 
             // BenefitHistoryレコードを複製し、sellTransactionIdを設定
+            if (benefitHistories.isNotEmpty()) {
             benefitHistories.forEach { history ->
-                val duplicatedHistory = BenefitHistory(
-                    id = 0, // 新規レコードとして作成
-                    stockLot = null,
-                    sellTransaction = savedSellTransaction,
-                    benefit = history.benefit,
-                    paymentDate = history.paymentDate
-                )
-                benefitHistoryRepository.save(duplicatedHistory)
+                    val duplicatedHistory = BenefitHistory(
+                        id = 0, // 新規レコードとして作成
+                        stockLot = null,
+                        sellTransaction = savedSellTransaction,
+                        benefit = history.benefit,
+                        paymentDate = history.paymentDate
+                    )
+                    benefitHistoryRepository.save(duplicatedHistory)
+                }
             }
-            transactionManager.commit()
-            //--- ここまでをTransactionalにする
         }
     }
 }
