@@ -5,6 +5,7 @@ import com.example.stock.service.StockLotService
 import com.example.stock.repository.BuyTransactionRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -15,17 +16,21 @@ class ProfitlossController(
 ) {
 
     @GetMapping
-    fun getProfitLoss(): List<ProfitlossDto> {
-        return stockLotService.findAll()
-            .map { stockLot ->
-                // 株式ロットIDに紐づく最初の購入取引から価格を取得
-                val buyTransaction = buyTransactionRepository.findByStockLotId(stockLot.id).firstOrNull()
-                val purchasePrice = buyTransaction?.price?.toDouble() ?: 0.0
-                ProfitlossDto(
-                    stockCode = stockLot.stock.code,
-                    stockName = stockLot.stock.name,
-                    purchasePrice = purchasePrice
-                )
-            }
+    fun getProfitLoss(@RequestParam(required = false) ownerId: Int?): List<ProfitlossDto> {
+        val stockLots = if (ownerId != null) {
+            stockLotService.findByOwnerId(ownerId)
+        } else {
+            stockLotService.findAll()
+        }
+        return stockLots.map { stockLot ->
+            // 株式ロットIDに紐づく最初の購入取引から価格を取得
+            val buyTransaction = buyTransactionRepository.findByStockLotId(stockLot.id).firstOrNull()
+            val purchasePrice = buyTransaction?.price?.toDouble() ?: 0.0
+            ProfitlossDto(
+                stockCode = stockLot.stock.code,
+                stockName = stockLot.stock.name,
+                purchasePrice = purchasePrice
+            )
+        }
     }
 }

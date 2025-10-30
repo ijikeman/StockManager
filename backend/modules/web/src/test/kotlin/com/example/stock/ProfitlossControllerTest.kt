@@ -95,4 +95,43 @@ class ProfitlossControllerTest {
             .andExpect(jsonPath("$[0].stockName").value("Toyota"))
             .andExpect(jsonPath("$[0].purchasePrice").value(0.0))
     }
+
+    @Test
+    fun `getProfitLoss should filter by ownerId when provided`() {
+        val owner1 = Owner(id = 1, name = "Owner 1")
+        val owner2 = Owner(id = 2, name = "Owner 2")
+        val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stock2 = Stock(id = 2, code = "5678", name = "Sony", currentPrice = 2000.0, minimalUnit = 100)
+        val stockLotsForOwner1 = listOf(
+            StockLot(id = 1, owner = owner1, stock = stock1, currentUnit = 10)
+        )
+
+        val buyTransaction1 = BuyTransaction(
+            id = 1,
+            stockLot = stockLotsForOwner1[0],
+            unit = 10,
+            price = BigDecimal("1200.25"),
+            fee = BigDecimal("0"),
+            isNisa = false,
+            transactionDate = LocalDate.now()
+        )
+
+        whenever(stockLotService.findByOwnerId(1)).thenReturn(stockLotsForOwner1)
+        whenever(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
+
+        mockMvc.perform(get("/api/profitloss").param("ownerId", "1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
+            .andExpect(jsonPath("$.length()").value(1))
+    }
+
+    @Test
+    fun `getProfitLoss should return empty list when no stock lots exist for specific owner`() {
+        whenever(stockLotService.findByOwnerId(1)).thenReturn(emptyList())
+
+        mockMvc.perform(get("/api/profitloss").param("ownerId", "1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$").isEmpty)
+    }
 }
