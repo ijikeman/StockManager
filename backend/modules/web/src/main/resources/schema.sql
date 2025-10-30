@@ -91,6 +91,7 @@ CREATE TABLE benefit_history (
     stock_lot_id INT,
     sell_transaction_id INT,
     benefit DECIMAL(10, 2) NOT NULL,
+    payment_date DATE NOT NULL,
     FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id),
     FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );
