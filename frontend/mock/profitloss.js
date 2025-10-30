@@ -1,6 +1,9 @@
 import { MockMethod } from 'vite-plugin-mock';
 import Mock from 'mockjs';
 
+// Default minimal unit for Japanese stocks (standard is 100 shares per unit)
+const DEFAULT_MINIMAL_UNIT = 100;
+
 // Generate mock data for profit/loss summary
 // This combines income, benefit, stocklot evaluation, and sell transactions
 const generateProfitLossSummary = () => {
@@ -41,8 +44,7 @@ const generateProfitLossSummary = () => {
       fee: '@float(0, 500, 2, 2)',
       'amount': function() {
         const unit = this.unit;
-        const minimalUnit = 100;
-        const totalUnits = unit * minimalUnit;
+        const totalUnits = unit * DEFAULT_MINIMAL_UNIT;
         const profit = (this.sellPrice - this.buyPrice) * totalUnits - this.fee;
         return profit;
       }
@@ -59,8 +61,7 @@ const generateProfitLossSummary = () => {
       currentPrice: '@float(100, 2000, 2, 2)',
       'amount': function() {
         const unit = this.unit;
-        const minimalUnit = 100;
-        const totalUnits = unit * minimalUnit;
+        const totalUnits = unit * DEFAULT_MINIMAL_UNIT;
         return (this.currentPrice - this.averagePrice) * totalUnits;
       }
     }]
