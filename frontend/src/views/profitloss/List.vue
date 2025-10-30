@@ -56,11 +56,11 @@ export default {
             ...item,
             stockCode: item.stockCode || '',
             purchaseDate: item.purchaseDate || '',
-            purchaseAmount: item.purchaseAmount || 0,
+            purchasePrice: item.purchasePrice || 0,
             units: item.units || 0,
             totalDividend: item.totalDividend || 0,
             totalBenefit: item.totalBenefit || 0,
-            sellAmount: item.sellAmount || 0,
+            sellPrice: item.sellPrice || 0,
             profitLoss: item.profitLoss || 0,
             ownerName: item.ownerName || ''
           })),
@@ -216,16 +216,16 @@ export default {
   color: #383d41;
 }
 
-.amount-cell {
+.price-cell {
   text-align: right;
   font-weight: bold;
 }
 
-.amount-cell.positive {
+.price-cell.positive {
   color: #28a745;
 }
 
-.amount-cell.negative {
+.price-cell.negative {
   color: #dc3545;
 }
 </style>
