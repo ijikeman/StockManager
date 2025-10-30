@@ -99,9 +99,7 @@ class ProfitlossControllerTest {
     @Test
     fun `getProfitLoss should filter by ownerId when provided`() {
         val owner1 = Owner(id = 1, name = "Owner 1")
-        val owner2 = Owner(id = 2, name = "Owner 2")
         val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
-        val stock2 = Stock(id = 2, code = "5678", name = "Sony", currentPrice = 2000.0, minimalUnit = 100)
         val stockLotsForOwner1 = listOf(
             StockLot(id = 1, owner = owner1, stock = stock1, currentUnit = 10)
         )
