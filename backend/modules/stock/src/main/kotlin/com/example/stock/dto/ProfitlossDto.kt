@@ -5,6 +5,7 @@ package com.example.stock.dto
  * StockLotから銘柄名のみを表示する
  */
 data class ProfitlossDto(
-    val stockCode: String,
-    val stockName: String
+    val stockCode: String, // 銘柄コード
+    val stockName: String, // 銘柄名
+    val purchasePrice: Double // 購入価格
 )

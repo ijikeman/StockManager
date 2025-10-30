@@ -81,12 +81,12 @@
         <td>{{ item.stockCode }}</td>
         <td>{{ item.stockName }}</td>
         <td>{{ item.purchaseDate }}</td>
-        <td class="amount-cell">{{ fmt(item.purchaseAmount) }}</td>
+        <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
         <td>{{ item.units }}</td>
-        <td class="amount-cell positive">{{ fmt(item.totalDividend) }}</td>
-        <td class="amount-cell positive">{{ fmt(item.totalBenefit) }}</td>
-        <td class="amount-cell">{{ fmt(item.sellAmount) }}</td>
-        <td class="amount-cell" :class="item.profitLoss >= 0 ? 'positive' : 'negative'">{{ fmt(item.profitLoss) }}</td>
+        <td class="price-cell positive">{{ fmt(item.totalDividend) }}</td>
+        <td class="price-cell positive">{{ fmt(item.totalBenefit) }}</td>
+        <td class="price-cell">{{ fmt(item.sellPrice) }}</td>
+        <td class="price-cell" :class="item.profitLoss >= 0 ? 'positive' : 'negative'">{{ fmt(item.profitLoss) }}</td>
       </tr>
     </tbody>
   </table>
