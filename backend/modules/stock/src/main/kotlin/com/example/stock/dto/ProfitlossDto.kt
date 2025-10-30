@@ -5,5 +5,6 @@ package com.example.stock.dto
  * StockLotから銘柄名のみを表示する
  */
 data class ProfitlossDto(
+    val stockCode: String,
     val stockName: String
 )

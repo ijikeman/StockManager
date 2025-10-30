@@ -11,6 +11,6 @@ class ProfitlossController(private val stockLotService: StockLotService) {
     @GetMapping("/api/profitloss")
     fun getProfitLoss(): List<ProfitlossDto> {
         return stockLotService.findAll()
-            .map { stockLot -> ProfitlossDto(stockName = stockLot.stock.name) }
+            .map { stockLot -> ProfitlossDto(stockCode = stockLot.stock.code, stockName = stockLot.stock.name) }
     }
 }
