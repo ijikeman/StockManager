@@ -1,6 +1,6 @@
 package com.example.stock
 
-import com.example.stock.model.StockLot
+import com.example.stock.dto.ProfitlossDto
 import com.example.stock.service.StockLotService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController
 class ProfitlossController(private val stockLotService: StockLotService) {
 
     @GetMapping("/api/profitloss")
-    fun getProfitLoss(): List<StockLot> {
+    fun getProfitLoss(): List<ProfitlossDto> {
         return stockLotService.findAll()
+            .map { stockLot -> ProfitlossDto(stockName = stockLot.stock.name) }
     }
 }
