@@ -11,11 +11,17 @@ import StockLotSell from '../views/stocklot/Sell.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAdd from '../views/income/Add.vue';
 import IncomeEdit from '../views/income/Edit.vue';
+import ProfitLossList from '../views/profitloss/List.vue';
 
 const routes = [
   {
     path: '/',
     redirect: '/sector'
+  },
+  {
+    path: '/profitloss',
+    name: 'ProfitLossList',
+    component: ProfitLossList
   },
   {
     path: '/stocklot',

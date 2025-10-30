@@ -13,7 +13,8 @@ export default {
         { name: 'オーナー管理', path: '/owner' },
         { name: '銘柄管理', path: '/stock' },
         { name: 'ストックロット管理', path: '/stocklot' },
-        { name: '配当履歴', path: '/income' }
+        { name: '配当履歴', path: '/income' },
+        { name: '損益一覧', path: '/profitloss' }
       ]
     };
   },

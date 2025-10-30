@@ -1,0 +1,96 @@
+<div>
+  <div class="page-header">
+    <h1 class="page-title">損益一覧</h1>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="summary-section" v-if="profitLossData">
+    <div class="summary-card">
+      <h3>損益サマリー</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">配当金合計:</span>
+          <span class="summary-value positive">{{ fmt(profitLossData.summary.totalIncome) }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">優待金合計:</span>
+          <span class="summary-value positive">{{ fmt(profitLossData.summary.totalBenefit) }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">売却益合計:</span>
+          <span class="summary-value" :class="profitLossData.summary.totalSellProfit >= 0 ? 'positive' : 'negative'">
+            {{ fmt(profitLossData.summary.totalSellProfit) }}
+          </span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">含み損益合計:</span>
+          <span class="summary-value" :class="profitLossData.summary.totalEvaluation >= 0 ? 'positive' : 'negative'">
+            {{ fmt(profitLossData.summary.totalEvaluation) }}
+          </span>
+        </div>
+        <div class="summary-item total">
+          <span class="summary-label">総損益:</span>
+          <span class="summary-value" :class="profitLossData.summary.totalProfitLoss >= 0 ? 'positive' : 'negative'">
+            {{ fmt(profitLossData.summary.totalProfitLoss) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <label>
+      種別:
+      <select v-model="filterType" class="filter-select">
+        <option value="all">すべて</option>
+        <option value="income">配当金</option>
+        <option value="benefit">株主優待</option>
+        <option value="sell">売却益</option>
+        <option value="evaluation">含み損益</option>
+      </select>
+    </label>
+    <label>
+      オーナー:
+      <select v-model="filterOwner" class="filter-select">
+        <option value="">すべて</option>
+        <option v-for="owner in uniqueOwners" :key="owner" :value="owner">
+          {{ owner }}
+        </option>
+      </select>
+    </label>
+  </div>
+
+  <!-- Data Table -->
+  <table class="common-table profit-loss-table" v-if="filteredItems.length > 0">
+    <thead>
+      <tr>
+        <th>銘柄コード</th>
+        <th>銘柄名</th>
+        <th>購入日</th>
+        <th>購入金額</th>
+        <th>単元数</th>
+        <th>総配当金</th>
+        <th>総優待金</th>
+        <th>売却金額</th>
+        <th>損益金額</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="item in filteredItems" :key="`${item.stockCode}-${item.lotId}`">
+        <td>{{ item.stockCode }}</td>
+        <td>{{ item.stockName }}</td>
+        <td>{{ item.purchaseDate }}</td>
+        <td class="amount-cell">{{ fmt(item.purchaseAmount) }}</td>
+        <td>{{ item.units }}</td>
+        <td class="amount-cell positive">{{ fmt(item.totalDividend) }}</td>
+        <td class="amount-cell positive">{{ fmt(item.totalBenefit) }}</td>
+        <td class="amount-cell">{{ fmt(item.sellAmount) }}</td>
+        <td class="amount-cell" :class="item.profitLoss >= 0 ? 'positive' : 'negative'">{{ fmt(item.profitLoss) }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div v-else>
+    <p>データはありません</p>
+  </div>
+</div>
