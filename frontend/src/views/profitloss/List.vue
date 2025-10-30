@@ -50,7 +50,28 @@ export default {
     async fetchProfitLoss() {
       try {
         const response = await axios.get('/api/profitloss');
-        this.profitLossData = response.data;
+        // APIレスポンスを適切な形式に変換
+        this.profitLossData = {
+          items: response.data.map(item => ({
+            ...item,
+            stockCode: item.stockCode || '',
+            purchaseDate: item.purchaseDate || '',
+            purchaseAmount: item.purchaseAmount || 0,
+            units: item.units || 0,
+            totalDividend: item.totalDividend || 0,
+            totalBenefit: item.totalBenefit || 0,
+            sellAmount: item.sellAmount || 0,
+            profitLoss: item.profitLoss || 0,
+            ownerName: item.ownerName || ''
+          })),
+          summary: {
+            totalIncome: 0,
+            totalBenefit: 0,
+            totalSellProfit: 0,
+            totalEvaluation: 0,
+            totalProfitLoss: 0
+          }
+        };
       } catch (error) {
         console.error('Error fetching profit/loss data:', error);
       }
