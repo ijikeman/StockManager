@@ -281,11 +281,12 @@ class StockLotService(
           * stockLotのcurrentUnitを0に更新
           * stockLotに紐づいているすべての、IncomingHistoryとBenefitHistoryのレコードのstockLotIdをnullに設定
         */
+        // 全て売却
         if (stockLot.currentUnit - sellDto.unit == 0) {
             //--- ここからTransactionalにする
             transactionManager.beginTransaction()
-            // stockLotのcurrentUnitを0に更新
-            val updatedStockLot = stockLot.copy(currentUnit = 0)
+            // stockLotのcurrentUnitを減らして更新
+            val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
             stockLotRepository.save(updatedStockLot)
 
             // incomingHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
@@ -304,14 +305,13 @@ class StockLotService(
             transactionManager.commit()
             //--- ここまでをTransactionalにする
 
-        // 利用可能な単元数がある場合に売却処理を行う
+        // 売却後も残単元数がある場合
         } else {
             //--- ここからTransactionalにする
             transactionManager.beginTransaction()
             // stockLotのcurrentUnitを減らして更新
             val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
             stockLotRepository.save(updatedStockLot)
-
 
             // IncomingHistoryレコードを複製し、sellTransactionIdを設定
             incomingHistories.forEach { history ->
@@ -336,10 +336,8 @@ class StockLotService(
                 )
                 benefitHistoryRepository.save(duplicatedHistory)
             }
-            remainingSellUnit -= sellUnitForThisTx
+            transactionManager.commit()
+            //--- ここまでをTransactionalにする
         }
-
-        val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
-        stockLotRepository.save(updatedStockLot)
     }
 }
