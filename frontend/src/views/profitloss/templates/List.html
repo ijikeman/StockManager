@@ -65,30 +65,28 @@
   <table class="common-table profit-loss-table" v-if="filteredItems.length > 0">
     <thead>
       <tr>
-        <th>種別</th>
-        <th>日付</th>
         <th>銘柄コード</th>
         <th>銘柄名</th>
-        <th>オーナー</th>
-        <th>説明</th>
-        <th>金額</th>
+        <th>購入日</th>
+        <th>購入金額</th>
+        <th>単元数</th>
+        <th>総配当金</th>
+        <th>総優待金</th>
+        <th>売却金額</th>
+        <th>損益金額</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="item in filteredItems" :key="`${item.type}-${item.id}`">
-        <td>
-          <span class="type-badge" :class="`type-${item.type}`">
-            {{ getTypeLabel(item.type) }}
-          </span>
-        </td>
-        <td>{{ item.date || '-' }}</td>
+      <tr v-for="item in filteredItems" :key="`${item.stockCode}-${item.lotId}`">
         <td>{{ item.stockCode }}</td>
         <td>{{ item.stockName }}</td>
-        <td>{{ item.ownerName }}</td>
-        <td>{{ item.description }}</td>
-        <td class="amount-cell" :class="item.amount >= 0 ? 'positive' : 'negative'">
-          {{ fmt(item.amount) }}
-        </td>
+        <td>{{ item.purchaseDate }}</td>
+        <td class="amount-cell">{{ fmt(item.purchaseAmount) }}</td>
+        <td>{{ item.units }}</td>
+        <td class="amount-cell positive">{{ fmt(item.totalDividend) }}</td>
+        <td class="amount-cell positive">{{ fmt(item.totalBenefit) }}</td>
+        <td class="amount-cell">{{ fmt(item.sellAmount) }}</td>
+        <td class="amount-cell" :class="item.profitLoss >= 0 ? 'positive' : 'negative'">{{ fmt(item.profitLoss) }}</td>
       </tr>
     </tbody>
   </table>
