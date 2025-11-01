@@ -4,7 +4,11 @@ import com.example.stock.model.BuyTransaction
 import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.model.StockLot
+import com.example.stock.model.IncomingHistory
+import com.example.stock.model.BenefitHistory
 import com.example.stock.repository.BuyTransactionRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.BenefitHistoryRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -29,6 +33,12 @@ class ProfitlossServiceTest {
 
     @Mock
     private lateinit var buyTransactionRepository: BuyTransactionRepository
+
+    @Mock
+    private lateinit var incomingHistoryRepository: IncomingHistoryRepository
+
+    @Mock
+    private lateinit var benefitHistoryRepository: BenefitHistoryRepository
 
     @Test
     fun `getProfitLoss should return list of profitloss DTOs with purchase prices`() {
@@ -60,9 +70,45 @@ class ProfitlossServiceTest {
             transactionDate = LocalDate.now()
         )
 
+        val incomingHistory1 = IncomingHistory(
+            id = 1,
+            stockLot = stockLots[0],
+            incoming = BigDecimal("100.50"),
+            paymentDate = LocalDate.now()
+        )
+        val incomingHistory2 = IncomingHistory(
+            id = 2,
+            stockLot = stockLots[0],
+            incoming = BigDecimal("50.25"),
+            paymentDate = LocalDate.now()
+        )
+        val incomingHistory3 = IncomingHistory(
+            id = 3,
+            stockLot = stockLots[1],
+            incoming = BigDecimal("200.00"),
+            paymentDate = LocalDate.now()
+        )
+
+        val benefitHistory1 = BenefitHistory(
+            id = 1,
+            stockLot = stockLots[0],
+            benefit = BigDecimal("1000.00"),
+            paymentDate = LocalDate.now()
+        )
+        val benefitHistory2 = BenefitHistory(
+            id = 2,
+            stockLot = stockLots[1],
+            benefit = BigDecimal("500.00"),
+            paymentDate = LocalDate.now()
+        )
+
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
         mockitoWhen(buyTransactionRepository.findByStockLotId(2)).thenReturn(listOf(buyTransaction2))
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(listOf(incomingHistory1, incomingHistory2))
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(2)).thenReturn(listOf(incomingHistory3))
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(listOf(benefitHistory1))
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(2)).thenReturn(listOf(benefitHistory2))
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -72,9 +118,13 @@ class ProfitlossServiceTest {
         assertThat(result[0].stockCode).isEqualTo("1234")
         assertThat(result[0].stockName).isEqualTo("Toyota")
         assertThat(result[0].purchasePrice).isEqualTo(1200.25)
+        assertThat(result[0].totalDividend).isEqualTo(150.75) // 100.50 + 50.25
+        assertThat(result[0].totalBenefit).isEqualTo(1000.00)
         assertThat(result[1].stockCode).isEqualTo("5678")
         assertThat(result[1].stockName).isEqualTo("Sony")
         assertThat(result[1].purchasePrice).isEqualTo(2100.75)
+        assertThat(result[1].totalDividend).isEqualTo(200.00)
+        assertThat(result[1].totalBenefit).isEqualTo(500.00)
     }
 
     @Test
@@ -98,6 +148,8 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -107,6 +159,8 @@ class ProfitlossServiceTest {
         assertThat(result[0].stockCode).isEqualTo("1234")
         assertThat(result[0].stockName).isEqualTo("Toyota")
         assertThat(result[0].purchasePrice).isEqualTo(0.0)
+        assertThat(result[0].totalDividend).isEqualTo(0.0)
+        assertThat(result[0].totalBenefit).isEqualTo(0.0)
     }
 
     @Test
@@ -130,6 +184,8 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(stockLotsForOwner1)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getProfitLoss(1)
@@ -139,6 +195,8 @@ class ProfitlossServiceTest {
         assertThat(result[0].stockCode).isEqualTo("1234")
         assertThat(result[0].stockName).isEqualTo("Toyota")
         assertThat(result[0].purchasePrice).isEqualTo(1200.25)
+        assertThat(result[0].totalDividend).isEqualTo(0.0)
+        assertThat(result[0].totalBenefit).isEqualTo(0.0)
     }
 
     @Test
@@ -176,7 +234,9 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(2)).thenReturn(emptyList())
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        // Note: We don't stub stockLotId 2 because it's filtered out due to zero currentUnit
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -186,5 +246,7 @@ class ProfitlossServiceTest {
         assertThat(result[0].stockCode).isEqualTo("1234")
         assertThat(result[0].stockName).isEqualTo("Toyota")
         assertThat(result[0].purchasePrice).isEqualTo(1200.25)
+        assertThat(result[0].totalDividend).isEqualTo(0.0)
+        assertThat(result[0].totalBenefit).isEqualTo(0.0)
     }
 }
