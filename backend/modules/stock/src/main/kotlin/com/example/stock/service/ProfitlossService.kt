@@ -42,20 +42,16 @@ class ProfitlossService(
         
         // N+1クエリ問題を回避: すべての株式ロットIDに対して配当履歴を一括取得
         val incomingHistoryMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                incomingHistoryRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLot?.id }
         } else {
             emptyMap()
         }
         
         // N+1クエリ問題を回避: すべての株式ロットIDに対して優待履歴を一括取得
         val benefitHistoryMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                benefitHistoryRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLot?.id }
         } else {
             emptyMap()
         }
@@ -67,18 +63,18 @@ class ProfitlossService(
             
             // 株式ロットIDに紐づく配当履歴の合計を計算
             val totalDividend = incomingHistoryMap[stockLot.id]
-                ?.sumOf { it.incoming.toDouble() } ?: 0.0
+                ?.sumOf { it.incoming } ?: java.math.BigDecimal.ZERO
             
             // 株式ロットIDに紐づく優待履歴の合計を計算
             val totalBenefit = benefitHistoryMap[stockLot.id]
-                ?.sumOf { it.benefit.toDouble() } ?: 0.0
+                ?.sumOf { it.benefit } ?: java.math.BigDecimal.ZERO
             
             ProfitlossDto(
                 stockCode = stockLot.stock.code,
                 stockName = stockLot.stock.name,
                 purchasePrice = purchasePrice,
-                totalDividend = totalDividend,
-                totalBenefit = totalBenefit
+                totalDividend = totalDividend.toDouble(),
+                totalBenefit = totalBenefit.toDouble()
             )
         }
     }

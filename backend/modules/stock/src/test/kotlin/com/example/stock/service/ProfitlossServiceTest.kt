@@ -105,10 +105,12 @@ class ProfitlossServiceTest {
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
         mockitoWhen(buyTransactionRepository.findByStockLotId(2)).thenReturn(listOf(buyTransaction2))
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(listOf(incomingHistory1, incomingHistory2))
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(2)).thenReturn(listOf(incomingHistory3))
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(listOf(benefitHistory1))
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(2)).thenReturn(listOf(benefitHistory2))
+        mockitoWhen(incomingHistoryRepository.findByStockLotIdIn(listOf(1, 2))).thenReturn(
+            listOf(incomingHistory1, incomingHistory2, incomingHistory3)
+        )
+        mockitoWhen(benefitHistoryRepository.findByStockLotIdIn(listOf(1, 2))).thenReturn(
+            listOf(benefitHistory1, benefitHistory2)
+        )
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -148,8 +150,8 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(emptyList())
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(incomingHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -184,8 +186,8 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(stockLotsForOwner1)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(incomingHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getProfitLoss(1)
@@ -234,9 +236,9 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(emptyList())
-        // Note: We don't stub stockLotId 2 because it's filtered out due to zero currentUnit
+        mockitoWhen(incomingHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
+        // Note: We only query for stockLotId 1 because stockLotId 2 is filtered out due to zero currentUnit
 
         // when
         val result = profitlossService.getProfitLoss()
@@ -303,10 +305,10 @@ class ProfitlossServiceTest {
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(
+        mockitoWhen(incomingHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(
             listOf(incomingHistory1, incomingHistory2, incomingHistory3)
         )
-        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(
+        mockitoWhen(benefitHistoryRepository.findByStockLotIdIn(listOf(1))).thenReturn(
             listOf(benefitHistory1, benefitHistory2)
         )
 
