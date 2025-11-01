@@ -4,6 +4,7 @@ import com.example.stock.dto.ProfitlossDto
 import com.example.stock.service.ProfitlossService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -13,7 +14,7 @@ class ProfitlossController(
 ) {
 
     @GetMapping
-    fun getProfitLoss(): List<ProfitlossDto> {
-        return profitlossService.getProfitLoss()
+    fun getProfitLoss(@RequestParam(required = false) ownerId: Int?): List<ProfitlossDto> {
+        return profitlossService.getProfitLoss(ownerId)
     }
 }

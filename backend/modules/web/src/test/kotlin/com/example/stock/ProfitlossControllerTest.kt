@@ -36,7 +36,7 @@ class ProfitlossControllerTest {
             )
         )
 
-        whenever(profitlossService.getProfitLoss()).thenReturn(profitlossList)
+        whenever(profitlossService.getProfitLoss(null)).thenReturn(profitlossList)
 
         mockMvc.perform(get("/api/profitloss"))
             .andExpect(status().isOk)
@@ -48,7 +48,7 @@ class ProfitlossControllerTest {
 
     @Test
     fun `getProfitLoss should return empty list when no stock lots exist`() {
-        whenever(profitlossService.getProfitLoss()).thenReturn(emptyList())
+        whenever(profitlossService.getProfitLoss(null)).thenReturn(emptyList())
 
         mockMvc.perform(get("/api/profitloss"))
             .andExpect(status().isOk)
@@ -65,11 +65,39 @@ class ProfitlossControllerTest {
             )
         )
 
-        whenever(profitlossService.getProfitLoss()).thenReturn(profitlossList)
+        whenever(profitlossService.getProfitLoss(null)).thenReturn(profitlossList)
 
         mockMvc.perform(get("/api/profitloss"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].stockName").value("Toyota"))
             .andExpect(jsonPath("$[0].purchasePrice").value(0.0))
+    }
+
+    @Test
+    fun `getProfitLoss should filter by ownerId when provided`() {
+        val profitlossList = listOf(
+            ProfitlossDto(
+                stockCode = "1234",
+                stockName = "Toyota",
+                purchasePrice = 1200.25
+            )
+        )
+
+        whenever(profitlossService.getProfitLoss(1)).thenReturn(profitlossList)
+
+        mockMvc.perform(get("/api/profitloss").param("ownerId", "1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
+            .andExpect(jsonPath("$.length()").value(1))
+    }
+
+    @Test
+    fun `getProfitLoss should return empty list when no stock lots exist for specific owner`() {
+        whenever(profitlossService.getProfitLoss(1)).thenReturn(emptyList())
+
+        mockMvc.perform(get("/api/profitloss").param("ownerId", "1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$").isEmpty)
     }
 }

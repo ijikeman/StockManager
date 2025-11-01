@@ -108,4 +108,48 @@ class ProfitlossServiceTest {
         assertThat(result[0].stockName).isEqualTo("Toyota")
         assertThat(result[0].purchasePrice).isEqualTo(0.0)
     }
+
+    @Test
+    fun `getProfitLoss should filter by ownerId when provided`() {
+        // given
+        val owner1 = Owner(id = 1, name = "Owner 1")
+        val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stockLotsForOwner1 = listOf(
+            StockLot(id = 1, owner = owner1, stock = stock1, currentUnit = 10)
+        )
+
+        val buyTransaction1 = BuyTransaction(
+            id = 1,
+            stockLot = stockLotsForOwner1[0],
+            unit = 10,
+            price = BigDecimal("1200.25"),
+            fee = BigDecimal("0"),
+            isNisa = false,
+            transactionDate = LocalDate.now()
+        )
+
+        mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(stockLotsForOwner1)
+        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
+
+        // when
+        val result = profitlossService.getProfitLoss(1)
+
+        // then
+        assertThat(result).hasSize(1)
+        assertThat(result[0].stockCode).isEqualTo("1234")
+        assertThat(result[0].stockName).isEqualTo("Toyota")
+        assertThat(result[0].purchasePrice).isEqualTo(1200.25)
+    }
+
+    @Test
+    fun `getProfitLoss should return empty list when no stock lots exist for specific owner`() {
+        // given
+        mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(emptyList())
+
+        // when
+        val result = profitlossService.getProfitLoss(1)
+
+        // then
+        assertThat(result).isEmpty()
+    }
 }
