@@ -2,6 +2,8 @@ package com.example.stock.service
 
 import com.example.stock.dto.ProfitlossDto
 import com.example.stock.repository.BuyTransactionRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.BenefitHistoryRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service
 @Service
 class ProfitlossService(
     private val stockLotService: StockLotService,
-    private val buyTransactionRepository: BuyTransactionRepository
+    private val buyTransactionRepository: BuyTransactionRepository,
+    private val incomingHistoryRepository: IncomingHistoryRepository,
+    private val benefitHistoryRepository: BenefitHistoryRepository
 ) {
 
     /**
@@ -36,14 +40,41 @@ class ProfitlossService(
             emptyMap()
         }
         
+        // N+1クエリ問題を回避: すべての株式ロットIDに対して配当履歴を一括取得
+        val incomingHistoryMap = if (stockLotIds.isNotEmpty()) {
+            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLot?.id }
+        } else {
+            emptyMap()
+        }
+        
+        // N+1クエリ問題を回避: すべての株式ロットIDに対して優待履歴を一括取得
+        val benefitHistoryMap = if (stockLotIds.isNotEmpty()) {
+            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLot?.id }
+        } else {
+            emptyMap()
+        }
+        
         return stockLots.map { stockLot ->
             // 株式ロットIDに紐づく最初の購入取引から価格を取得
             val buyTransaction = buyTransactionsMap[stockLot.id]?.firstOrNull()
             val purchasePrice = buyTransaction?.price?.toDouble() ?: 0.0
+            
+            // 株式ロットIDに紐づく配当履歴の合計を計算
+            val totalDividend = incomingHistoryMap[stockLot.id]
+                ?.sumOf { it.incoming } ?: java.math.BigDecimal.ZERO
+            
+            // 株式ロットIDに紐づく優待履歴の合計を計算
+            val totalBenefit = benefitHistoryMap[stockLot.id]
+                ?.sumOf { it.benefit } ?: java.math.BigDecimal.ZERO
+            
             ProfitlossDto(
                 stockCode = stockLot.stock.code,
                 stockName = stockLot.stock.name,
-                purchasePrice = purchasePrice
+                purchasePrice = purchasePrice,
+                totalDividend = totalDividend.toDouble(),
+                totalBenefit = totalBenefit.toDouble()
             )
         }
     }
