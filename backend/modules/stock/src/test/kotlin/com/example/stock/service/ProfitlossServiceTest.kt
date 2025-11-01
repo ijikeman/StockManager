@@ -152,4 +152,39 @@ class ProfitlossServiceTest {
         // then
         assertThat(result).isEmpty()
     }
+
+    @Test
+    fun `getProfitLoss should exclude stock lots with zero currentUnit`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stock2 = Stock(id = 2, code = "5678", name = "Sony", currentPrice = 2000.0, minimalUnit = 100)
+        val stockLots = listOf(
+            StockLot(id = 1, owner = owner, stock = stock1, currentUnit = 10),
+            StockLot(id = 2, owner = owner, stock = stock2, currentUnit = 0) // Zero unit - should be excluded
+        )
+
+        val buyTransaction1 = BuyTransaction(
+            id = 1,
+            stockLot = stockLots[0],
+            unit = 10,
+            price = BigDecimal("1200.25"),
+            fee = BigDecimal("0"),
+            isNisa = false,
+            transactionDate = LocalDate.now()
+        )
+
+        mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
+        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
+        mockitoWhen(buyTransactionRepository.findByStockLotId(2)).thenReturn(emptyList())
+
+        // when
+        val result = profitlossService.getProfitLoss()
+
+        // then
+        assertThat(result).hasSize(1) // Only the stock lot with non-zero units should be returned
+        assertThat(result[0].stockCode).isEqualTo("1234")
+        assertThat(result[0].stockName).isEqualTo("Toyota")
+        assertThat(result[0].purchasePrice).isEqualTo(1200.25)
+    }
 }

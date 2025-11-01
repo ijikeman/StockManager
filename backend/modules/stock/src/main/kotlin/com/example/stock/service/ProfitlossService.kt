@@ -23,7 +23,7 @@ class ProfitlossService(
             stockLotService.findByOwnerId(ownerId)
         } else {
             stockLotService.findAll()
-        }
+        }.filter { it.currentUnit > 0 }
         
         // N+1クエリ問題を回避: すべての株式ロットIDに対して購入取引を一括取得
         val stockLotIds = stockLots.map { it.id }
