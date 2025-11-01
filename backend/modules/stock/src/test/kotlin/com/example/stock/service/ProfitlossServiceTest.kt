@@ -249,4 +249,76 @@ class ProfitlossServiceTest {
         assertThat(result[0].totalDividend).isEqualTo(0.0)
         assertThat(result[0].totalBenefit).isEqualTo(0.0)
     }
+
+    @Test
+    fun `getProfitLoss should calculate total dividends and benefits correctly with multiple records`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10)
+
+        val buyTransaction = BuyTransaction(
+            id = 1,
+            stockLot = stockLot,
+            unit = 10,
+            price = BigDecimal("1200.00"),
+            fee = BigDecimal("0"),
+            isNisa = false,
+            transactionDate = LocalDate.now()
+        )
+
+        // Multiple dividend payments
+        val incomingHistory1 = IncomingHistory(
+            id = 1,
+            stockLot = stockLot,
+            incoming = BigDecimal("100.00"),
+            paymentDate = LocalDate.now().minusMonths(3)
+        )
+        val incomingHistory2 = IncomingHistory(
+            id = 2,
+            stockLot = stockLot,
+            incoming = BigDecimal("150.50"),
+            paymentDate = LocalDate.now().minusMonths(2)
+        )
+        val incomingHistory3 = IncomingHistory(
+            id = 3,
+            stockLot = stockLot,
+            incoming = BigDecimal("200.75"),
+            paymentDate = LocalDate.now().minusMonths(1)
+        )
+
+        // Multiple benefit payments
+        val benefitHistory1 = BenefitHistory(
+            id = 1,
+            stockLot = stockLot,
+            benefit = BigDecimal("500.00"),
+            paymentDate = LocalDate.now().minusMonths(6)
+        )
+        val benefitHistory2 = BenefitHistory(
+            id = 2,
+            stockLot = stockLot,
+            benefit = BigDecimal("1000.25"),
+            paymentDate = LocalDate.now().minusMonths(3)
+        )
+
+        mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
+        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
+        mockitoWhen(incomingHistoryRepository.findByStockLotId(1)).thenReturn(
+            listOf(incomingHistory1, incomingHistory2, incomingHistory3)
+        )
+        mockitoWhen(benefitHistoryRepository.findByStockLotId(1)).thenReturn(
+            listOf(benefitHistory1, benefitHistory2)
+        )
+
+        // when
+        val result = profitlossService.getProfitLoss()
+
+        // then
+        assertThat(result).hasSize(1)
+        assertThat(result[0].stockCode).isEqualTo("1234")
+        assertThat(result[0].stockName).isEqualTo("Toyota")
+        assertThat(result[0].purchasePrice).isEqualTo(1200.00)
+        assertThat(result[0].totalDividend).isEqualTo(451.25) // 100.00 + 150.50 + 200.75
+        assertThat(result[0].totalBenefit).isEqualTo(1500.25) // 500.00 + 1000.25
+    }
 }
