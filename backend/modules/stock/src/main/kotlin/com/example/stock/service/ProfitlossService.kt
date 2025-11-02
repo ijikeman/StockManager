@@ -1,6 +1,7 @@
 package com.example.stock.service
 
 import com.example.stock.dto.ProfitlossStockLotDto
+import com.example.stock.dto.ProfitlossDto
 import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.SellTransactionRepository
 import com.example.stock.repository.IncomingHistoryRepository
@@ -109,6 +110,86 @@ class ProfitlossService(
                 totalBenefit = totalBenefit,
                 buyTransactionDate = firstBuyTransaction?.transactionDate
             )
+        }
+    }
+
+    /**
+     * 売却取引から損益情報を取得します。
+     * ownerIdに紐づく全stocklotを検索し、関連buytransactionを検索し、
+     * さらにselltransactionを検索し、売却損益を計算する。
+     * @param ownerId 所有者ID（オプション）。指定された場合は、その所有者の株式ロットのみを取得します。
+     * @return 損益情報のリスト
+     */
+    fun getProfitLoss(ownerId: Int? = null): List<ProfitlossDto> {
+        val stockLots = if (ownerId != null) {
+            stockLotService.findByOwnerId(ownerId)
+        } else {
+            stockLotService.findAll()
+        }.filter { it.currentUnit > 0 } // 現在の単元数が0より大きい株式ロットのみ対象
+        
+        // N+1クエリ問題を回避: すべての株式ロットIDに対して購入取引を一括取得
+        val stockLotIds = stockLots.map { it.id }
+        val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
+            stockLotIds.flatMap { stockLotId ->
+                buyTransactionRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+        } else {
+            emptyMap()
+        }
+        
+        // すべての購入取引IDに対して売却取引を一括取得
+        val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
+        val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
+            buyTransactionIds.flatMap { buyTransactionId ->
+                sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
+                    .map { buyTransactionId to it }
+            }.groupBy({ it.first }, { it.second })
+        } else {
+            emptyMap()
+        }
+        
+        // DTOのリストを作成
+        return stockLots.flatMap { stockLot ->
+            val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
+            buyTransactions.flatMap { buyTransaction ->
+                val sellTransactions = sellTransactionsMap[buyTransaction.id] ?: emptyList()
+                if (sellTransactions.isEmpty()) {
+                    // 売却取引がない場合は、購入取引だけの情報を返す
+                    listOf(
+                        ProfitlossDto(
+                            stockCode = stockLot.stock.code,
+                            stockName = stockLot.stock.name,
+                            purchasePrice = buyTransaction.price.toDouble(),
+                            sellPrice = null,
+                            sellUnit = null,
+                            profitLoss = null,
+                            buyTransactionDate = buyTransaction.transactionDate,
+                            sellTransactionDate = null
+                        )
+                    )
+                } else {
+                    sellTransactions.map { sellTransaction ->
+                        // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
+                        val profitLoss = (sellTransaction.price - buyTransaction.price)
+                            .multiply(BigDecimal(sellTransaction.unit))
+                            .multiply(BigDecimal(stockLot.stock.minimalUnit))
+                            .subtract(buyTransaction.fee)
+                            .subtract(sellTransaction.fee)
+                        
+                        ProfitlossDto(
+                            stockCode = stockLot.stock.code,
+                            stockName = stockLot.stock.name,
+                            purchasePrice = buyTransaction.price.toDouble(),
+                            sellPrice = sellTransaction.price.toDouble(),
+                            sellUnit = sellTransaction.unit,
+                            profitLoss = profitLoss,
+                            buyTransactionDate = buyTransaction.transactionDate,
+                            sellTransactionDate = sellTransaction.transactionDate
+                        )
+                    }
+                }
+            }
         }
     }
 }
