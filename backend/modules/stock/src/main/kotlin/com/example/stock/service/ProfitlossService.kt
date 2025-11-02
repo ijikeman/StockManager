@@ -16,7 +16,9 @@ import java.math.BigDecimal
 class ProfitlossService(
     private val stockLotService: StockLotService,
     private val buyTransactionRepository: BuyTransactionRepository,
-    private val sellTransactionRepository: SellTransactionRepository
+    private val sellTransactionRepository: SellTransactionRepository,
+    private val incomingHistoryRepository: IncomingHistoryRepository,
+    private val benefitHistoryRepository: BenefitHistoryRepository
 ) {
 
     /**
@@ -51,7 +53,7 @@ class ProfitlossService(
         // 一括取得: buyTransactionId -> List<IncomingHistory>
         val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
-                IncomingHistoryRepository.findByStockLotId(stockLotId)
+                incomingHistoryRepository.findByStockLotId(stockLotId)
                     .map { stockLotId to it }
             }.groupBy({ it.first }, { it.second })
         } else {
@@ -61,7 +63,7 @@ class ProfitlossService(
         // 購入取引ごとの総配当金額 (BigDecimal) を算出
         val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
             incomes.fold(BigDecimal.ZERO) { acc, d ->
-            acc + (d.amount ?: BigDecimal.ZERO)
+            acc + (d.incoming ?: BigDecimal.ZERO)
             }
         }
         // Dtoへの格納は後続処理で incomingTotalsMap を参照して行う
@@ -70,7 +72,7 @@ class ProfitlossService(
         // すべての購入取引IDに対して優待履歴の一括取得
         val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
-                BenefitHistoryRepository.findByStockLotId(stockLotId)
+                benefitHistoryRepository.findByStockLotId(stockLotId)
                     .map { stockLotId to it }
             }.groupBy({ it.first }, { it.second })
         } else {
@@ -80,7 +82,7 @@ class ProfitlossService(
         // 購入取引ごとの総優待金額を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { acc, b ->
-                acc + (b.amount ?: BigDecimal.ZERO)
+                acc + (b.benefit ?: BigDecimal.ZERO)
             }
         }
 
@@ -89,7 +91,7 @@ class ProfitlossService(
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
             // 各購入取引の配当金額と優待金額を合計
             val totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
-                acc + (incomeTotalsMap[bt.id] ?: BigDecimal.ZERO)
+                acc + (incomingTotalsMap[bt.id] ?: BigDecimal.ZERO)
             }
             val totalBenefit = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
                 acc + (benefitTotalsMap[bt.id] ?: BigDecimal.ZERO)
@@ -98,10 +100,10 @@ class ProfitlossService(
             val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
 
             ProfitlossStockLotDto(
-                stockCode = stockLot.stockCode,
-                stockName = stockLot.stockName,
-                purchasePrice = stockLot.purchasePrice,
-                currentPrice = stockLot.currentPrice,
+                stockCode = stockLot.stock.code,
+                stockName = stockLot.stock.name,
+                purchasePrice = firstBuyTransaction?.price?.toDouble() ?: 0.0,
+                currentPrice = stockLot.stock.currentPrice,
                 currentUnit = stockLot.currentUnit,
                 totalIncoming = totalIncoming,
                 totalBenefit = totalBenefit,
