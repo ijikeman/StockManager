@@ -7,6 +7,8 @@ import com.example.stock.model.StockLot
 import com.example.stock.model.SellTransaction
 import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.SellTransactionRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.BenefitHistoryRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,6 +36,12 @@ class ProfitlossServiceTest {
 
     @Mock
     private lateinit var sellTransactionRepository: SellTransactionRepository
+
+    @Mock
+    private lateinit var incomingHistoryRepository: IncomingHistoryRepository
+
+    @Mock
+    private lateinit var benefitHistoryRepository: BenefitHistoryRepository
 
     @Test
     fun `getProfitLoss should return list of profitloss DTOs with purchase prices`() {
