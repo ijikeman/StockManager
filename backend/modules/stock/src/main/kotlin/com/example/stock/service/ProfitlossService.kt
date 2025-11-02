@@ -108,7 +108,8 @@ class ProfitlossService(
                 currentUnit = stockLot.currentUnit,
                 totalIncoming = totalIncoming,
                 totalBenefit = totalBenefit,
-                buyTransactionDate = firstBuyTransaction?.transactionDate
+                buyTransactionDate = firstBuyTransaction?.transactionDate,
+                ownerName = stockLot.owner.name
             )
         }
     }
@@ -213,7 +214,8 @@ class ProfitlossService(
                             sellUnit = sellTransaction.unit,
                             profitLoss = profitLoss,
                             buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = sellTransaction.transactionDate
+                            sellTransactionDate = sellTransaction.transactionDate,
+                            ownerName = stockLot.owner.name
                         ))
                     }
                 } else {
@@ -229,7 +231,8 @@ class ProfitlossService(
                             sellUnit = null,
                             profitLoss = null,
                             buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = null
+                            sellTransactionDate = null,
+                            ownerName = stockLot.owner.name
                         ))
                     }
                 }
