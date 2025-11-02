@@ -10,6 +10,7 @@ const generateProfitLossStockLotData = () => {
     'items|5-10': [{
       'stockCode': '@string("upper", 4)',
       'stockName': '@word(3, 6)',
+      'minimalUnit|100-1000': 100,
       'purchasePrice': '@float(100, 2000, 2, 2)',
       'currentPrice': '@float(100, 2500, 2, 2)',
       'currentUnit|1-20': 1,

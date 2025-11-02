@@ -161,6 +161,7 @@ class ProfitlossService(
                         ProfitlossDto(
                             stockCode = stockLot.stock.code,
                             stockName = stockLot.stock.name,
+                            minimalUnit = stockLot.stock.minimalUnit,
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = null,
                             sellUnit = null,
@@ -181,6 +182,7 @@ class ProfitlossService(
                         ProfitlossDto(
                             stockCode = stockLot.stock.code,
                             stockName = stockLot.stock.name,
+                            minimalUnit = stockLot.stock.minimalUnit,
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = sellTransaction.price.toDouble(),
                             sellUnit = sellTransaction.unit,

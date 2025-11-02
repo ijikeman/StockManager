@@ -51,8 +51,8 @@ export default {
       
       // Calculate evaluation profit/loss: (currentPrice - purchasePrice) * currentUnit * minimalUnit
       const totalEvaluation = this.profitLossData.reduce((sum, item) => {
-        if (item.currentPrice && item.currentUnit) {
-          const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * 100;
+        if (item.currentPrice && item.currentUnit && item.minimalUnit) {
+          const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
           return sum + evaluation;
         }
         return sum;
@@ -82,9 +82,9 @@ export default {
       return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     },
     calculateEvaluation(item) {
-      if (item.currentPrice && item.currentUnit) {
-        // Assuming minimal unit is 100 (standard for Japanese stocks)
-        const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * 100;
+      if (item.currentPrice && item.currentUnit && item.minimalUnit) {
+        // Calculate evaluation using minimalUnit from API
+        const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
         return evaluation;
       }
       return 0;
