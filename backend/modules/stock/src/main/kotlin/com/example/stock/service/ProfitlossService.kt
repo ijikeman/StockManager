@@ -1,8 +1,11 @@
 package com.example.stock.service
 
-import com.example.stock.dto.ProfitlossDto
+import com.example.stock.dto.ProfitlossStockLotDto
 import com.example.stock.repository.BuyTransactionRepository
 import com.example.stock.repository.SellTransactionRepository
+import com.example.stock.repository.IncomingHistoryRepository
+import com.example.stock.repository.BenefitHistoryRepository
+import com.example.stock.model.IncomingHistory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -23,15 +26,16 @@ class ProfitlossService(
      * @param ownerId 所有者ID（オプション）。指定された場合は、その所有者の株式ロットのみを取得します。
      * @return 損益情報のリスト
      */
-    fun getProfitLoss(ownerId: Int? = null): List<ProfitlossDto> {
+    fun getProfitStockLotLoss(ownerId: Int? = null): List<ProfitlossStockLotDto> {
         val stockLots = if (ownerId != null) {
             stockLotService.findByOwnerId(ownerId)
         } else {
             stockLotService.findAll()
-        }.filter { it.currentUnit > 0 }
+        }.filter { it.currentUnit > 0 } // 現在の単元数が0より大きい株式ロットのみ対象
         
-        // N+1クエリ問題を回避: すべての株式ロットIDに対して購入取引を一括取得
+        // N+1クエリ問題を回避: 
         val stockLotIds = stockLots.map { it.id }
+        // すべての株式ロットIDに対して購入取引を一括取得
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
                 buyTransactionRepository.findByStockLotId(stockLotId)
@@ -41,60 +45,68 @@ class ProfitlossService(
             emptyMap()
         }
         
-        // すべての購入取引IDに対して売却取引を一括取得
-        val buyTransactionIds = buyTransactionsMap.values.flatten().map { it.id }
-        val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
-            buyTransactionIds.flatMap { buyTransactionId ->
-                sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
-                    .map { buyTransactionId to it }
+        // すべての購入取引IDに対して配当金履歴の一括取得し総配当金額をDtoに格納
+        val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
+
+        // 一括取得: buyTransactionId -> List<IncomingHistory>
+        val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
+            stockLotIds.flatMap { stockLotId ->
+                IncomingHistoryRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+        } else {
+            emptyMap<Int, List<IncomingHistory>>()
+        }
+
+        // 購入取引ごとの総配当金額 (BigDecimal) を算出
+        val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
+            incomes.fold(BigDecimal.ZERO) { acc, d ->
+            acc + (d.amount ?: BigDecimal.ZERO)
+            }
+        }
+        // Dtoへの格納は後続処理で incomingTotalsMap を参照して行う
+
+
+        // すべての購入取引IDに対して優待履歴の一括取得
+        val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
+            stockLotIds.flatMap { stockLotId ->
+                BenefitHistoryRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
             }.groupBy({ it.first }, { it.second })
         } else {
             emptyMap()
         }
-        
-        // 各購入取引とその売却取引のペアから損益を計算
-        return buyTransactionsMap.flatMap { (stockLotId, buyTransactions) ->
-            val stockLot = stockLots.first { it.id == stockLotId }
-            buyTransactions.flatMap { buyTransaction ->
-                val sellTransactions = sellTransactionsMap[buyTransaction.id] ?: emptyList()
-                if (sellTransactions.isEmpty()) {
-                    // 売却取引がない場合は、購入情報のみを返す
-                    listOf(
-                        ProfitlossDto(
-                            stockCode = stockLot.stock.code,
-                            stockName = stockLot.stock.name,
-                            purchasePrice = buyTransaction.price.toDouble(),
-                            sellPrice = null,
-                            sellUnit = null,
-                            profitLoss = null,
-                            buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = null
-                        )
-                    )
-                } else {
-                    // 各売却取引について損益を計算
-                    sellTransactions.map { sellTransaction ->
-                        // 損益 = (売却価格 - 購入価格) * 単元数 * 最小単元 - 購入手数料 - 売却手数料
-                        val minimalUnit = stockLot.stock.minimalUnit
-                        val profitLoss = (sellTransaction.price - buyTransaction.price) * 
-                                        BigDecimal(sellTransaction.unit) * 
-                                        BigDecimal(minimalUnit) - 
-                                        buyTransaction.fee - 
-                                        sellTransaction.fee
-                        
-                        ProfitlossDto(
-                            stockCode = stockLot.stock.code,
-                            stockName = stockLot.stock.name,
-                            purchasePrice = buyTransaction.price.toDouble(),
-                            sellPrice = sellTransaction.price.toDouble(),
-                            sellUnit = sellTransaction.unit,
-                            profitLoss = profitLoss,
-                            buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = sellTransaction.transactionDate
-                        )
-                    }
-                }
+
+        // 購入取引ごとの総優待金額を算出
+        val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
+            benefits.fold(BigDecimal.ZERO) { acc, b ->
+                acc + (b.amount ?: BigDecimal.ZERO)
             }
+        }
+
+        // DTOのリストを作成
+        return stockLots.map { stockLot ->
+            val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
+            // 各購入取引の配当金額と優待金額を合計
+            val totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
+                acc + (incomeTotalsMap[bt.id] ?: BigDecimal.ZERO)
+            }
+            val totalBenefit = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
+                acc + (benefitTotalsMap[bt.id] ?: BigDecimal.ZERO)
+            }
+            // 最初の購入取引日を取得
+            val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
+
+            ProfitlossStockLotDto(
+                stockCode = stockLot.stockCode,
+                stockName = stockLot.stockName,
+                purchasePrice = stockLot.purchasePrice,
+                currentPrice = stockLot.currentPrice,
+                currentUnit = stockLot.currentUnit,
+                totalIncoming = totalIncoming,
+                totalBenefit = totalBenefit,
+                buyTransactionDate = firstBuyTransaction?.transactionDate
+            )
         }
     }
 }
