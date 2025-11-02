@@ -7,87 +7,87 @@ export default {
   name: 'ProfitLossList',
   data() {
     return {
-      profitLossData: null,
-      filterType: 'all',
+      profitLossData: [],
       filterOwner: '',
     };
   },
   computed: {
     filteredItems() {
-      if (!this.profitLossData || !this.profitLossData.items) {
+      if (!this.profitLossData || this.profitLossData.length === 0) {
         return [];
       }
 
-      let items = this.profitLossData.items;
-
-      // Filter by type
-      if (this.filterType !== 'all') {
-        items = items.filter(item => item.type === this.filterType);
-      }
+      let items = this.profitLossData;
 
       // Filter by owner
       if (this.filterOwner) {
         items = items.filter(item => item.ownerName === this.filterOwner);
       }
 
-      // Sort by date (most recent first) for items that have dates
+      // Sort by stock code
       return items.sort((a, b) => {
-        if (!a.date && !b.date) return 0;
-        if (!a.date) return 1;
-        if (!b.date) return -1;
-        return new Date(b.date) - new Date(a.date);
+        return a.stockCode.localeCompare(b.stockCode);
       });
     },
     uniqueOwners() {
-      if (!this.profitLossData || !this.profitLossData.items) {
+      if (!this.profitLossData || this.profitLossData.length === 0) {
         return [];
       }
-      const owners = this.profitLossData.items.map(item => item.ownerName);
+      const owners = this.profitLossData.map(item => item.ownerName).filter(Boolean);
       return [...new Set(owners)].sort();
+    },
+    summary() {
+      if (!this.profitLossData || this.profitLossData.length === 0) {
+        return {
+          totalIncoming: 0,
+          totalBenefit: 0,
+          totalEvaluation: 0,
+          totalProfitLoss: 0
+        };
+      }
+
+      const totalIncoming = this.profitLossData.reduce((sum, item) => sum + (Number(item.totalIncoming) || 0), 0);
+      const totalBenefit = this.profitLossData.reduce((sum, item) => sum + (Number(item.totalBenefit) || 0), 0);
+      
+      // Calculate evaluation profit/loss: (currentPrice - purchasePrice) * currentUnit * minimalUnit
+      const totalEvaluation = this.profitLossData.reduce((sum, item) => {
+        if (item.currentPrice && item.currentUnit && item.minimalUnit) {
+          const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
+          return sum + evaluation;
+        }
+        return sum;
+      }, 0);
+      
+      const totalProfitLoss = totalIncoming + totalBenefit + totalEvaluation;
+
+      return {
+        totalIncoming,
+        totalBenefit,
+        totalEvaluation,
+        totalProfitLoss
+      };
     }
   },
   methods: {
     async fetchProfitLoss() {
       try {
         const response = await axios.get('/api/profitloss');
-        // APIレスポンスを適切な形式に変換
-        this.profitLossData = {
-          items: response.data.map(item => ({
-            ...item,
-            stockCode: item.stockCode || '',
-            purchaseDate: item.purchaseDate || '',
-            purchasePrice: item.purchasePrice || 0,
-            units: item.units || 0,
-            totalDividend: item.totalDividend || 0,
-            totalBenefit: item.totalBenefit || 0,
-            sellPrice: item.sellPrice || 0,
-            profitLoss: item.profitLoss || 0,
-            ownerName: item.ownerName || ''
-          })),
-          summary: {
-            totalIncome: 0,
-            totalBenefit: 0,
-            totalSellProfit: 0,
-            totalEvaluation: 0,
-            totalProfitLoss: 0
-          }
-        };
+        this.profitLossData = response.data;
       } catch (error) {
         console.error('Error fetching profit/loss data:', error);
       }
     },
-    getTypeLabel(type) {
-      const labels = {
-        income: '配当金',
-        benefit: '優待',
-        sell: '売却',
-        evaluation: '含み損益'
-      };
-      return labels[type] || type;
-    },
     fmt(value) {
       const n = Number(value) || 0;
       return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    },
+    calculateEvaluation(item) {
+      if (item.currentPrice && item.currentUnit && item.minimalUnit) {
+        // Calculate evaluation using minimalUnit from API
+        const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
+        return evaluation;
+      }
+      return 0;
     }
   },
   mounted() {
@@ -227,5 +227,9 @@ export default {
 
 .price-cell.negative {
   color: #dc3545;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>
