@@ -30,6 +30,7 @@ class ProfitlossControllerTest {
             ProfitlossStockLotDto(
                 stockCode = "1234",
                 stockName = "Toyota",
+                minimal_unit = 1,
                 purchasePrice = 1200.25,
                 currentPrice = 1300.0,
                 currentUnit = 100,
@@ -40,6 +41,7 @@ class ProfitlossControllerTest {
             ProfitlossStockLotDto(
                 stockCode = "5678",
                 stockName = "Sony",
+                minimal_unit = 1,
                 purchasePrice = 2100.75,
                 currentPrice = 2200.0,
                 currentUnit = 50,
@@ -55,6 +57,7 @@ class ProfitlossControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].stockCode").value("1234"))
             .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].minimal_unit").value(1))
             .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
             .andExpect(jsonPath("$[0].currentPrice").value(1300.0))
             .andExpect(jsonPath("$[0].currentUnit").value(100))
@@ -80,6 +83,7 @@ class ProfitlossControllerTest {
             ProfitlossStockLotDto(
                 stockCode = "1234",
                 stockName = "Toyota",
+                minimal_unit = 1,
                 purchasePrice = 1200.25,
                 currentPrice = null,
                 currentUnit = null,
@@ -95,6 +99,7 @@ class ProfitlossControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].stockCode").value("1234"))
             .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].minimal_unit").value(1))
             .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
             .andExpect(jsonPath("$[0].currentPrice").doesNotExist())
             .andExpect(jsonPath("$[0].currentUnit").doesNotExist())
@@ -110,6 +115,7 @@ class ProfitlossControllerTest {
             ProfitlossStockLotDto(
                 stockCode = "1234",
                 stockName = "Toyota",
+                minimal_unit = 1,
                 purchasePrice = 1200.25,
                 currentPrice = 1300.0,
                 currentUnit = 100,
@@ -125,6 +131,7 @@ class ProfitlossControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].stockCode").value("1234"))
             .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].minimal_unit").value(1))
             .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
             .andExpect(jsonPath("$[0].currentPrice").value(1300.0))
             .andExpect(jsonPath("$[0].totalIncoming").value(50000))

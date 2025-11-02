@@ -10,6 +10,7 @@ import java.time.LocalDate
 data class ProfitlossDto(
     val stockCode: String, // 銘柄コード
     val stockName: String, // 銘柄名
+    val minimalUnit: Int, // 最小単元
     val purchasePrice: Double, // 購入価格
     val sellPrice: Double? = null, // 売却価格
     val sellUnit: Int? = null, // 売却単元数

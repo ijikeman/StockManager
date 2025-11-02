@@ -103,6 +103,7 @@ class ProfitlossService(
             ProfitlossStockLotDto(
                 stockCode = stockLot.stock.code,
                 stockName = stockLot.stock.name,
+                minimalUnit = stockLot.stock.minimal_unit,
                 purchasePrice = firstBuyTransaction?.price?.toDouble() ?: 0.0,
                 currentPrice = stockLot.stock.currentPrice,
                 currentUnit = stockLot.currentUnit,
