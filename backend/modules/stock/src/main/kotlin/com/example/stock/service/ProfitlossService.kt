@@ -185,21 +185,57 @@ class ProfitlossService(
             }
         }
 
-        // DTOのリストを作成
-        return stockLots.map { stockLot ->
-            // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
-            val ProfitStockLotlossDto(
-                    stockCode = stockLot.stock.code,
-                    stockName = stockLot.stock.name,
-                    minimalUnit = stockLot.stock.minimalUnit,
-                    purchasePrice = buyTransaction.price.toDouble(),
-                    sellPrice = sellTransaction.price.toDouble(),
-                    sellUnit = sellTransaction.unit,
-                    profitLoss = profitLoss,
-                    buyTransactionDate = buyTransaction.transactionDate,
-                    sellTransactionDate = sellTransaction.transactionDate
-                )
+        // DTOのリストを作成 - 各売却取引ごとに1つのDTOを作成
+        val result = mutableListOf<ProfitlossDto>()
+        
+        stockLots.forEach { stockLot ->
+            val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
+            
+            buyTransactions.forEach { buyTransaction ->
+                val sellTransactions = sellTransactionsMap[buyTransaction.id] ?: emptyList()
+                
+                if (sellTransactions.isNotEmpty()) {
+                    // 売却取引がある場合、各売却取引ごとにDTOを作成
+                    sellTransactions.forEach { sellTransaction ->
+                        // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
+                        val profitLoss = (sellTransaction.price - buyTransaction.price) * 
+                                        sellTransaction.unit.toBigDecimal() * 
+                                        stockLot.stock.minimalUnit.toBigDecimal() - 
+                                        buyTransaction.fee - 
+                                        sellTransaction.fee
+                        
+                        result.add(ProfitlossDto(
+                            stockCode = stockLot.stock.code,
+                            stockName = stockLot.stock.name,
+                            minimalUnit = stockLot.stock.minimalUnit,
+                            purchasePrice = buyTransaction.price.toDouble(),
+                            sellPrice = sellTransaction.price.toDouble(),
+                            sellUnit = sellTransaction.unit,
+                            profitLoss = profitLoss,
+                            buyTransactionDate = buyTransaction.transactionDate,
+                            sellTransactionDate = sellTransaction.transactionDate
+                        ))
+                    }
+                } else {
+                    // 売却取引がない場合（保有中の株式）、基本情報のみのDTOを作成
+                    // ただし、currentUnitが0より大きい場合のみ
+                    if (stockLot.currentUnit > 0) {
+                        result.add(ProfitlossDto(
+                            stockCode = stockLot.stock.code,
+                            stockName = stockLot.stock.name,
+                            minimalUnit = stockLot.stock.minimalUnit,
+                            purchasePrice = buyTransaction.price.toDouble(),
+                            sellPrice = null,
+                            sellUnit = null,
+                            profitLoss = null,
+                            buyTransactionDate = buyTransaction.transactionDate,
+                            sellTransactionDate = null
+                        ))
+                    }
+                }
+            }
         }
-        }
+        
+        return result
     }
 }
