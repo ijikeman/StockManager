@@ -199,9 +199,9 @@ class ProfitlossService(
                     // 売却取引がある場合、各売却取引ごとにDTOを作成
                     sellTransactions.forEach { sellTransaction ->
                         // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
-                        val profitLoss = (sellTransaction.price - buyTransaction.price) * 
+                        val profitLoss = ((sellTransaction.price - buyTransaction.price) * 
                                         sellTransaction.unit.toBigDecimal() * 
-                                        stockLot.stock.minimalUnit.toBigDecimal() - 
+                                        stockLot.stock.minimalUnit.toBigDecimal()) - 
                                         buyTransaction.fee - 
                                         sellTransaction.fee
                         
