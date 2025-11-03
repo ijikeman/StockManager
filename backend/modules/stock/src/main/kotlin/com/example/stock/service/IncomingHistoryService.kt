@@ -83,4 +83,16 @@ class IncomingHistoryService(
 
 		return incomingHistoryRepository.save(updated)
 	}
+
+	/**
+	 * 配当履歴を削除します。
+	 * @param id 削除対象の配当履歴ID
+	 * @throws EntityNotFoundException 指定されたIDの配当履歴が見つからない場合
+	 */
+	fun delete(id: Int) {
+		if (!incomingHistoryRepository.existsById(id)) {
+			throw EntityNotFoundException("IncomingHistory not found with id: $id")
+		}
+		incomingHistoryRepository.deleteById(id)
+	}
 }

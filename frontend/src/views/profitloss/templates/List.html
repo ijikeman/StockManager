@@ -89,7 +89,7 @@
           <td class="price-cell">{{ item.currentPrice ? fmt(item.currentPrice) : '-' }}</td>
           <td class="text-center">{{ item.currentUnit || 0 }}</td>
           <td class="price-cell positive">{{ fmt((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
-          <td class="price-cell positive">{{ fmt(item.totalBenefit || 0) }}</td>
+          <td class="price-cell positive">{{ fmt(item.totalBenefit * item.currentUnit * item.minimalUnit || 0) }}</td>
           <td class="price-cell" :class="calculateEvaluation(item) >= 0 ? 'positive' : 'negative'">
             {{ fmt(calculateEvaluation(item)) }}
           </td>

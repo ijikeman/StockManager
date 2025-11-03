@@ -11,6 +11,9 @@ import StockLotSell from '../views/stocklot/Sell.vue';
 import IncomeList from '../views/income/List.vue';
 import IncomeAdd from '../views/income/Add.vue';
 import IncomeEdit from '../views/income/Edit.vue';
+import BenefitList from '../views/benefit/List.vue';
+import BenefitAdd from '../views/benefit/Add.vue';
+import BenefitEdit from '../views/benefit/Edit.vue';
 import ProfitLossList from '../views/profitloss/List.vue';
 
 const routes = [
@@ -53,6 +56,22 @@ const routes = [
     path: '/income/edit/:id',
     name: 'IncomeEdit',
     component: IncomeEdit,
+    props: true
+  },
+  {
+    path: '/benefit',
+    name: 'BenefitList',
+    component: BenefitList
+  },
+  {
+    path: '/benefit/add',
+    name: 'BenefitAdd',
+    component: BenefitAdd
+  },
+  {
+    path: '/benefit/edit/:id',
+    name: 'BenefitEdit',
+    component: BenefitEdit,
     props: true
   },
   {
