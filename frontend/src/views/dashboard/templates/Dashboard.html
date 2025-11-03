@@ -1,0 +1,60 @@
+<!-- ダッシュボードページのコンテナ -->
+<div class="dashboard-container">
+  <!-- ページヘッダー -->
+  <div class="page-header">
+    <h1 class="page-title">管理システム ダッシュボード</h1>
+    <p class="page-subtitle">各機能へのクイックアクセス</p>
+  </div>
+
+  <!-- ナビゲーションカードグリッド -->
+  <div class="dashboard-grid">
+    <!-- セクター管理カード -->
+    <div class="dashboard-card" @click="navigateTo('/sector')">
+      <div class="card-icon">📊</div>
+      <h3 class="card-title">セクター管理</h3>
+      <p class="card-description">セクター情報の登録・管理</p>
+    </div>
+
+    <!-- オーナー管理カード -->
+    <div class="dashboard-card" @click="navigateTo('/owner')">
+      <div class="card-icon">👤</div>
+      <h3 class="card-title">オーナー管理</h3>
+      <p class="card-description">オーナー情報の登録・管理</p>
+    </div>
+
+    <!-- 銘柄管理カード -->
+    <div class="dashboard-card" @click="navigateTo('/stock')">
+      <div class="card-icon">📈</div>
+      <h3 class="card-title">銘柄管理</h3>
+      <p class="card-description">株式銘柄の登録・管理</p>
+    </div>
+
+    <!-- ストックロット管理カード -->
+    <div class="dashboard-card" @click="navigateTo('/stocklot')">
+      <div class="card-icon">📦</div>
+      <h3 class="card-title">ストックロット管理</h3>
+      <p class="card-description">保有株式の売買管理</p>
+    </div>
+
+    <!-- 配当履歴カード -->
+    <div class="dashboard-card" @click="navigateTo('/income')">
+      <div class="card-icon">💰</div>
+      <h3 class="card-title">配当履歴</h3>
+      <p class="card-description">配当金の履歴管理</p>
+    </div>
+
+    <!-- 優待履歴カード -->
+    <div class="dashboard-card benefit-card" @click="navigateTo('/benefit')">
+      <div class="card-icon">🎁</div>
+      <h3 class="card-title">優待履歴</h3>
+      <p class="card-description">株主優待の履歴管理</p>
+    </div>
+
+    <!-- 損益一覧カード -->
+    <div class="dashboard-card" @click="navigateTo('/profitloss')">
+      <div class="card-icon">📊</div>
+      <h3 class="card-title">損益一覧</h3>
+      <p class="card-description">含み損益・確定損益の確認</p>
+    </div>
+  </div>
+</div>
