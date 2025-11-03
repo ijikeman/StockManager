@@ -179,7 +179,7 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
-        // 購入取引ごとの総優待金額を算出
+        // 売却取引ごとの総優待金額を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { acc, b ->
                 acc + (b.benefit ?: BigDecimal.ZERO)
@@ -235,6 +235,8 @@ class ProfitlossService(
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = null,
                             sellUnit = null,
+                            totalIncoming = null,
+                            totalBenefit = null,
                             profitLoss = null,
                             buyTransactionDate = buyTransaction.transactionDate,
                             sellTransactionDate = null,
