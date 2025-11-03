@@ -19,7 +19,7 @@ class ProfitlossController(
     }
     
     @GetMapping("/realized")
-    fun getProfitLoss(@RequestParam(required = false) ownerId: Int?): List<ProfitlossDto> {
-        return profitlossService.getProfitLoss(ownerId)
+    fun getSellTransactionProfitloss(@RequestParam(required = false) ownerId: Int?): List<ProfitlossDto> {
+        return profitlossService.getSellTransactionProfitloss(ownerId)
     }
 }
