@@ -56,4 +56,19 @@ class IncomingHistoryController(
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
+
+    /**
+     * 配当情報を削除します
+     * @param id 削除対象の配当情報ID
+     * @return 削除結果
+     */
+    @DeleteMapping("/{id}")
+    fun deleteIncomingHistory(@PathVariable id: Int): ResponseEntity<Void> {
+        return try {
+            incomingHistoryService.delete(id)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } catch (e: Exception) {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+    }
 }

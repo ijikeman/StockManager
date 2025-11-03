@@ -14,6 +14,7 @@ export default {
         { name: '銘柄管理', path: '/stock' },
         { name: 'ストックロット管理', path: '/stocklot' },
         { name: '配当履歴', path: '/income' },
+        { name: '優待履歴', path: '/benefit' },
         { name: '損益一覧', path: '/profitloss' }
       ]
     };

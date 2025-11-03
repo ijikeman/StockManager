@@ -1,0 +1,33 @@
+<div class="form-container">
+  <h3 class="form-title">優待編集</h3>
+
+  <form @submit.prevent="updateBenefit" class="form-inline">
+    <input
+      type="date"
+      v-model="formData.paymentDate"
+      required
+      class="form-control"
+    >
+    <input
+      type="text"
+      :value="formData.stockLot && formData.stockLot.stock ? formData.stockLot.stock.name : ''"
+      readonly
+      class="form-control"
+    >
+    <input
+      type="number"
+      v-model="benefit_per_unit"
+      placeholder="単元あたり優待"
+      required
+      class="form-control"
+    >
+    <div v-if="formData.stockLot">
+      単元数: {{ formData.stockLot.currentUnit }}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-success">保存</button>
+      <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
+    </div>
+  </form>
+</div>
