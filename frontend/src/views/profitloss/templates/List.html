@@ -3,80 +3,169 @@
     <h1 class="page-title">損益一覧</h1>
   </div>
 
-  <!-- Summary Section -->
-  <div class="summary-section" v-if="profitLossData && profitLossData.length > 0">
-    <div class="summary-card">
-      <h3>損益サマリー</h3>
-      <div class="summary-grid">
-        <div class="summary-item">
-          <span class="summary-label">配当金合計:</span>
-          <span class="summary-value positive">{{ fmt(summary.totalIncoming) }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">優待金合計:</span>
-          <span class="summary-value positive">{{ fmt(summary.totalBenefit) }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">含み損益合計:</span>
-          <span class="summary-value" :class="summary.totalEvaluation >= 0 ? 'positive' : 'negative'">
-            {{ fmt(summary.totalEvaluation) }}
-          </span>
-        </div>
-        <div class="summary-item total">
-          <span class="summary-label">総損益:</span>
-          <span class="summary-value" :class="summary.totalProfitLoss >= 0 ? 'positive' : 'negative'">
-            {{ fmt(summary.totalProfitLoss) }}
-          </span>
-        </div>
-      </div>
+  <!-- Tab Navigation -->
+  <div class="tab-container">
+    <div class="tab-buttons">
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'unrealized' }"
+        @click="setActiveTab('unrealized')">
+        含み損益（未実現）
+      </button>
+      <button 
+        class="tab-button" 
+        :class="{ active: activeTab === 'realized' }"
+        @click="setActiveTab('realized')">
+        確定損益（実現済み）
+      </button>
     </div>
   </div>
 
-  <!-- Filter Section -->
-  <div class="filter-section">
-    <label>
-      オーナー:
-      <select v-model="filterOwner" class="filter-select">
-        <option value="">すべて</option>
-        <option v-for="owner in uniqueOwners" :key="owner" :value="owner">
-          {{ owner }}
-        </option>
-      </select>
-    </label>
+  <!-- Unrealized Profit/Loss Tab -->
+  <div v-if="activeTab === 'unrealized'">
+    <!-- Summary Section for Unrealized -->
+    <div class="summary-section" v-if="unrealizedData && unrealizedData.length > 0">
+      <div class="summary-card">
+        <h3>含み損益サマリー</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">配当金合計:</span>
+            <span class="summary-value positive">{{ fmt(unrealizedSummary.totalIncoming) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">優待金合計:</span>
+            <span class="summary-value positive">{{ fmt(unrealizedSummary.totalBenefit) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">含み損益合計:</span>
+            <span class="summary-value" :class="unrealizedSummary.totalEvaluation >= 0 ? 'positive' : 'negative'">
+              {{ fmt(unrealizedSummary.totalEvaluation) }}
+            </span>
+          </div>
+          <div class="summary-item total">
+            <span class="summary-label">総損益:</span>
+            <span class="summary-value" :class="unrealizedSummary.totalProfitLoss >= 0 ? 'positive' : 'negative'">
+              {{ fmt(unrealizedSummary.totalProfitLoss) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <label>
+        オーナー:
+        <select v-model="filterOwner" class="filter-select">
+          <option value="">すべて</option>
+          <option v-for="owner in uniqueOwners" :key="owner" :value="owner">
+            {{ owner }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Unrealized Data Table -->
+    <table class="common-table profit-loss-table" v-if="filteredUnrealizedItems.length > 0">
+      <thead>
+        <tr>
+          <th>銘柄コード</th>
+          <th>銘柄名</th>
+          <th>購入日</th>
+          <th>購入単価</th>
+          <th>現在価格</th>
+          <th>保有単元数</th>
+          <th>総配当金</th>
+          <th>総優待金</th>
+          <th>含み損益</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in filteredUnrealizedItems" :key="`${item.stockCode}`">
+          <td>{{ item.stockCode }}</td>
+          <td>{{ item.stockName }}</td>
+          <td>{{ item.buyTransactionDate || '-' }}</td>
+          <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
+          <td class="price-cell">{{ item.currentPrice ? fmt(item.currentPrice) : '-' }}</td>
+          <td class="text-center">{{ item.currentUnit || 0 }}</td>
+          <td class="price-cell positive">{{ fmt((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
+          <td class="price-cell positive">{{ fmt(item.totalBenefit || 0) }}</td>
+          <td class="price-cell" :class="calculateEvaluation(item) >= 0 ? 'positive' : 'negative'">
+            {{ fmt(calculateEvaluation(item)) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-else>
+      <p>データはありません</p>
+    </div>
   </div>
 
-  <!-- Data Table -->
-  <table class="common-table profit-loss-table" v-if="filteredItems.length > 0">
-    <thead>
-      <tr>
-        <th>銘柄コード</th>
-        <th>銘柄名</th>
-        <th>購入日</th>
-        <th>購入単価</th>
-        <th>現在価格</th>
-        <th>保有単元数</th>
-        <th>総配当金</th>
-        <th>総優待金</th>
-        <th>含み損益</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="item in filteredItems" :key="`${item.stockCode}`">
-        <td>{{ item.stockCode }}</td>
-        <td>{{ item.stockName }}</td>
-        <td>{{ item.buyTransactionDate || '-' }}</td>
-        <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
-        <td class="price-cell">{{ item.currentPrice ? fmt(item.currentPrice) : '-' }}</td>
-        <td class="text-center">{{ item.currentUnit || 0 }}</td>
-        <td class="price-cell positive">{{ fmt((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
-        <td class="price-cell positive">{{ fmt(item.totalBenefit || 0) }}</td>
-        <td class="price-cell" :class="calculateEvaluation(item) >= 0 ? 'positive' : 'negative'">
-          {{ fmt(calculateEvaluation(item)) }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div v-else>
-    <p>データはありません</p>
+  <!-- Realized Profit/Loss Tab -->
+  <div v-if="activeTab === 'realized'">
+    <!-- Summary Section for Realized -->
+    <div class="summary-section" v-if="realizedData && realizedData.length > 0">
+      <div class="summary-card">
+        <h3>確定損益サマリー</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">取引件数:</span>
+            <span class="summary-value">{{ realizedSummary.count }}</span>
+          </div>
+          <div class="summary-item total">
+            <span class="summary-label">総確定損益:</span>
+            <span class="summary-value" :class="realizedSummary.totalProfitLoss >= 0 ? 'positive' : 'negative'">
+              {{ fmt(realizedSummary.totalProfitLoss) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+      <label>
+        オーナー:
+        <select v-model="filterOwner" class="filter-select">
+          <option value="">すべて</option>
+          <option v-for="owner in uniqueOwners" :key="owner" :value="owner">
+            {{ owner }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Realized Data Table -->
+    <table class="common-table profit-loss-table" v-if="filteredRealizedItems.length > 0">
+      <thead>
+        <tr>
+          <th>銘柄コード</th>
+          <th>銘柄名</th>
+          <th>購入日</th>
+          <th>購入単価</th>
+          <th>売却日</th>
+          <th>売却単価</th>
+          <th>売却単元数</th>
+          <th>確定損益</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in filteredRealizedItems" :key="`${item.stockCode}-${item.sellTransactionDate}-${index}`">
+          <td>{{ item.stockCode }}</td>
+          <td>{{ item.stockName }}</td>
+          <td>{{ item.buyTransactionDate || '-' }}</td>
+          <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
+          <td>{{ item.sellTransactionDate || '-' }}</td>
+          <td class="price-cell">{{ item.sellPrice ? fmt(item.sellPrice) : '-' }}</td>
+          <td class="text-center">{{ item.sellUnit || '-' }}</td>
+          <td class="price-cell" :class="(item.profitLoss || 0) >= 0 ? 'positive' : 'negative'">
+            {{ item.profitLoss ? fmt(item.profitLoss) : '-' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-else>
+      <p>データはありません</p>
+    </div>
   </div>
 </div>

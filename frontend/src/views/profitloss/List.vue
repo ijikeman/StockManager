@@ -7,17 +7,23 @@ export default {
   name: 'ProfitLossList',
   data() {
     return {
-      profitLossData: [],
+      unrealizedData: [],  // 含み損益データ (getProfitStockLotLoss)
+      realizedData: [],    // 確定損益データ (getProfitLoss)
       filterOwner: '',
+      activeTab: 'unrealized', // 'unrealized' or 'realized'
     };
   },
   computed: {
-    filteredItems() {
-      if (!this.profitLossData || this.profitLossData.length === 0) {
+    // For backward compatibility, keep profitLossData pointing to unrealized data
+    profitLossData() {
+      return this.unrealizedData;
+    },
+    filteredUnrealizedItems() {
+      if (!this.unrealizedData || this.unrealizedData.length === 0) {
         return [];
       }
 
-      let items = this.profitLossData;
+      let items = this.unrealizedData;
 
       // Filter by owner
       if (this.filterOwner) {
@@ -29,15 +35,41 @@ export default {
         return a.stockCode.localeCompare(b.stockCode);
       });
     },
-    uniqueOwners() {
-      if (!this.profitLossData || this.profitLossData.length === 0) {
+    filteredRealizedItems() {
+      if (!this.realizedData || this.realizedData.length === 0) {
         return [];
       }
-      const owners = this.profitLossData.map(item => item.ownerName).filter(Boolean);
-      return [...new Set(owners)].sort();
+
+      let items = this.realizedData;
+
+      // Filter by owner
+      if (this.filterOwner) {
+        items = items.filter(item => item.ownerName === this.filterOwner);
+      }
+
+      // Sort by stock code and sell transaction date
+      return items.sort((a, b) => {
+        const codeCompare = a.stockCode.localeCompare(b.stockCode);
+        if (codeCompare !== 0) return codeCompare;
+        
+        // If same stock code, sort by sell date
+        const dateA = a.sellTransactionDate || '';
+        const dateB = b.sellTransactionDate || '';
+        return dateB.localeCompare(dateA); // Most recent first
+      });
     },
-    summary() {
-      if (!this.profitLossData || this.profitLossData.length === 0) {
+    // Keep for backward compatibility
+    filteredItems() {
+      return this.filteredUnrealizedItems;
+    },
+    uniqueOwners() {
+      const unrealizedOwners = (this.unrealizedData || []).map(item => item.ownerName).filter(Boolean);
+      const realizedOwners = (this.realizedData || []).map(item => item.ownerName).filter(Boolean);
+      const allOwners = [...unrealizedOwners, ...realizedOwners];
+      return [...new Set(allOwners)].sort();
+    },
+    unrealizedSummary() {
+      if (!this.unrealizedData || this.unrealizedData.length === 0) {
         return {
           totalIncoming: 0,
           totalBenefit: 0,
@@ -46,14 +78,14 @@ export default {
         };
       }
 
-      const totalIncoming = this.profitLossData.reduce((sum, item) => {
+      const totalIncoming = this.unrealizedData.reduce((sum, item) => {
         const incomingAmount = item.totalIncoming * item.currentUnit * item.minimalUnit;
         return sum + (incomingAmount || 0);
       }, 0);
-      const totalBenefit = this.profitLossData.reduce((sum, item) => sum + (Number(item.totalBenefit) || 0), 0);
+      const totalBenefit = this.unrealizedData.reduce((sum, item) => sum + (Number(item.totalBenefit) || 0), 0);
       
       // Calculate evaluation profit/loss: (currentPrice - purchasePrice) * currentUnit * minimalUnit
-      const totalEvaluation = this.profitLossData.reduce((sum, item) => {
+      const totalEvaluation = this.unrealizedData.reduce((sum, item) => {
         if (item.currentPrice && item.currentUnit && item.minimalUnit) {
           const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
           return sum + evaluation;
@@ -69,13 +101,39 @@ export default {
         totalEvaluation,
         totalProfitLoss
       };
+    },
+    realizedSummary() {
+      if (!this.realizedData || this.realizedData.length === 0) {
+        return {
+          totalProfitLoss: 0,
+          count: 0
+        };
+      }
+
+      const totalProfitLoss = this.realizedData.reduce((sum, item) => {
+        return sum + (Number(item.profitLoss) || 0);
+      }, 0);
+
+      return {
+        totalProfitLoss,
+        count: this.realizedData.length
+      };
+    },
+    // Keep for backward compatibility
+    summary() {
+      return this.unrealizedSummary;
     }
   },
   methods: {
     async fetchProfitLoss() {
       try {
-        const response = await axios.get('/api/profitloss');
-        this.profitLossData = response.data;
+        // Fetch unrealized profit/loss (含み損益)
+        const unrealizedResponse = await axios.get('/api/profitloss');
+        this.unrealizedData = unrealizedResponse.data;
+        
+        // Fetch realized profit/loss (確定損益)
+        const realizedResponse = await axios.get('/api/profitloss/realized');
+        this.realizedData = realizedResponse.data;
       } catch (error) {
         console.error('Error fetching profit/loss data:', error);
       }
@@ -91,6 +149,9 @@ export default {
         return evaluation;
       }
       return 0;
+    },
+    setActiveTab(tab) {
+      this.activeTab = tab;
     }
   },
   mounted() {
@@ -111,6 +172,37 @@ export default {
   font-size: 24px;
   font-weight: bold;
   color: #333;
+}
+
+.tab-container {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.tab-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6c757d;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+  font-weight: bold;
+}
+
+.tab-button:hover {
+  color: #007bff;
 }
 
 .summary-section {
