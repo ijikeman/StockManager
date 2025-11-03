@@ -22,10 +22,10 @@ class IncomingHistoryController(
     /* 特定のIncomingHistoryを渡す */
     @GetMapping("/{id}")
     fun getIncomingHistoryById(@PathVariable id: Int): ResponseEntity<IncomingHistory> {
-        val incomingHistory = incomingHistoryService.findById(id)
-        return if (incomingHistory != null) {
+        return try {
+            val incomingHistory = incomingHistoryService.findById(id)
             ResponseEntity(incomingHistory, HttpStatus.OK)
-        } else {
+        } catch (e: Exception) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }

@@ -22,10 +22,10 @@ class BenefitHistoryController(
     /* 特定のBenefitHistoryを渡す */
     @GetMapping("/{id}")
     fun getBenefitHistoryById(@PathVariable id: Int): ResponseEntity<BenefitHistory> {
-        val benefitHistory = benefitHistoryService.findById(id)
-        return if (benefitHistory != null) {
+        return try {
+            val benefitHistory = benefitHistoryService.findById(id)
             ResponseEntity(benefitHistory, HttpStatus.OK)
-        } else {
+        } catch (e: Exception) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
