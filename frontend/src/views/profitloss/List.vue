@@ -82,7 +82,10 @@ export default {
         const incomingAmount = item.totalIncoming * item.currentUnit * item.minimalUnit;
         return sum + (incomingAmount || 0);
       }, 0);
-      const totalBenefit = this.unrealizedData.reduce((sum, item) => sum + (Number(item.totalBenefit) || 0), 0);
+      const totalBenefit = this.unrealizedData.reduce((sum, item) => {
+        const benefitAmount = item.totalBenefit * item.currentUnit * item.minimalUnit;
+        return sum + (benefitAmount || 0);
+      }, 0);
       
       // Calculate evaluation profit/loss: (currentPrice - purchasePrice) * currentUnit * minimalUnit
       const totalEvaluation = this.unrealizedData.reduce((sum, item) => {
