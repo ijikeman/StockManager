@@ -205,6 +205,10 @@ class ProfitlossService(
                                         buyTransaction.fee - 
                                         sellTransaction.fee
                         
+                        // 売却取引に対応する配当金と優待金を取得
+                        val totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                        val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                        
                         result.add(ProfitlossDto(
                             stockCode = stockLot.stock.code,
                             stockName = stockLot.stock.name,
@@ -212,6 +216,8 @@ class ProfitlossService(
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = sellTransaction.price.toDouble(),
                             sellUnit = sellTransaction.unit,
+                            totalIncoming = totalIncoming.toDouble(),
+                            totalBenefit = totalBenefit.toDouble(),
                             profitLoss = profitLoss,
                             buyTransactionDate = buyTransaction.transactionDate,
                             sellTransactionDate = sellTransaction.transactionDate,

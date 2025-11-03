@@ -146,4 +146,51 @@ class ProfitlossControllerTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$").isEmpty)
     }
+
+    @Test
+    fun `getProfitLoss should return list of realized profit loss with totalIncoming and totalBenefit`() {
+        val date = LocalDate.of(2025, 1, 1)
+        val profitlossList = listOf(
+            com.example.stock.dto.ProfitlossDto(
+                stockCode = "1234",
+                stockName = "Toyota",
+                minimalUnit = 100,
+                purchasePrice = 1200.25,
+                sellPrice = 1500.0,
+                sellUnit = 5,
+                totalIncoming = 2500.0,
+                totalBenefit = 3000.0,
+                profitLoss = BigDecimal("149850.00"),
+                buyTransactionDate = date,
+                sellTransactionDate = date.plusMonths(6),
+                ownerName = "Test Owner"
+            )
+        )
+
+        whenever(profitlossService.getProfitLoss(null)).thenReturn(profitlossList)
+
+        mockMvc.perform(get("/api/profitloss/realized"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[0].stockCode").value("1234"))
+            .andExpect(jsonPath("$[0].stockName").value("Toyota"))
+            .andExpect(jsonPath("$[0].minimalUnit").value(100))
+            .andExpect(jsonPath("$[0].purchasePrice").value(1200.25))
+            .andExpect(jsonPath("$[0].sellPrice").value(1500.0))
+            .andExpect(jsonPath("$[0].sellUnit").value(5))
+            .andExpect(jsonPath("$[0].totalIncoming").value(2500.0))
+            .andExpect(jsonPath("$[0].totalBenefit").value(3000.0))
+            .andExpect(jsonPath("$[0].profitLoss").value(149850.00))
+            .andExpect(jsonPath("$[0].buyTransactionDate").value("2025-01-01"))
+            .andExpect(jsonPath("$[0].sellTransactionDate").value("2025-07-01"))
+            .andExpect(jsonPath("$[0].ownerName").value("Test Owner"))
+    }
+
+    @Test
+    fun `getProfitLoss should return empty list when no realized profit loss exists`() {
+        whenever(profitlossService.getProfitLoss(null)).thenReturn(emptyList())
+
+        mockMvc.perform(get("/api/profitloss/realized"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$").isEmpty)
+    }
 }
