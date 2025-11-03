@@ -105,16 +105,28 @@ export default {
     realizedSummary() {
       if (!this.realizedData || this.realizedData.length === 0) {
         return {
+          totalIncoming: 0,
+          totalBenefit: 0,
           totalProfitLoss: 0,
           count: 0
         };
       }
+
+      const totalIncoming = this.realizedData.reduce((sum, item) => {
+        return sum + (Number(item.totalIncoming) || 0);
+      }, 0);
+
+      const totalBenefit = this.realizedData.reduce((sum, item) => {
+        return sum + (Number(item.totalBenefit) || 0);
+      }, 0);
 
       const totalProfitLoss = this.realizedData.reduce((sum, item) => {
         return sum + (Number(item.profitLoss) || 0);
       }, 0);
 
       return {
+        totalIncoming,
+        totalBenefit,
         totalProfitLoss,
         count: this.realizedData.length
       };

@@ -179,7 +179,7 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
-        // 購入取引ごとの総優待金額を算出
+        // 売却取引ごとの総優待金額を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { acc, b ->
                 acc + (b.benefit ?: BigDecimal.ZERO)
@@ -205,6 +205,10 @@ class ProfitlossService(
                                         buyTransaction.fee - 
                                         sellTransaction.fee
                         
+                        // 売却取引に対応する配当金と優待金を取得
+                        val totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                        val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                        
                         result.add(ProfitlossDto(
                             stockCode = stockLot.stock.code,
                             stockName = stockLot.stock.name,
@@ -212,6 +216,8 @@ class ProfitlossService(
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = sellTransaction.price.toDouble(),
                             sellUnit = sellTransaction.unit,
+                            totalIncoming = totalIncoming.toDouble(),
+                            totalBenefit = totalBenefit.toDouble(),
                             profitLoss = profitLoss,
                             buyTransactionDate = buyTransaction.transactionDate,
                             sellTransactionDate = sellTransaction.transactionDate,
@@ -229,6 +235,8 @@ class ProfitlossService(
                             purchasePrice = buyTransaction.price.toDouble(),
                             sellPrice = null,
                             sellUnit = null,
+                            totalIncoming = null,
+                            totalBenefit = null,
                             profitLoss = null,
                             buyTransactionDate = buyTransaction.transactionDate,
                             sellTransactionDate = null,

@@ -112,6 +112,14 @@
             <span class="summary-label">取引件数:</span>
             <span class="summary-value">{{ realizedSummary.count }}</span>
           </div>
+          <div class="summary-item">
+            <span class="summary-label">配当金合計:</span>
+            <span class="summary-value positive">{{ fmt(realizedSummary.totalIncoming) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">優待金合計:</span>
+            <span class="summary-value positive">{{ fmt(realizedSummary.totalBenefit) }}</span>
+          </div>
           <div class="summary-item total">
             <span class="summary-label">総確定損益:</span>
             <span class="summary-value" :class="realizedSummary.totalProfitLoss >= 0 ? 'positive' : 'negative'">
@@ -146,6 +154,8 @@
           <th>売却日</th>
           <th>売却単価</th>
           <th>売却単元数</th>
+          <th>総配当金</th>
+          <th>総優待金</th>
           <th>確定損益</th>
         </tr>
       </thead>
@@ -158,6 +168,8 @@
           <td>{{ item.sellTransactionDate || '-' }}</td>
           <td class="price-cell">{{ item.sellPrice ? fmt(item.sellPrice) : '-' }}</td>
           <td class="text-center">{{ item.sellUnit || '-' }}</td>
+          <td class="price-cell positive">{{ fmt(item.totalIncoming || 0) }}</td>
+          <td class="price-cell positive">{{ fmt(item.totalBenefit || 0) }}</td>
           <td class="price-cell" :class="(item.profitLoss || 0) >= 0 ? 'positive' : 'negative'">
             {{ item.profitLoss ? fmt(item.profitLoss) : '-' }}
           </td>

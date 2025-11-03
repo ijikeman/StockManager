@@ -315,4 +315,119 @@ class ProfitlossServiceTest {
         // 損益 = (1500 - 1000) * 7 * 100 - 100 - 70 = 500 * 700 - 170 = 350000 - 170 = 349830
         assertThat(result[1].profitLoss).isEqualTo(BigDecimal("349830.00"))
     }
+
+    @Test
+    fun `getProfitLoss should populate totalIncoming and totalBenefit for sold stocks`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 5)
+
+        val buyTransaction = BuyTransaction(
+            id = 1,
+            stockLot = stockLot,
+            unit = 10,
+            price = BigDecimal("1000.00"),
+            fee = BigDecimal("100.00"),
+            isNisa = false,
+            transactionDate = LocalDate.of(2024, 1, 1)
+        )
+
+        val sellTransaction = SellTransaction(
+            id = 1,
+            buyTransaction = buyTransaction,
+            unit = 5,
+            price = BigDecimal("1500.00"),
+            fee = BigDecimal("50.00"),
+            transactionDate = LocalDate.of(2024, 6, 1)
+        )
+
+        val incomingHistory1 = com.example.stock.model.IncomingHistory(
+            id = 1,
+            stockLot = null,
+            sellTransaction = sellTransaction,
+            incoming = BigDecimal("1000.00"),
+            paymentDate = LocalDate.of(2024, 3, 1)
+        )
+
+        val incomingHistory2 = com.example.stock.model.IncomingHistory(
+            id = 2,
+            stockLot = null,
+            sellTransaction = sellTransaction,
+            incoming = BigDecimal("1500.00"),
+            paymentDate = LocalDate.of(2024, 9, 1)
+        )
+
+        val benefitHistory = com.example.stock.model.BenefitHistory(
+            id = 1,
+            stockLot = null,
+            sellTransaction = sellTransaction,
+            benefit = BigDecimal("3000.00"),
+            paymentDate = LocalDate.of(2024, 12, 1)
+        )
+
+        mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
+        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(incomingHistory1, incomingHistory2))
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(benefitHistory))
+
+        // when
+        val result = profitlossService.getProfitLoss()
+
+        // then
+        assertThat(result).hasSize(1)
+        assertThat(result[0].stockCode).isEqualTo("1234")
+        assertThat(result[0].stockName).isEqualTo("Toyota")
+        assertThat(result[0].purchasePrice).isEqualTo(1000.00)
+        assertThat(result[0].sellPrice).isEqualTo(1500.00)
+        assertThat(result[0].sellUnit).isEqualTo(5)
+        // totalIncoming = 1000 + 1500 = 2500
+        assertThat(result[0].totalIncoming).isEqualTo(2500.00)
+        // totalBenefit = 3000
+        assertThat(result[0].totalBenefit).isEqualTo(3000.00)
+        // 損益 = (1500 - 1000) * 5 * 100 - 100 - 50 = 500 * 500 - 150 = 250000 - 150 = 249850
+        assertThat(result[0].profitLoss).isEqualTo(BigDecimal("249850.00"))
+    }
+
+    @Test
+    fun `getProfitLoss should handle zero totalIncoming and totalBenefit for sold stocks`() {
+        // given
+        val owner = Owner(id = 1, name = "Test Owner")
+        val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 5)
+
+        val buyTransaction = BuyTransaction(
+            id = 1,
+            stockLot = stockLot,
+            unit = 10,
+            price = BigDecimal("1000.00"),
+            fee = BigDecimal("100.00"),
+            isNisa = false,
+            transactionDate = LocalDate.of(2024, 1, 1)
+        )
+
+        val sellTransaction = SellTransaction(
+            id = 1,
+            buyTransaction = buyTransaction,
+            unit = 5,
+            price = BigDecimal("1500.00"),
+            fee = BigDecimal("50.00"),
+            transactionDate = LocalDate.of(2024, 6, 1)
+        )
+
+        mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
+        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
+
+        // when
+        val result = profitlossService.getProfitLoss()
+
+        // then
+        assertThat(result).hasSize(1)
+        assertThat(result[0].totalIncoming).isEqualTo(0.00)
+        assertThat(result[0].totalBenefit).isEqualTo(0.00)
+    }
 }
