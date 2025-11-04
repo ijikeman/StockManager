@@ -175,6 +175,29 @@ class StockServiceTest {
     }
 
     @Test
+    fun `updateStockPrice should preserve old incoming value when new incoming is null`() {
+        // given: Test case for when dividend value is "---" (null)
+        val code = "1301"
+        val originalStock = Stock(id = 1, code = code, name = "teststock", currentPrice = 1000.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 1), sector = sector, minimalUnit = 100)
+        // StockInfo with null incoming (simulating "---" dividend value from web scraping)
+        val stockInfo = StockInfo(price = 1200.0, incoming = null, earningsDate = java.time.LocalDate.of(2025, 1, 2), previousPrice = 1100.0, latestDisclosureDate = null)
+        val updatedStock = originalStock.copy(currentPrice = 1200.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 2), previousPrice = 1100.0)
+
+        mockitoWhen(yahooFinanceProvider.fetchStockInfo(code)).thenReturn(stockInfo)
+        mockitoWhen(stockRepository.findByCode(code)).thenReturn(originalStock)
+        mockitoWhen(stockRepository.save(updatedStock)).thenReturn(updatedStock)
+
+        // when
+        val result = stockService.updateStockPrice(code)
+
+        // then: The incoming value should remain unchanged (10.0) even though new value was null
+        assertThat(result).isNotNull
+        assertThat(result?.currentPrice).isEqualTo(1200.0) // Price should be updated
+        assertThat(result?.incoming).isEqualTo(10.0) // Incoming should preserve old value
+        assertThat(result?.earningsDate).isEqualTo(java.time.LocalDate.of(2025, 1, 2))
+    }
+
+    @Test
     fun `updateAllStockPrices should update all stocks`() {
         // given
     val stock1 = Stock(id = 1, code = "1301", name = "stock1", currentPrice = 1000.0, incoming = 10.0, earningsDate = java.time.LocalDate.of(2025, 1, 1), sector = sector, minimalUnit = 100)

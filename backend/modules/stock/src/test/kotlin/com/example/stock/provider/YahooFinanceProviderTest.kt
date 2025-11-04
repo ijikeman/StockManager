@@ -50,4 +50,14 @@ class YahooFinanceProviderTest {
         val name = provider.fetchStockName("dummy")
         assertEquals("テスト株式会社", name)
     }
+
+    @Test
+    fun `toDoubleOrNull should return null when text is ---`() {
+        // Test that the "---" string correctly converts to null
+        val text = "---"
+        val result = text.toDoubleOrNull()
+        
+        // Verify that "---" is correctly parsed as null
+        assertNull(result, "The text '---' should convert to null")
+    }
 }
