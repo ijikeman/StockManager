@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import Dashboard from '../views/dashboard/Dashboard.vue';
 import OwnerList from '../views/owner/List.vue';
 import OwnerAddEdit from '../views/owner/AddEdit.vue';
 import StockList from '../views/stock/List.vue';
@@ -19,7 +20,8 @@ import ProfitLossList from '../views/profitloss/List.vue';
 const routes = [
   {
     path: '/',
-    redirect: '/sector'
+    name: 'Dashboard',
+    component: Dashboard
   },
   {
     path: '/profitloss',
