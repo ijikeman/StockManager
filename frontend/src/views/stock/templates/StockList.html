@@ -56,7 +56,7 @@
         <td :class="getPriceChangeClass(stock)">{{ formatPriceChange(stock) }}</td>
         <td>{{ stock.incoming }}</td>
         <td :class="getEarningDateClass(stock.earningsDate)">{{ formatEarningsDate(stock.earningsDate) }}</td>
-        <td>
+        <td :class="getDisclosureDateClass(stock.latestDisclosureDate)">
           <a v-if="stock.latestDisclosureDate && getDisclosureUrl(stock)" 
              :href="getDisclosureUrl(stock)" 
              target="_blank" 

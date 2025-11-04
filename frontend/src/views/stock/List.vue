@@ -132,6 +132,27 @@ export default {
       }
     },
 
+    getDisclosureDateClass(date) {
+      if (!date) return '';
+      
+      const disclosureDate = new Date(date);
+      const today = new Date();
+      
+      disclosureDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = disclosureDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        return 'earnings-future';
+      } else if (diffDays < 0) {
+        return 'earnings-past';
+      } else {
+        return 'earnings-today';
+      }
+    },
+
     formatEarningsDate(date) {
       if (!date) return '-';
       
