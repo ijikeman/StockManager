@@ -61,7 +61,7 @@
              :href="getDisclosureUrl(stock)" 
              target="_blank" 
              rel="noopener noreferrer"
-             class="disclosure-link">
+             :class="['disclosure-link', getDisclosureDateClass(stock.latestDisclosureDate)]">
             {{ formatDisclosureDate(stock.latestDisclosureDate) }}
           </a>
           <span v-else>-</span>

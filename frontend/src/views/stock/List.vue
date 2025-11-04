@@ -111,16 +111,16 @@ export default {
         }
       }
     },
-    getEarningDateClass(date) {
+    getDateClass(date) {
       if (!date) return '';
       
-      const earningsDate = new Date(date);
+      const targetDate = new Date(date);
       const today = new Date();
       
-      earningsDate.setHours(0, 0, 0, 0);
+      targetDate.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
       
-      const diffTime = earningsDate - today;
+      const diffTime = targetDate - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
       if (diffDays > 0) {
@@ -130,6 +130,14 @@ export default {
       } else {
         return 'earnings-today';
       }
+    },
+
+    getEarningDateClass(date) {
+      return this.getDateClass(date);
+    },
+
+    getDisclosureDateClass(date) {
+      return this.getDateClass(date);
     },
 
     formatEarningsDate(date) {
@@ -273,11 +281,23 @@ export default {
 }
 
 .disclosure-link {
-  color: #007bff;
   text-decoration: none;
 }
 
 .disclosure-link:hover {
   text-decoration: underline;
+}
+
+/* Ensure temporal colors override link default color */
+.disclosure-link.earnings-past {
+  color: #dc3545;
+}
+
+.disclosure-link.earnings-today {
+  color: #007bff;
+}
+
+.disclosure-link.earnings-future {
+  color: #28a745;
 }
 </style>
