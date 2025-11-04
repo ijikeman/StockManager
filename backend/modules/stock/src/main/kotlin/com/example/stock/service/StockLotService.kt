@@ -285,7 +285,7 @@ class StockLotService(
             if (incomingHistories.isNotEmpty()) {
                 incomingHistories.forEach { history ->
                     history.stockLot = null
-                    history.sellTransaction = null
+                    history.sellTransaction = savedSellTransaction
                     incomingHistoryRepository.save(history)
                 }
             }
@@ -293,7 +293,7 @@ class StockLotService(
             if (benefitHistories.isNotEmpty()) {
                 benefitHistories.forEach { history ->
                     history.stockLot = null
-                    history.sellTransaction = null
+                    history.sellTransaction = savedSellTransaction
                     benefitHistoryRepository.save(history)
                 }
             }
