@@ -75,7 +75,10 @@ class YahooFinanceProvider(
     private fun extractIncoming(doc: org.jsoup.nodes.Document): Double? {
         val dividendElement = doc.select("dt").find { it.text().contains("1株配当") }
         val valueText = dividendElement?.nextElementSibling()?.selectFirst("""span[class*="DataListItem__value"]""")?.text()
-        return valueText?.toDoubleOrNull()
+        // Explicitly check for "---" (Yahoo Finance's placeholder for unavailable dividend data)
+        // While toDoubleOrNull() would return null anyway, this makes the intention clear
+        // and ensures that when dividend data is unavailable, the database retains the previous value
+        return if (valueText == "---" || valueText.isNullOrBlank()) null else valueText.toDoubleOrNull()
     }
 
     private fun extractEarningsDate(doc: org.jsoup.nodes.Document): LocalDate? {
