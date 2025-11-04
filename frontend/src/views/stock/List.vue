@@ -281,11 +281,23 @@ export default {
 }
 
 .disclosure-link {
-  color: #007bff;
   text-decoration: none;
 }
 
 .disclosure-link:hover {
   text-decoration: underline;
+}
+
+/* Ensure temporal colors override link default color */
+.disclosure-link.earnings-past {
+  color: #dc3545;
+}
+
+.disclosure-link.earnings-today {
+  color: #007bff;
+}
+
+.disclosure-link.earnings-future {
+  color: #28a745;
 }
 </style>
