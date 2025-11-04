@@ -168,8 +168,8 @@
           <td>{{ item.sellTransactionDate || '-' }}</td>
           <td class="price-cell">{{ item.sellPrice ? fmt(item.sellPrice) : '-' }}</td>
           <td class="text-center">{{ item.sellUnit || '-' }}</td>
-          <td class="price-cell positive">{{ fmt((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
-          <td class="price-cell positive">{{ fmt((item.totalBenefit * item.currentUnit * item.minimalUnit) || 0) }}</td>
+          <td class="price-cell positive">{{ fmt((item.totalIncoming * item.sellUnit * item.minimalUnit) || 0) }}</td>
+          <td class="price-cell positive">{{ fmt((item.totalBenefit * item.sellUnit * item.minimalUnit) || 0) }}</td>
           <td class="price-cell" :class="(item.profitLoss || 0) >= 0 ? 'positive' : 'negative'">
             {{ item.profitLoss ? fmt(item.profitLoss) : '-' }}
           </td>
