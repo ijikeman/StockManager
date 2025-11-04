@@ -121,7 +121,7 @@ class ProfitlossService(
      * @param ownerId 所有者ID（オプション）。指定された場合は、その所有者の株式ロットのみを取得します。
      * @return 損益情報のリスト
      */
-    fun getProfitLoss(ownerId: Int? = null): List<ProfitlossDto> {
+    fun getSellTransactionProfitloss(ownerId: Int? = null): List<ProfitlossDto> {
         val stockLots = if (ownerId != null) {
             stockLotService.findByOwnerId(ownerId)
         } else {
@@ -195,54 +195,33 @@ class ProfitlossService(
             buyTransactions.forEach { buyTransaction ->
                 val sellTransactions = sellTransactionsMap[buyTransaction.id] ?: emptyList()
                 
-                if (sellTransactions.isNotEmpty()) {
-                    // 売却取引がある場合、各売却取引ごとにDTOを作成
-                    sellTransactions.forEach { sellTransaction ->
-                        // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
-                        val profitLoss = ((sellTransaction.price - buyTransaction.price) * 
-                                        sellTransaction.unit.toBigDecimal() * 
-                                        stockLot.stock.minimalUnit.toBigDecimal()) - 
-                                        buyTransaction.fee - 
-                                        sellTransaction.fee
-                        
-                        // 売却取引に対応する配当金と優待金を取得
-                        val totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
-                        val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
-                        
-                        result.add(ProfitlossDto(
-                            stockCode = stockLot.stock.code,
-                            stockName = stockLot.stock.name,
-                            minimalUnit = stockLot.stock.minimalUnit,
-                            purchasePrice = buyTransaction.price.toDouble(),
-                            sellPrice = sellTransaction.price.toDouble(),
-                            sellUnit = sellTransaction.unit,
-                            totalIncoming = totalIncoming.toDouble(),
-                            totalBenefit = totalBenefit.toDouble(),
-                            profitLoss = profitLoss,
-                            buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = sellTransaction.transactionDate,
-                            ownerName = stockLot.owner.name
-                        ))
-                    }
-                } else {
-                    // 売却取引がない場合（保有中の株式）、基本情報のみのDTOを作成
-                    // ただし、currentUnitが0より大きい場合のみ
-                    if (stockLot.currentUnit > 0) {
-                        result.add(ProfitlossDto(
-                            stockCode = stockLot.stock.code,
-                            stockName = stockLot.stock.name,
-                            minimalUnit = stockLot.stock.minimalUnit,
-                            purchasePrice = buyTransaction.price.toDouble(),
-                            sellPrice = null,
-                            sellUnit = null,
-                            totalIncoming = null,
-                            totalBenefit = null,
-                            profitLoss = null,
-                            buyTransactionDate = buyTransaction.transactionDate,
-                            sellTransactionDate = null,
-                            ownerName = stockLot.owner.name
-                        ))
-                    }
+                // 売却取引がある場合のみ、各売却取引ごとにDTOを作成
+                sellTransactions.forEach { sellTransaction ->
+                    // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
+                    val profitLoss = ((sellTransaction.price - buyTransaction.price) * 
+                                    sellTransaction.unit.toBigDecimal() * 
+                                    stockLot.stock.minimalUnit.toBigDecimal()) - 
+                                    buyTransaction.fee - 
+                                    sellTransaction.fee
+                    
+                    // 売却取引に対応する配当金と優待金を取得
+                    val totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                    val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                    
+                    result.add(ProfitlossDto(
+                        stockCode = stockLot.stock.code,
+                        stockName = stockLot.stock.name,
+                        minimalUnit = stockLot.stock.minimalUnit,
+                        purchasePrice = buyTransaction.price.toDouble(),
+                        sellPrice = sellTransaction.price.toDouble(),
+                        sellUnit = sellTransaction.unit,
+                        totalIncoming = totalIncoming.toDouble(),
+                        totalBenefit = totalBenefit.toDouble(),
+                        profitLoss = profitLoss,
+                        buyTransactionDate = buyTransaction.transactionDate,
+                        sellTransactionDate = sellTransaction.transactionDate,
+                        ownerName = stockLot.owner.name
+                    ))
                 }
             }
         }

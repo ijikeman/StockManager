@@ -148,7 +148,7 @@ class ProfitlossControllerTest {
     }
 
     @Test
-    fun `getProfitLoss should return list of realized profit loss with totalIncoming and totalBenefit`() {
+    fun `getSellTransactionProfitloss should return list of realized profit loss with totalIncoming and totalBenefit`() {
         val date = LocalDate.of(2025, 1, 1)
         val profitlossList = listOf(
             com.example.stock.dto.ProfitlossDto(
@@ -167,7 +167,7 @@ class ProfitlossControllerTest {
             )
         )
 
-        whenever(profitlossService.getProfitLoss(null)).thenReturn(profitlossList)
+        whenever(profitlossService.getSellTransactionProfitloss(null)).thenReturn(profitlossList)
 
         mockMvc.perform(get("/api/profitloss/realized"))
             .andExpect(status().isOk)
@@ -186,8 +186,8 @@ class ProfitlossControllerTest {
     }
 
     @Test
-    fun `getProfitLoss should return empty list when no realized profit loss exists`() {
-        whenever(profitlossService.getProfitLoss(null)).thenReturn(emptyList())
+    fun `getSellTransactionProfitloss should return empty list when no realized profit loss exists`() {
+        whenever(profitlossService.getSellTransactionProfitloss(null)).thenReturn(emptyList())
 
         mockMvc.perform(get("/api/profitloss/realized"))
             .andExpect(status().isOk)

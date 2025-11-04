@@ -44,7 +44,7 @@ class ProfitlossServiceTest {
     private lateinit var benefitHistoryRepository: BenefitHistoryRepository
 
     @Test
-    fun `getProfitLoss should return list of profitloss DTOs with purchase prices`() {
+    fun `getSellTransactionProfitloss should return empty list when no sell transactions exist`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -80,34 +80,26 @@ class ProfitlossServiceTest {
         mockitoWhen(sellTransactionRepository.findByBuyTransactionId(2)).thenReturn(emptyList())
 
         // when
-        val result = profitlossService.getProfitLoss()
-
-        // then
-        assertThat(result).hasSize(2)
-        assertThat(result[0].stockCode).isEqualTo("1234")
-        assertThat(result[0].stockName).isEqualTo("Toyota")
-        assertThat(result[0].purchasePrice).isEqualTo(1200.25)
-        assertThat(result[0].profitLoss).isNull()
-        assertThat(result[1].stockCode).isEqualTo("5678")
-        assertThat(result[1].stockName).isEqualTo("Sony")
-        assertThat(result[1].purchasePrice).isEqualTo(2100.75)
-        assertThat(result[1].profitLoss).isNull()
-    }
-
-    @Test
-    fun `getProfitLoss should return empty list when no stock lots exist`() {
-        // given
-        mockitoWhen(stockLotService.findAll()).thenReturn(emptyList())
-
-        // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun `getProfitLoss should handle stock lots without buy transactions`() {
+    fun `getSellTransactionProfitloss should return empty list when no stock lots exist`() {
+        // given
+        mockitoWhen(stockLotService.findAll()).thenReturn(emptyList())
+
+        // when
+        val result = profitlossService.getSellTransactionProfitloss()
+
+        // then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `getSellTransactionProfitloss should handle stock lots without buy transactions`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -117,14 +109,14 @@ class ProfitlossServiceTest {
         mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(emptyList())
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun `getProfitLoss should filter by ownerId when provided`() {
+    fun `getSellTransactionProfitloss should filter by ownerId when provided`() {
         // given
         val owner1 = Owner(id = 1, name = "Owner 1")
         val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -147,30 +139,26 @@ class ProfitlossServiceTest {
         mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(emptyList())
 
         // when
-        val result = profitlossService.getProfitLoss(1)
-
-        // then
-        assertThat(result).hasSize(1)
-        assertThat(result[0].stockCode).isEqualTo("1234")
-        assertThat(result[0].stockName).isEqualTo("Toyota")
-        assertThat(result[0].purchasePrice).isEqualTo(1200.25)
-        assertThat(result[0].profitLoss).isNull()
-    }
-
-    @Test
-    fun `getProfitLoss should return empty list when no stock lots exist for specific owner`() {
-        // given
-        mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(emptyList())
-
-        // when
-        val result = profitlossService.getProfitLoss(1)
+        val result = profitlossService.getSellTransactionProfitloss(1)
 
         // then
         assertThat(result).isEmpty()
     }
 
     @Test
-    fun `getProfitLoss should exclude stock lots with zero currentUnit`() {
+    fun `getSellTransactionProfitloss should return empty list when no stock lots exist for specific owner`() {
+        // given
+        mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(emptyList())
+
+        // when
+        val result = profitlossService.getSellTransactionProfitloss(1)
+
+        // then
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `getSellTransactionProfitloss should exclude stock lots with zero currentUnit`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock1 = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -195,18 +183,14 @@ class ProfitlossServiceTest {
         mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(emptyList())
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
-        assertThat(result).hasSize(1) // Only the stock lot with non-zero units should be returned
-        assertThat(result[0].stockCode).isEqualTo("1234")
-        assertThat(result[0].stockName).isEqualTo("Toyota")
-        assertThat(result[0].purchasePrice).isEqualTo(1200.25)
-        assertThat(result[0].profitLoss).isNull()
+        assertThat(result).isEmpty() // No sell transactions, so no results
     }
 
     @Test
-    fun `getProfitLoss should calculate profit loss when sell transactions exist`() {
+    fun `getSellTransactionProfitloss should calculate profit loss when sell transactions exist`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -236,7 +220,7 @@ class ProfitlossServiceTest {
         mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).hasSize(1)
@@ -252,7 +236,7 @@ class ProfitlossServiceTest {
     }
 
     @Test
-    fun `getProfitLoss should return multiple entries when multiple sell transactions exist`() {
+    fun `getSellTransactionProfitloss should return multiple entries when multiple sell transactions exist`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -292,7 +276,7 @@ class ProfitlossServiceTest {
             .thenReturn(listOf(sellTransaction1, sellTransaction2))
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).hasSize(2)
@@ -317,7 +301,7 @@ class ProfitlossServiceTest {
     }
 
     @Test
-    fun `getProfitLoss should populate totalIncoming and totalBenefit for sold stocks`() {
+    fun `getSellTransactionProfitloss should populate totalIncoming and totalBenefit for sold stocks`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -373,7 +357,7 @@ class ProfitlossServiceTest {
         mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(benefitHistory))
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).hasSize(1)
@@ -391,7 +375,7 @@ class ProfitlossServiceTest {
     }
 
     @Test
-    fun `getProfitLoss should handle zero totalIncoming and totalBenefit for sold stocks`() {
+    fun `getSellTransactionProfitloss should handle zero totalIncoming and totalBenefit for sold stocks`() {
         // given
         val owner = Owner(id = 1, name = "Test Owner")
         val stock = Stock(id = 1, code = "1234", name = "Toyota", currentPrice = 1500.0, minimalUnit = 100)
@@ -423,7 +407,7 @@ class ProfitlossServiceTest {
         mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
 
         // when
-        val result = profitlossService.getProfitLoss()
+        val result = profitlossService.getSellTransactionProfitloss()
 
         // then
         assertThat(result).hasSize(1)
