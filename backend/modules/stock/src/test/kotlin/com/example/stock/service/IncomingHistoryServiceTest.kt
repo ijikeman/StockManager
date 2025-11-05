@@ -143,4 +143,42 @@ class IncomingHistoryServiceTest {
         assertThat(captured.incoming).isEqualByComparingTo(updateDto.incoming)
         assertThat(captured.stockLot).isEqualTo(stockLot)
     }
+
+    @Test
+    fun `create with NISA flag should save and return IncomingHistory with correct NISA flag`() {
+        // Arrange
+        val dto = IncomingHistoryAddDto(
+            paymentDate = LocalDate.of(2025, 10, 7),
+            lotId = 1,
+            incoming = BigDecimal("1000.00"),
+            isNisa = true
+        )
+
+        val owner = Owner(id = 1, name = "testOwner")
+        val stock = Stock(id = 1, code = "TST", name = "testStock")
+        val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 100)
+        mockitoWhen(stockLotRepository.findById(dto.lotId)).thenReturn(Optional.of(stockLot))
+
+        val expectedHistory = IncomingHistory(
+            stockLot = stockLot,
+            incoming = dto.incoming,
+            paymentDate = dto.paymentDate,
+            isNisa = dto.isNisa
+        )
+        val savedHistory = expectedHistory.copy(id = 125)
+        mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
+
+        // Act
+        val result = incomingHistoryService.create(dto)
+
+        // Assert
+        verify(incomingHistoryRepository).save(incomingHistoryCaptor.capture())
+        val captured = incomingHistoryCaptor.value
+
+        assertThat(result).isEqualTo(savedHistory)
+        assertThat(captured.stockLot).isEqualTo(stockLot)
+        assertThat(captured.incoming).isEqualByComparingTo(dto.incoming)
+        assertThat(captured.paymentDate).isEqualTo(dto.paymentDate)
+        assertThat(captured.isNisa).isEqualTo(true)
+    }
 }
