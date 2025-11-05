@@ -21,6 +21,19 @@ class ProfitlossService(
     private val incomingHistoryRepository: IncomingHistoryRepository,
     private val benefitHistoryRepository: BenefitHistoryRepository
 ) {
+    
+    companion object {
+        /**
+         * 株式譲渡益課税率 (20% 所得税 + 0.315% 復興特別所得税 = 20.315%)
+         * NISA口座でない場合に適用される税率
+         */
+        private const val TAX_STOCK_CAPITALGAINSTAXRATE = 0.20315
+        
+        /**
+         * 税引き後の割合 (1 - TAX_STOCK_CAPITALGAINSTAXRATE = 0.79685)
+         */
+        private val AFTER_TAX_RATIO = BigDecimal.ONE - BigDecimal(TAX_STOCK_CAPITALGAINSTAXRATE.toString())
+    }
 
     /**
      * 株式ロットから損益情報を取得します。
@@ -90,7 +103,7 @@ class ProfitlossService(
         return stockLots.map { stockLot ->
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
             // 各購入取引の配当金額と優待金額を合計
-            val totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
+            var totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
                 acc + (incomingTotalsMap[bt.id] ?: BigDecimal.ZERO)
             }
             val totalBenefit = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
@@ -101,6 +114,28 @@ class ProfitlossService(
             
             // すべての購入取引がNISAの場合のみisNisa=trueとする
             val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
+            
+            // NISAでない場合は配当金に税金を適用
+            if (!isNisa) {
+                totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
+            }
+            
+            // 評価損益を計算（NISAでない場合は税金を適用）
+            val evaluationGain = if (stockLot.stock.currentPrice != null && stockLot.currentUnit != null) {
+                val purchasePrice = firstBuyTransaction?.price ?: BigDecimal.ZERO
+                val currentPriceBD = BigDecimal.valueOf(stockLot.stock.currentPrice)
+                val gain = (currentPriceBD - purchasePrice)
+                    .multiply(BigDecimal.valueOf(stockLot.currentUnit.toLong()))
+                    .multiply(BigDecimal.valueOf(stockLot.stock.minimalUnit.toLong()))
+                
+                if (!isNisa) {
+                    gain.multiply(AFTER_TAX_RATIO)
+                } else {
+                    gain
+                }
+            } else {
+                null
+            }
 
             ProfitlossStockLotDto(
                 stockCode = stockLot.stock.code,
@@ -111,6 +146,7 @@ class ProfitlossService(
                 currentUnit = stockLot.currentUnit,
                 totalIncoming = totalIncoming,
                 totalBenefit = totalBenefit,
+                evaluationGain = evaluationGain,
                 buyTransactionDate = firstBuyTransaction?.transactionDate,
                 ownerName = stockLot.owner.name,
                 isNisa = isNisa
@@ -202,15 +238,21 @@ class ProfitlossService(
                 // 売却取引がある場合のみ、各売却取引ごとにDTOを作成
                 sellTransactions.forEach { sellTransaction ->
                     // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
-                    val profitLoss = ((sellTransaction.price - buyTransaction.price) * 
+                    var profitLoss = ((sellTransaction.price - buyTransaction.price) * 
                                     sellTransaction.unit.toBigDecimal() * 
                                     stockLot.stock.minimalUnit.toBigDecimal()) - 
                                     buyTransaction.fee - 
                                     sellTransaction.fee
                     
                     // 売却取引に対応する配当金と優待金を取得
-                    val totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                    var totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
                     val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
+                    
+                    // NISAでない場合は配当金と株価差益に税金を適用
+                    if (!buyTransaction.isNisa) {
+                        totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
+                        profitLoss = profitLoss.multiply(AFTER_TAX_RATIO)
+                    }
                     
                     result.add(ProfitlossDto(
                         stockCode = stockLot.stock.code,
