@@ -32,7 +32,7 @@ class ProfitlossService(
         /**
          * 税引き後の割合 (1 - TAX_STOCK_CAPITALGAINSTAXRATE = 0.79685)
          */
-        private val AFTER_TAX_RATIO = BigDecimal.ONE - BigDecimal(TAX_STOCK_CAPITALGAINSTAXRATE.toString())
+        private val AFTER_TAX_RATIO = BigDecimal.ONE - BigDecimal.valueOf(TAX_STOCK_CAPITALGAINSTAXRATE)
     }
 
     /**

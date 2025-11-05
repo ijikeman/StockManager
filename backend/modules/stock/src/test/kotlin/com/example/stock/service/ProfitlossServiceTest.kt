@@ -24,6 +24,12 @@ import java.time.LocalDate
  */
 @ExtendWith(MockitoExtension::class)
 class ProfitlossServiceTest {
+    
+    companion object {
+        // 株式譲渡益課税率 (ProfitlossServiceと同じ値)
+        private const val TAX_STOCK_CAPITALGAINSTAXRATE = 0.20315
+        private val AFTER_TAX_RATIO = BigDecimal.ONE - BigDecimal.valueOf(TAX_STOCK_CAPITALGAINSTAXRATE)
+    }
 
     @InjectMocks
     private lateinit var profitlossService: ProfitlossService
@@ -230,8 +236,8 @@ class ProfitlossServiceTest {
         assertThat(result[0].sellPrice).isEqualTo(1500.00)
         assertThat(result[0].sellUnit).isEqualTo(5)
         // 損益 = (1500 - 1000) * 5 * 100 - 100 - 50 = 500 * 500 - 150 = 250000 - 150 = 249850
-        // NISAでない場合は税引き後: 249850 * 0.79685 = 199092.9725
-        assertThat(result[0].profitLoss).isEqualByComparingTo(BigDecimal("199092.9725"))
+        val expectedProfitLoss = BigDecimal("249850").multiply(AFTER_TAX_RATIO)
+        assertThat(result[0].profitLoss).isEqualByComparingTo(expectedProfitLoss)
         assertThat(result[0].buyTransactionDate).isEqualTo(LocalDate.of(2024, 1, 1))
         assertThat(result[0].sellTransactionDate).isEqualTo(LocalDate.of(2024, 6, 1))
     }
@@ -289,8 +295,8 @@ class ProfitlossServiceTest {
         assertThat(result[0].sellPrice).isEqualTo(1200.00)
         assertThat(result[0].sellUnit).isEqualTo(3)
         // 損益 = (1200 - 1000) * 3 * 100 - 100 - 30 = 200 * 300 - 130 = 60000 - 130 = 59870
-        // NISAでない場合は税引き後: 59870 * 0.79685 = 47707.4095
-        assertThat(result[0].profitLoss).isEqualByComparingTo(BigDecimal("47707.4095"))
+        val expectedProfitLoss1 = BigDecimal("59870").multiply(AFTER_TAX_RATIO)
+        assertThat(result[0].profitLoss).isEqualByComparingTo(expectedProfitLoss1)
         
         // Second sell transaction
         assertThat(result[1].stockCode).isEqualTo("1234")
@@ -299,8 +305,8 @@ class ProfitlossServiceTest {
         assertThat(result[1].sellPrice).isEqualTo(1500.00)
         assertThat(result[1].sellUnit).isEqualTo(7)
         // 損益 = (1500 - 1000) * 7 * 100 - 100 - 70 = 500 * 700 - 170 = 350000 - 170 = 349830
-        // NISAでない場合は税引き後: 349830 * 0.79685 = 278762.0355
-        assertThat(result[1].profitLoss).isEqualByComparingTo(BigDecimal("278762.0355"))
+        val expectedProfitLoss2 = BigDecimal("349830").multiply(AFTER_TAX_RATIO)
+        assertThat(result[1].profitLoss).isEqualByComparingTo(expectedProfitLoss2)
     }
 
     @Test
@@ -370,13 +376,13 @@ class ProfitlossServiceTest {
         assertThat(result[0].sellPrice).isEqualTo(1500.00)
         assertThat(result[0].sellUnit).isEqualTo(5)
         // totalIncoming = 1000 + 1500 = 2500
-        // NISAでない場合は税引き後: 2500 * 0.79685 = 1992.125
-        assertThat(result[0].totalIncoming).isEqualTo(1992.125)
+        val expectedTotalIncoming = BigDecimal("2500").multiply(AFTER_TAX_RATIO).toDouble()
+        assertThat(result[0].totalIncoming).isEqualTo(expectedTotalIncoming)
         // totalBenefit = 3000
         assertThat(result[0].totalBenefit).isEqualTo(3000.00)
         // 損益 = (1500 - 1000) * 5 * 100 - 100 - 50 = 500 * 500 - 150 = 250000 - 150 = 249850
-        // NISAでない場合は税引き後: 249850 * 0.79685 = 199092.9725
-        assertThat(result[0].profitLoss).isEqualByComparingTo(BigDecimal("199092.9725"))
+        val expectedProfitLossWithIncoming = BigDecimal("249850").multiply(AFTER_TAX_RATIO)
+        assertThat(result[0].profitLoss).isEqualByComparingTo(expectedProfitLossWithIncoming)
     }
 
     @Test
