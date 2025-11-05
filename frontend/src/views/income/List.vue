@@ -10,7 +10,25 @@ export default {
       incomes: [],
     };
   },
+  computed: {
+    // Calculate displayed income with tax deduction for non-NISA accounts
+    displayIncomes() {
+      return this.incomes.map(income => ({
+        ...income,
+        displayAmount: this.calculateDisplayAmount(income)
+      }));
+    }
+  },
   methods: {
+    calculateDisplayAmount(income) {
+      // If NISA flag is false, apply tax (20.315% in Japan)
+      if (income.isNisa === false) {
+        const taxRate = 0.20315;
+        const afterTax = income.incoming * (1 - taxRate);
+        return Math.floor(afterTax); // Round down to integer
+      }
+      return income.incoming;
+    },
     async fetchIncomes() {
       try {
         const response = await axios.get('/api/incominghistory');

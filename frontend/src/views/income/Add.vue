@@ -10,7 +10,8 @@ export default {
       formData: {
         paymentDate: new Date().toISOString().slice(0, 10),
         lotId: null,
-        incoming: null
+        incoming: null,
+        isNisa: false
       },
       dividend_per_unit: null,
       stockLots: []

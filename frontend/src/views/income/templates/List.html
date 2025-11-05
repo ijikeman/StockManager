@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <table class="common-table" v-if="incomes.length > 0">
+  <table class="common-table" v-if="displayIncomes.length > 0">
     <thead>
       <tr>
         <th>日付</th>
@@ -16,13 +16,13 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="income in incomes" :key="income.id">
+      <tr v-for="income in displayIncomes" :key="income.id">
         <td>{{ income.paymentDate }}</td>
         <td>
           <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
           <span v-else-if="income.sellTransaction">{{ income.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
         </td>
-        <td>{{ income.incoming }}</td>
+        <td>{{ income.displayAmount }}</td>
         <td>
           <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>
           <button @click="deleteIncome(income.id)" class="btn btn-danger">削除</button>

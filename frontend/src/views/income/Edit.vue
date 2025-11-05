@@ -16,7 +16,8 @@ export default {
       formData: {
         paymentDate: '',
         incoming: null,
-        stockLot: null
+        stockLot: null,
+        isNisa: false
       },
       dividend_per_unit: null
     };
@@ -37,7 +38,8 @@ export default {
         this.formData = {
           paymentDate: response.data.paymentDate,
           incoming: response.data.incoming,
-          stockLot: response.data.stockLot
+          stockLot: response.data.stockLot,
+          isNisa: response.data.isNisa || false
         };
         if (this.formData.incoming) {
           this.dividend_per_unit = this.formData.incoming;
@@ -53,7 +55,8 @@ export default {
         const updateData = {
           paymentDate: this.formData.paymentDate,
           lotId: this.formData.stockLot.id,
-          incoming: Number(this.dividend_per_unit)
+          incoming: Number(this.dividend_per_unit),
+          isNisa: this.formData.isNisa
         };
 
         await axios.put(`/api/incominghistory/${this.id}`, updateData);

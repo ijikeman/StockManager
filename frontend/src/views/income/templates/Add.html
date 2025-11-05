@@ -31,6 +31,14 @@
         class="form-control"
       >
     </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" v-model="formData.isNisa">
+        NISA口座
+      </label>
+    </div>
+
     <div class="form-actions">
       <button type="submit" class="btn btn-success">保存</button>
       <button type="button" class="btn btn-secondary" @click="cancel">キャンセル</button>
