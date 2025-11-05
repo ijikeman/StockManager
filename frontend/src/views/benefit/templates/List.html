@@ -19,8 +19,8 @@
       <tr v-for="benefit in benefits" :key="benefit.id">
         <td>{{ benefit.paymentDate }}</td>
         <td>
-          <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
-          <span v-else-if="income.sellTransaction">{{ income.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
+          <span v-if="benefit.stockLot">{{ benefit.stockLot.stock?.name }}</span>
+          <span v-else-if="benefit.sellTransaction">{{ benefit.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
         </td>
         <td>{{ benefit.benefit }}</td>
         <td>
