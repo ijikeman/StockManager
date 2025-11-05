@@ -18,6 +18,7 @@ const aaplStockLot = {
   minimalUnit: 1,
   averagePrice: 150.00,
   purchaseDate: '2023-01-15',
+  incoming: 200.00,
 };
 
 

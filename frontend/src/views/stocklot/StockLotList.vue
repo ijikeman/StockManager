@@ -56,6 +56,31 @@ export default {
     goToSellPage(id) {
       this.$router.push(`/stocklot/sell/${id}`);
     },
+    /**
+     * 購入株価配当利回りを計算
+     * @param {Object} lot - ストックロットオブジェクト
+     * @returns {string} - フォーマットされた配当利回り
+     */
+    purchasePriceDividendYield(lot) {
+      const purchasePrice = lot.averagePrice ?? lot.price;
+      if (!purchasePrice || !lot.incoming || purchasePrice <= 0) {
+        return '0.00';
+      }
+      const yieldRate = (lot.incoming / purchasePrice) * 100;
+      return yieldRate.toFixed(2);
+    },
+    /**
+     * 現在株価配当利回りを計算
+     * @param {Object} lot - ストックロットオブジェクト
+     * @returns {string} - フォーマットされた配当利回り
+     */
+    currentPriceDividendYield(lot) {
+      if (!lot.stock?.currentPrice || !lot.incoming || lot.stock.currentPrice <= 0) {
+        return '0.00';
+      }
+      const yieldRate = (lot.incoming / lot.stock.currentPrice) * 100;
+      return yieldRate.toFixed(2);
+    },
   },
   watch: {
     selectedOwner() {
