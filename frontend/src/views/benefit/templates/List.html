@@ -10,7 +10,6 @@
     <thead>
       <tr>
         <th>日付</th>
-        <th>ロット番号</th>
         <th>銘柄名</th>
         <th>優待金</th>
         <th>アクション</th>
@@ -19,8 +18,10 @@
     <tbody>
       <tr v-for="benefit in benefits" :key="benefit.id">
         <td>{{ benefit.paymentDate }}</td>
-        <td>{{ benefit.stockLot?.id }}</td>
-        <td>{{ benefit.stockLot?.stock?.name }}</td>
+        <td>
+          <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
+          <span v-else-if="income.sellTransaction">{{ income.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
+        </td>
         <td>{{ benefit.benefit }}</td>
         <td>
           <button @click="editBenefit(benefit.id)" class="btn btn-secondary">編集</button>
