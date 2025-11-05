@@ -41,7 +41,7 @@
         <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
           {{ fmt(evaluation(lot)) }}
         </td>
-        <td>{{ lot.incoming }}</td>
+        <td>{{ fmt(lot.incoming) }}</td>
         <td>{{ purchasePriceDividendYield(lot) }}%</td>
         <td>{{ currentPriceDividendYield(lot) }}%</td>
         <td>
