@@ -1,44 +1,36 @@
-<template src="./templates/List.html"></template>
+<div>
+  <div class="page-header">
+    <h1 class="page-title">優待履歴</h1>
+    <div>
+      <button @click="goToAddBenefit" class="btn btn-primary">新規登録</button>
+    </div>
+  </div>
 
-<script>
-import axios from 'axios';
-
-export default {
-  name: 'BenefitList',
-  data() {
-    return {
-      benefits: [],
-    };
-  },
-  methods: {
-    async fetchBenefits() {
-      try {
-        const response = await axios.get('/api/benefithistory');
-        this.benefits = response.data;
-      } catch (error) {
-        console.error('Error fetching benefits:', error);
-      }
-    },
-    goToAddBenefit() {
-      this.$router.push('/benefit/add');
-    },
-    editBenefit(id) {
-      this.$router.push(`/benefit/edit/${id}`);
-    },
-    async deleteBenefit(id) {
-      if (confirm('Are you sure you want to delete this benefit?')) {
-        try {
-          await axios.delete(`/api/benefithistory/${id}`);
-          this.fetchBenefits();
-        } catch (error) {
-          console.error('Error deleting benefit:', error);
-          alert('Failed to delete benefit.');
-        }
-      }
-    },
-  },
-  mounted() {
-    this.fetchBenefits();
-  }
-};
-</script>
+  <table class="common-table" v-if="benefits.length > 0">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>銘柄名</th>
+        <th>優待金</th>
+        <th>アクション</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="benefit in benefits" :key="benefit.id">
+        <td>{{ benefit.paymentDate }}</td>
+        <td>
+          <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
+          <span v-else-if="income.sellTransaction">{{ income.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
+        </td>
+        <td>{{ benefit.benefit }}</td>
+        <td>
+          <button @click="editBenefit(benefit.id)" class="btn btn-secondary">編集</button>
+          <button @click="deleteBenefit(benefit.id)" class="btn btn-danger">削除</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div v-else>
+    <p>データはありません</p>
+  </div>
+</div>
