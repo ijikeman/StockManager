@@ -17,5 +17,6 @@ data class ProfitlossStockLotDto(
     val totalIncoming: BigDecimal? = null, // 総配当金額
     val totalBenefit: BigDecimal? = null, // 総優待金額
     val buyTransactionDate: LocalDate? = null, // 購入取引日
-    val ownerName: String? = null // 所有者名
+    val ownerName: String? = null, // 所有者名
+    val isNisa: Boolean = false // NISAかどうか
 )

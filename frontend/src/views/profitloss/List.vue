@@ -342,4 +342,12 @@ export default {
 .text-center {
   text-align: center;
 }
+
+.nisa-row {
+  background-color: #c8f7c5 !important;
+}
+
+.nisa-row td {
+  background-color: #c8f7c5 !important;
+}
 </style>
