@@ -312,7 +312,8 @@ class StockLotService(
                         stockLot = null,
                         sellTransaction = savedSellTransaction,
                         incoming = history.incoming,
-                        paymentDate = history.paymentDate
+                        paymentDate = history.paymentDate,
+                        isNisa = history.isNisa
                     )
                     incomingHistoryRepository.save(duplicatedHistory)
                 }

@@ -6,5 +6,6 @@ import java.time.LocalDate
 data class IncomingHistoryAddDto(
     val paymentDate: LocalDate,
     val lotId: Int,
-    val incoming: BigDecimal
+    val incoming: BigDecimal,
+    val isNisa: Boolean = false
 )

@@ -73,14 +73,16 @@ class StockLotSellWithHistoryIntegrationTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("50.00"),
-            paymentDate = LocalDate.of(2025, 9, 1)
+            paymentDate = LocalDate.of(2025, 9, 1),
+            isNisa = false
         ))
 
         val incomingHistory2 = entityManager.persist(IncomingHistory(
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("60.00"),
-            paymentDate = LocalDate.of(2025, 10, 1)
+            paymentDate = LocalDate.of(2025, 10, 1),
+            isNisa = false
         ))
 
         entityManager.flush()
@@ -243,7 +245,8 @@ class StockLotSellWithHistoryIntegrationTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("80.00"),
-            paymentDate = LocalDate.of(2025, 9, 10)
+            paymentDate = LocalDate.of(2025, 9, 10),
+            isNisa = false
         ))
 
         entityManager.flush()

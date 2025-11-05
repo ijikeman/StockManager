@@ -63,7 +63,8 @@ class IncomingHistoryRepositoryTest {
             stockLot = persistedStockLot,
             sellTransaction = null,
             incoming = BigDecimal("400.0"),
-            paymentDate = java.time.LocalDate.now()
+            paymentDate = java.time.LocalDate.now(),
+            isNisa = false
         )
         val persistedIncomingHistory = entityManager.persist(incomingHistory)
 
@@ -124,7 +125,8 @@ class IncomingHistoryRepositoryTest {
             stockLot = null,
             sellTransaction = persistedSellTransaction,
             incoming = BigDecimal("400.0"),
-            paymentDate = java.time.LocalDate.now()
+            paymentDate = java.time.LocalDate.now(),
+            isNisa = false
         )
         val persistedIncomingHistory = entityManager.persist(incomingHistory)
 

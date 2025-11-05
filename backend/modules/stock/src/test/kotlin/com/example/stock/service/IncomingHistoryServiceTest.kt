@@ -48,7 +48,8 @@ class IncomingHistoryServiceTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("500.00"),
-            paymentDate = LocalDate.of(2025, 10, 6)
+            paymentDate = LocalDate.of(2025, 10, 6),
+            isNisa = false
         )
         val savedHistory = incomingHistory.copy(id = 123)
         mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
@@ -80,7 +81,8 @@ class IncomingHistoryServiceTest {
         val expectedHistory = IncomingHistory(
             stockLot = stockLot,
             incoming = dto.incoming,
-            paymentDate = dto.paymentDate
+            paymentDate = dto.paymentDate,
+            isNisa = dto.isNisa
         )
         val savedHistory = expectedHistory.copy(id = 124)
         mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
@@ -110,7 +112,8 @@ class IncomingHistoryServiceTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("500.00"),
-            paymentDate = LocalDate.of(2025, 10, 6)
+            paymentDate = LocalDate.of(2025, 10, 6),
+            isNisa = false
         )
         
         val updateDto = IncomingHistoryAddDto(
@@ -121,7 +124,8 @@ class IncomingHistoryServiceTest {
         
         val updatedHistory = existing.copy(
             paymentDate = updateDto.paymentDate,
-            incoming = updateDto.incoming
+            incoming = updateDto.incoming,
+            isNisa = updateDto.isNisa
         )
         
         mockitoWhen(incomingHistoryRepository.findById(123)).thenReturn(Optional.of(existing))

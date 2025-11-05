@@ -55,7 +55,8 @@ class IncomingHistoryService(
 		val incomingHistory = IncomingHistory(
 			paymentDate = dto.paymentDate,
 			stockLot = stockLot,
-			incoming = dto.incoming
+			incoming = dto.incoming,
+			isNisa = dto.isNisa
 		)
 
 		return incomingHistoryRepository.save(incomingHistory)
@@ -78,7 +79,8 @@ class IncomingHistoryService(
 
 		val updated = existing.copy(
 			paymentDate = dto.paymentDate,
-			incoming = dto.incoming
+			incoming = dto.incoming,
+			isNisa = dto.isNisa
 		)
 
 		return incomingHistoryRepository.save(updated)

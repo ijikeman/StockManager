@@ -331,7 +331,8 @@ class ProfitlossServiceTest {
             stockLot = null,
             sellTransaction = sellTransaction,
             incoming = BigDecimal("1000.00"),
-            paymentDate = LocalDate.of(2024, 3, 1)
+            paymentDate = LocalDate.of(2024, 3, 1),
+            isNisa = false
         )
 
         val incomingHistory2 = com.example.stock.model.IncomingHistory(
@@ -339,7 +340,8 @@ class ProfitlossServiceTest {
             stockLot = null,
             sellTransaction = sellTransaction,
             incoming = BigDecimal("1500.00"),
-            paymentDate = LocalDate.of(2024, 9, 1)
+            paymentDate = LocalDate.of(2024, 9, 1),
+            isNisa = false
         )
 
         val benefitHistory = com.example.stock.model.BenefitHistory(
