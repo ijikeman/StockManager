@@ -16,7 +16,8 @@ const generateProfitLossStockLotData = () => {
       'currentUnit|1-20': 1,
       'totalIncoming': '@float(0, 50000, 2, 2)',
       'totalBenefit': '@float(0, 10000, 2, 2)',
-      'buyTransactionDate': '@date("yyyy-MM-dd")'
+      'buyTransactionDate': '@date("yyyy-MM-dd")',
+      'isNisa|1': [true, false]
     }]
   }).items;
 };
@@ -36,7 +37,8 @@ const generateRealizedProfitLossData = () => {
       'profitLoss': '@float(-50000, 100000, 2, 2)',
       'buyTransactionDate': '@date("yyyy-MM-dd")',
       'sellTransactionDate': '@date("yyyy-MM-dd")',
-      'ownerName': '@word(2, 4)'
+      'ownerName': '@word(2, 4)',
+      'isNisa|1': [true, false]
     }]
   }).items;
 };

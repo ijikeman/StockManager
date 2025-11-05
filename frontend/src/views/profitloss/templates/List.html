@@ -81,7 +81,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in filteredUnrealizedItems" :key="`${item.stockCode}`">
+        <tr v-for="item in filteredUnrealizedItems" :key="`${item.stockCode}`" :class="{ 'nisa-row': item.isNisa }">
           <td>{{ item.stockCode }}</td>
           <td>{{ item.stockName }}</td>
           <td>{{ item.buyTransactionDate || '-' }}</td>
@@ -161,7 +161,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in filteredRealizedItems" :key="`${item.stockCode}-${item.sellTransactionDate}-${index}`">
+        <tr v-for="(item, index) in filteredRealizedItems" :key="`${item.stockCode}-${item.sellTransactionDate}-${index}`" :class="{ 'nisa-row': item.isNisa }">
           <td>{{ item.stockCode }}</td>
           <td>{{ item.stockName }}</td>
           <td>{{ item.buyTransactionDate || '-' }}</td>
