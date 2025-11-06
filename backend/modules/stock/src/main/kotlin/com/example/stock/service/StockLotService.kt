@@ -141,6 +141,12 @@ class StockLotService(
         val earliestTransaction = buyTransactionRepository.findFirstByStockLotOrderByTransactionDateAsc(stockLot)
         val purchaseDate = earliestTransaction?.transactionDate
 
+        // Calculate total incoming (dividend) for this stock lot
+        val incomingHistories = incomingHistoryRepository.findByStockLotId(stockLot.id)
+        val totalIncoming = incomingHistories.fold(BigDecimal.ZERO) { acc, history ->
+            acc.add(history.incoming)
+        }
+
         return StockLotResponseDto(
             id = stockLot.id,
             owner = OwnerDto(id = stockLot.owner.id, name = stockLot.owner.name),
@@ -154,6 +160,7 @@ class StockLotService(
             currentUnit = stockLot.currentUnit,
             averagePrice = averagePrice,
             purchaseDate = purchaseDate,
+            incoming = totalIncoming,
         )
     }
 

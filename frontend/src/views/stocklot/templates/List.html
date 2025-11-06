@@ -20,9 +20,12 @@
         <th>銘柄名</th>
         <th>購入日</th>
         <th>単元数</th>
-        <th>平均購入価格</th>
+        <th>購入価格</th>
         <th>現在価格</th>
         <th>評価損益</th>
+        <th>配当金</th>
+        <th>購入株価配当利回り</th>
+        <th>現在株価配当利回り</th>
         <th>アクション</th>
       </tr>
     </thead>
@@ -38,6 +41,9 @@
         <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
           {{ fmt(evaluation(lot)) }}
         </td>
+        <td>{{ fmt(lot.incoming) }}</td>
+        <td>{{ purchasePriceDividendYield(lot) }}%</td>
+        <td>{{ currentPriceDividendYield(lot) }}%</td>
         <td>
           <button @click="goToSellPage(lot.id)" class="btn btn-success">売却</button>
         </td>

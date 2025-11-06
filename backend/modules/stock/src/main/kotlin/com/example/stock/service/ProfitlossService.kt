@@ -98,6 +98,9 @@ class ProfitlossService(
             }
             // 最初の購入取引日を取得
             val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
+            
+            // すべての購入取引がNISAの場合のみisNisa=trueとする
+            val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
 
             ProfitlossStockLotDto(
                 stockCode = stockLot.stock.code,
@@ -109,7 +112,8 @@ class ProfitlossService(
                 totalIncoming = totalIncoming,
                 totalBenefit = totalBenefit,
                 buyTransactionDate = firstBuyTransaction?.transactionDate,
-                ownerName = stockLot.owner.name
+                ownerName = stockLot.owner.name,
+                isNisa = isNisa
             )
         }
     }
@@ -220,7 +224,8 @@ class ProfitlossService(
                         profitLoss = profitLoss,
                         buyTransactionDate = buyTransaction.transactionDate,
                         sellTransactionDate = sellTransaction.transactionDate,
-                        ownerName = stockLot.owner.name
+                        ownerName = stockLot.owner.name,
+                        isNisa = buyTransaction.isNisa
                     ))
                 }
             }

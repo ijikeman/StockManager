@@ -18,6 +18,7 @@ const aaplStockLot = {
   minimalUnit: 1,
   averagePrice: 150.00,
   purchaseDate: '2023-01-15',
+  incoming: 200.00,
 };
 
 
@@ -39,6 +40,7 @@ const randomStocklots = Mock.mock({
     'minimalUnit': 1,
     'averagePrice': '@float(10, 2000, 2, 2)',
     'purchaseDate': '@date("yyyy-MM-dd")',
+    'incoming': '@float(0, 500, 2, 2)',
   }]
 }).list;
 
@@ -62,6 +64,7 @@ export default [
         stock: { id: body.stockId, name: 'Mock Stock', code: 'MSFT', currentPrice: 450.0 },
         currentUnit: body.unit,
         averagePrice: body.price,
+        incoming: 0.00,
       };
       stocklots.push(newStocklot);
       return newStocklot;

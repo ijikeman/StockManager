@@ -1,0 +1,30 @@
+services:
+  backend:
+    container_name: backend
+    build: ./backend
+    volumes:
+      -  /usr/local/1mg/data/docker/StockManager:/tmp/data
+    environment:
+      # Ensure Spring Boot prints logs to stdout and enables colored output in many terminals
+      - SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_SQL_INIT_MODE=never
+    networks:
+      - proxy
+    env_file:
+      - .env.production
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    depends_on:
+      - backend
+    networks:
+      - proxy
+    env_file:
+      - .env.production
+
+networks:
+  proxy:
+    name: proxy
+    external: true
