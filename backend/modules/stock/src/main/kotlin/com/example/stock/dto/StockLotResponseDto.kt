@@ -10,5 +10,6 @@ data class StockLotResponseDto(
     val currentUnit: Int,
     val averagePrice: BigDecimal,
     val purchaseDate: LocalDate?,
-    val incoming: BigDecimal
+    val incoming: BigDecimal,
+    val totalIncoming: BigDecimal
 )

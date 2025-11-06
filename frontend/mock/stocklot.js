@@ -13,12 +13,14 @@ const aaplStockLot = {
     code: 'AAPL',
     name: 'AAPL',
     currentPrice: 170.00,
+    incoming: 0.25,
   },
   currentUnit: 100,
   minimalUnit: 1,
   averagePrice: 150.00,
   purchaseDate: '2023-01-15',
-  incoming: 200.00,
+  incoming: 0.25,
+  totalIncoming: 200.00,
 };
 
 
@@ -35,12 +37,14 @@ const randomStocklots = Mock.mock({
       code: '@string("upper", 4)',
       name: '@word(3, 6)',
       currentPrice: '@float(10, 2000, 2, 2)',
+      incoming: '@float(0, 10, 2, 2)',
     },
     'currentUnit': '@integer(10, 500)',
     'minimalUnit': 1,
     'averagePrice': '@float(10, 2000, 2, 2)',
     'purchaseDate': '@date("yyyy-MM-dd")',
-    'incoming': '@float(0, 500, 2, 2)',
+    'incoming': '@float(0, 10, 2, 2)',
+    'totalIncoming': '@float(0, 500, 2, 2)',
   }]
 }).list;
 
@@ -61,10 +65,11 @@ export default [
       const newStocklot = {
         id: Mock.Random.integer(100, 1000),
         owner: { id: body.ownerId, name: 'Mock Owner' },
-        stock: { id: body.stockId, name: 'Mock Stock', code: 'MSFT', currentPrice: 450.0 },
+        stock: { id: body.stockId, name: 'Mock Stock', code: 'MSFT', currentPrice: 450.0, incoming: 0.5 },
         currentUnit: body.unit,
         averagePrice: body.price,
-        incoming: 0.00,
+        incoming: 0.5,
+        totalIncoming: 0.00,
       };
       stocklots.push(newStocklot);
       return newStocklot;
