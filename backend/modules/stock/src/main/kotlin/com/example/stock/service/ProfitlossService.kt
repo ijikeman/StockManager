@@ -237,12 +237,10 @@ class ProfitlossService(
                 
                 // 売却取引がある場合のみ、各売却取引ごとにDTOを作成
                 sellTransactions.forEach { sellTransaction ->
-                    // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数 - 購入手数料 - 売却手数料
+                    // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数
                     var profitLoss = ((sellTransaction.price - buyTransaction.price) * 
                                     sellTransaction.unit.toBigDecimal() * 
-                                    stockLot.stock.minimalUnit.toBigDecimal()) - 
-                                    buyTransaction.fee - 
-                                    sellTransaction.fee
+                                    stockLot.stock.minimalUnit.toBigDecimal())
                     
                     // 売却取引に対応する配当金と優待金を取得
                     var totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
@@ -263,7 +261,7 @@ class ProfitlossService(
                         sellUnit = sellTransaction.unit,
                         totalIncoming = totalIncoming.toDouble(),
                         totalBenefit = totalBenefit.toDouble(),
-                        profitLoss = profitLoss,
+                        profitLoss = profitLoss  - buyTransaction.fee - sellTransaction.fee, // 手数料を差し引く
                         buyTransactionDate = buyTransaction.transactionDate,
                         sellTransactionDate = sellTransaction.transactionDate,
                         ownerName = stockLot.owner.name,
