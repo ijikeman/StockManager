@@ -8,11 +8,11 @@ import com.example.stock.model.Owner
 import com.example.stock.model.Stock
 import com.example.stock.repository.StockLotRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
@@ -25,7 +25,6 @@ import java.util.Optional
 @ExtendWith(MockitoExtension::class)
 class IncomingHistoryServiceTest {
 
-    @InjectMocks
     private lateinit var incomingHistoryService: IncomingHistoryService
 
     @Mock
@@ -36,6 +35,16 @@ class IncomingHistoryServiceTest {
 
     @Captor
     private lateinit var incomingHistoryCaptor: ArgumentCaptor<IncomingHistory>
+
+    @BeforeEach
+    fun setUp() {
+        // Initialize service with default tax rate
+        incomingHistoryService = IncomingHistoryService(
+            incomingHistoryRepository,
+            stockLotRepository,
+            BigDecimal("0.20315")
+        )
+    }
 
     @Test
     fun `create should save and return IncomingHistory`() {

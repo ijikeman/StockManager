@@ -35,3 +35,8 @@ server:
     whitelabel:
       enabled: false
   port: 8080
+
+# Tax Settings
+tax:
+  stock:
+    capital-gain-tax-rate: ${TAX_STOCK_CAPITALGAINTAXRATE:0.20315}

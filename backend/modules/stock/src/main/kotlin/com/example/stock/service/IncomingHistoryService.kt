@@ -5,12 +5,16 @@ import com.example.stock.model.IncomingHistory
 import com.example.stock.repository.IncomingHistoryRepository
 import com.example.stock.repository.StockLotRepository
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 
 @Service
 class IncomingHistoryService(
 	private val incomingHistoryRepository: IncomingHistoryRepository,
-	private val stockLotRepository: StockLotRepository
+	private val stockLotRepository: StockLotRepository,
+	@Value("\${tax.stock.capital-gain-tax-rate:0.20315}")
+	private val taxRate: BigDecimal
 ) {
 
 	/**
@@ -52,10 +56,9 @@ class IncomingHistoryService(
 		val stockLot = stockLotRepository.findById(dto.lotId)
 			.orElseThrow { EntityNotFoundException("StockLot not found with id: ${dto.lotId}") }
 
-		// NISA口座でない場合は税金(20.315%)を差し引く
-		val taxRate = java.math.BigDecimal("0.20315")
+		// NISA口座でない場合は税金を差し引く
 		val netIncoming = if (!dto.isNisa) {
-			dto.incoming.multiply(java.math.BigDecimal.ONE.subtract(taxRate))
+			dto.incoming.multiply(BigDecimal.ONE.subtract(taxRate))
 		} else {
 			dto.incoming
 		}
@@ -84,10 +87,9 @@ class IncomingHistoryService(
 			throw IllegalArgumentException("Cannot change stockLot for existing income history")
 		}
 
-		// NISA口座でない場合は税金(20.315%)を差し引く
-		val taxRate = java.math.BigDecimal("0.20315")
+		// NISA口座でない場合は税金を差し引く
 		val netIncoming = if (!dto.isNisa) {
-			dto.incoming.multiply(java.math.BigDecimal.ONE.subtract(taxRate))
+			dto.incoming.multiply(BigDecimal.ONE.subtract(taxRate))
 		} else {
 			dto.incoming
 		}
