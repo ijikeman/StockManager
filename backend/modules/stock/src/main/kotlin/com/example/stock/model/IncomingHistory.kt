@@ -36,10 +36,7 @@ data class IncomingHistory(
     var incoming: BigDecimal, // 入金額
 
     @Column(name = "payment_date", nullable = false)
-    var paymentDate: LocalDate, // 支払日
-
-    @Column(name = "is_nisa", nullable = false)
-    var isNisa: Boolean = false // NISAかどうか
+    var paymentDate: LocalDate // 支払日
 )
 {
     init {

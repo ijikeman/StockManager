@@ -81,7 +81,6 @@ CREATE TABLE incoming_history (
     sell_transaction_id INT,
     incoming DECIMAL(10, 2) NOT NULL,
     payment_date DATE NOT NULL,
-    is_nisa BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (stock_lot_id) REFERENCES stock_lot(id),
     FOREIGN KEY (sell_transaction_id) REFERENCES sell_transaction(id)
 );

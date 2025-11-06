@@ -3,9 +3,6 @@
 <script>
 import axios from 'axios';
 
-// Japanese dividend tax rate for non-NISA accounts
-const DIVIDEND_TAX_RATE = 0.20315;
-
 export default {
   name: 'IncomeList',
   data() {
@@ -13,24 +10,7 @@ export default {
       incomes: [],
     };
   },
-  computed: {
-    // Calculate displayed income with tax deduction for non-NISA accounts
-    displayIncomes() {
-      return this.incomes.map(income => ({
-        ...income,
-        displayAmount: this.calculateDisplayAmount(income)
-      }));
-    }
-  },
   methods: {
-    calculateDisplayAmount(income) {
-      // If NISA flag is false or undefined, apply tax
-      if (!income.isNisa) {
-        const afterTax = income.incoming * (1 - DIVIDEND_TAX_RATE);
-        return Math.round(afterTax); // Round to nearest integer
-      }
-      return income.incoming;
-    },
     async fetchIncomes() {
       try {
         const response = await axios.get('/api/incominghistory');

@@ -48,8 +48,7 @@ class IncomingHistoryServiceTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("500.00"),
-            paymentDate = LocalDate.of(2025, 10, 6),
-            isNisa = false
+            paymentDate = LocalDate.of(2025, 10, 6)
         )
         val savedHistory = incomingHistory.copy(id = 123)
         mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
@@ -78,11 +77,14 @@ class IncomingHistoryServiceTest {
         val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 100)
         mockitoWhen(stockLotRepository.findById(dto.lotId)).thenReturn(Optional.of(stockLot))
 
+        // NISA flag is false by default, so tax should be applied
+        val taxRate = BigDecimal("0.20315")
+        val expectedIncoming = dto.incoming.multiply(BigDecimal.ONE.subtract(taxRate))
+        
         val expectedHistory = IncomingHistory(
             stockLot = stockLot,
-            incoming = dto.incoming,
-            paymentDate = dto.paymentDate,
-            isNisa = dto.isNisa
+            incoming = expectedIncoming,
+            paymentDate = dto.paymentDate
         )
         val savedHistory = expectedHistory.copy(id = 124)
         mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
@@ -96,7 +98,8 @@ class IncomingHistoryServiceTest {
 
         assertThat(result).isEqualTo(savedHistory)
         assertThat(captured.stockLot).isEqualTo(stockLot)
-        assertThat(captured.incoming).isEqualByComparingTo(dto.incoming)
+        // Verify tax was applied (should be approximately 796.85)
+        assertThat(captured.incoming).isEqualByComparingTo(expectedIncoming)
         assertThat(captured.paymentDate).isEqualTo(dto.paymentDate)
     }
 
@@ -112,8 +115,7 @@ class IncomingHistoryServiceTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("500.00"),
-            paymentDate = LocalDate.of(2025, 10, 6),
-            isNisa = false
+            paymentDate = LocalDate.of(2025, 10, 6)
         )
         
         val updateDto = IncomingHistoryAddDto(
@@ -122,10 +124,13 @@ class IncomingHistoryServiceTest {
             incoming = BigDecimal("600.00")
         )
         
+        // NISA flag is false by default, so tax should be applied
+        val taxRate = BigDecimal("0.20315")
+        val expectedIncoming = updateDto.incoming.multiply(BigDecimal.ONE.subtract(taxRate))
+        
         val updatedHistory = existing.copy(
             paymentDate = updateDto.paymentDate,
-            incoming = updateDto.incoming,
-            isNisa = updateDto.isNisa
+            incoming = expectedIncoming
         )
         
         mockitoWhen(incomingHistoryRepository.findById(123)).thenReturn(Optional.of(existing))
@@ -140,12 +145,13 @@ class IncomingHistoryServiceTest {
         
         assertThat(result).isEqualTo(updatedHistory)
         assertThat(captured.paymentDate).isEqualTo(updateDto.paymentDate)
-        assertThat(captured.incoming).isEqualByComparingTo(updateDto.incoming)
+        // Verify tax was applied
+        assertThat(captured.incoming).isEqualByComparingTo(expectedIncoming)
         assertThat(captured.stockLot).isEqualTo(stockLot)
     }
 
     @Test
-    fun `create with NISA flag should save and return IncomingHistory with correct NISA flag`() {
+    fun `create from DTO with NISA flag true should not apply tax`() {
         // Arrange
         val dto = IncomingHistoryAddDto(
             paymentDate = LocalDate.of(2025, 10, 7),
@@ -161,9 +167,8 @@ class IncomingHistoryServiceTest {
 
         val expectedHistory = IncomingHistory(
             stockLot = stockLot,
-            incoming = dto.incoming,
-            paymentDate = dto.paymentDate,
-            isNisa = dto.isNisa
+            incoming = dto.incoming, // No tax applied for NISA
+            paymentDate = dto.paymentDate
         )
         val savedHistory = expectedHistory.copy(id = 125)
         mockitoWhen(incomingHistoryRepository.save(any(IncomingHistory::class.java))).thenReturn(savedHistory)
@@ -177,8 +182,8 @@ class IncomingHistoryServiceTest {
 
         assertThat(result).isEqualTo(savedHistory)
         assertThat(captured.stockLot).isEqualTo(stockLot)
+        // Verify NO tax was applied - full amount should be saved
         assertThat(captured.incoming).isEqualByComparingTo(dto.incoming)
         assertThat(captured.paymentDate).isEqualTo(dto.paymentDate)
-        assertThat(captured.isNisa).isEqualTo(true)
     }
 }

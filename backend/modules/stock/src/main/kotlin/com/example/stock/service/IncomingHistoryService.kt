@@ -52,11 +52,18 @@ class IncomingHistoryService(
 		val stockLot = stockLotRepository.findById(dto.lotId)
 			.orElseThrow { EntityNotFoundException("StockLot not found with id: ${dto.lotId}") }
 
+		// NISA口座でない場合は税金(20.315%)を差し引く
+		val taxRate = java.math.BigDecimal("0.20315")
+		val netIncoming = if (!dto.isNisa) {
+			dto.incoming.multiply(java.math.BigDecimal.ONE.subtract(taxRate))
+		} else {
+			dto.incoming
+		}
+
 		val incomingHistory = IncomingHistory(
 			paymentDate = dto.paymentDate,
 			stockLot = stockLot,
-			incoming = dto.incoming,
-			isNisa = dto.isNisa
+			incoming = netIncoming
 		)
 
 		return incomingHistoryRepository.save(incomingHistory)
@@ -77,10 +84,17 @@ class IncomingHistoryService(
 			throw IllegalArgumentException("Cannot change stockLot for existing income history")
 		}
 
+		// NISA口座でない場合は税金(20.315%)を差し引く
+		val taxRate = java.math.BigDecimal("0.20315")
+		val netIncoming = if (!dto.isNisa) {
+			dto.incoming.multiply(java.math.BigDecimal.ONE.subtract(taxRate))
+		} else {
+			dto.incoming
+		}
+
 		val updated = existing.copy(
 			paymentDate = dto.paymentDate,
-			incoming = dto.incoming,
-			isNisa = dto.isNisa
+			incoming = netIncoming
 		)
 
 		return incomingHistoryRepository.save(updated)

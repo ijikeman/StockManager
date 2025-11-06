@@ -44,8 +44,7 @@ class IncomingHistoryModelTest {
             stockLot = stockLot,
             sellTransaction = null,
             incoming = BigDecimal("200.25"),
-            paymentDate = paymentDate,
-            isNisa = false
+            paymentDate = paymentDate
         )
 
         assertEquals(1, incomingHistory.id)
@@ -101,8 +100,7 @@ class IncomingHistoryModelTest {
             stockLot = null,
             sellTransaction = sellTransaction,
             incoming = BigDecimal("200.25"),
-            paymentDate = paymentDate,
-            isNisa = false
+            paymentDate = paymentDate
         )
 
         assertEquals(1, incomingHistory.id)
