@@ -156,11 +156,13 @@ class StockLotService(
                 name = stockLot.stock.name,
                 currentPrice = stockLot.stock.currentPrice,
                 minimalUnit = stockLot.stock.minimalUnit,
+                incoming = stockLot.stock.incoming,
             ),
             currentUnit = stockLot.currentUnit,
             averagePrice = averagePrice,
             purchaseDate = purchaseDate,
-            incoming = totalIncoming,
+            incoming = BigDecimal.valueOf(stockLot.stock.incoming),
+            totalIncoming = totalIncoming,
         )
     }
 
