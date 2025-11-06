@@ -249,7 +249,10 @@ class ProfitlossService(
                     // NISAでない場合は配当金と株価差益に税金を適用
                     if (!buyTransaction.isNisa) {
                         totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
-                        profitLoss = profitLoss.multiply(AFTER_TAX_RATIO)
+                        // 売却益に対する税金を適用(マイナスなら適用しない)
+                        if (profitLoss > BigDecimal.ZERO) {
+                            profitLoss = profitLoss.multiply(AFTER_TAX_RATIO)
+                        }
                     }
                     
                     result.add(ProfitlossDto(
