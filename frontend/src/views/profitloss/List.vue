@@ -158,8 +158,12 @@ export default {
       return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     },
     calculateEvaluation(item) {
+      // Use evaluationGain from backend if available (includes tax adjustment for non-NISA)
+      if (item.evaluationGain !== null && item.evaluationGain !== undefined) {
+        return Number(item.evaluationGain);
+      }
+      // Fallback to calculation (for backward compatibility)
       if (item.currentPrice && item.currentUnit && item.minimalUnit) {
-        // Calculate evaluation using minimalUnit from API
         const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
         return evaluation;
       }
