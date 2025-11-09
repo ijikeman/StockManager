@@ -158,9 +158,9 @@ export default {
       return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     },
     calculateEvaluation(item) {
-      // Use evaluationGain from backend if available (includes tax adjustment for non-NISA)
-      if (item.evaluationGain !== null && item.evaluationGain !== undefined) {
-        return Number(item.evaluationGain);
+      // Use evaluationProfitloss from backend if available (includes tax adjustment for non-NISA)
+      if (item.evaluationProfitloss !== null && item.evaluationProfitloss !== undefined) {
+        return Number(item.evaluationProfitloss);
       }
       // Fallback to calculation (for backward compatibility)
       if (item.currentPrice && item.currentUnit && item.minimalUnit) {

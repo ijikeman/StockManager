@@ -121,17 +121,17 @@ class ProfitlossService(
             }
             
             // 評価損益を計算（NISAでない場合は税金を適用）
-            val evaluationGain = if (stockLot.stock.currentPrice != null && stockLot.currentUnit != null) {
+            val evaluationProfitloss = if (stockLot.stock.currentPrice != null && stockLot.currentUnit != null) {
                 val purchasePrice = firstBuyTransaction?.price ?: BigDecimal.ZERO
                 val currentPriceBD = BigDecimal.valueOf(stockLot.stock.currentPrice)
-                val gain = (currentPriceBD - purchasePrice)
+                val profitloss = (currentPriceBD - purchasePrice)
                     .multiply(BigDecimal.valueOf(stockLot.currentUnit.toLong()))
                     .multiply(BigDecimal.valueOf(stockLot.stock.minimalUnit.toLong()))
                 
                 if (!isNisa) {
-                    gain.multiply(AFTER_TAX_RATIO)
+                    profitloss.multiply(AFTER_TAX_RATIO)
                 } else {
-                    gain
+                    profitloss
                 }
             } else {
                 null
@@ -146,7 +146,7 @@ class ProfitlossService(
                 currentUnit = stockLot.currentUnit,
                 totalIncoming = totalIncoming,
                 totalBenefit = totalBenefit,
-                evaluationGain = evaluationGain,
+                evaluationProfitloss = evaluationProfitloss,
                 buyTransactionDate = firstBuyTransaction?.transactionDate,
                 ownerName = stockLot.owner.name,
                 isNisa = isNisa
