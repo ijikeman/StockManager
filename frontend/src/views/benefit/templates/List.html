@@ -22,7 +22,7 @@
           <span v-if="benefit.stockLot">{{ benefit.stockLot.stock?.name }}</span>
           <span v-else-if="benefit.sellTransaction">{{ benefit.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
         </td>
-        <td>{{ benefit.benefit }}</td>
+        <td>{{ fmt(benefit.benefit) }}</td>
         <td>
           <button @click="editBenefit(benefit.id)" class="btn btn-secondary">編集</button>
           <button @click="deleteBenefit(benefit.id)" class="btn btn-danger">削除</button>

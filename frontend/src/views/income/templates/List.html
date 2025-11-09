@@ -22,7 +22,7 @@
           <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
           <span v-else-if="income.sellTransaction">{{ income.sellTransaction.buyTransaction?.stockLot?.stock?.name }}</span>
         </td>
-        <td>{{ income.incoming }}</td>
+        <td>{{ fmt(income.incoming) }}</td>
         <td>
           <button @click="editIncome(income.id)" class="btn btn-secondary">編集</button>
           <button @click="deleteIncome(income.id)" class="btn btn-danger">削除</button>

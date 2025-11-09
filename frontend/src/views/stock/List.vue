@@ -14,6 +14,7 @@
 
 <script>
 import axios from 'axios';
+import { formatNumber } from '@/utils/formatters';
 
 export default {
   // コンポーネント名を'StockList'に設定
@@ -78,6 +79,10 @@ export default {
         return ((stock.currentPrice - stock.previousPrice) / stock.previousPrice) * 100;
       }
       return null;
+    },
+    // 数値を整数でフォーマット
+    fmt(value) {
+      return formatNumber(value);
     },
     // 前日比のフォーマット（整数表示）
     formatPriceChange(stock) {

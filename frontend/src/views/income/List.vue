@@ -2,6 +2,7 @@
 
 <script>
 import axios from 'axios';
+import { formatNumber } from '@/utils/formatters';
 
 export default {
   name: 'IncomeList',
@@ -11,6 +12,9 @@ export default {
     };
   },
   methods: {
+    fmt(value) {
+      return formatNumber(value);
+    },
     async fetchIncomes() {
       try {
         const response = await axios.get('/api/incominghistory');
