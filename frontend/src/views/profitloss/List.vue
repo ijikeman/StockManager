@@ -1,20 +1,20 @@
 <template src="./templates/List.html"></template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'; // HTTPリクエストを行うためのライブラリをインポート
 
 export default {
-  name: 'ProfitLossList',
+  name: 'ProfitLossList', // コンポーネント名を定義
   data() {
     return {
       unrealizedData: [],  // 含み損益データ (getProfitStockLotLoss)
       realizedData: [],    // 確定損益データ (getProfitLoss)
-      filterOwner: '',
-      activeTab: 'unrealized', // 'unrealized' or 'realized'
+      filterOwner: '', // 所有者でフィルタリングするための変数
+      activeTab: 'unrealized', // 現在のタブ ('unrealized' または 'realized')
     };
   },
   computed: {
-    // For backward compatibility, keep profitLossData pointing to unrealized data
+    // 後方互換性のため、profitLossDataを含み損益データに紐付け
     profitLossData() {
       return this.unrealizedData;
     },
@@ -25,12 +25,12 @@ export default {
 
       let items = this.unrealizedData;
 
-      // Filter by owner
+      // 所有者でフィルタリング
       if (this.filterOwner) {
         items = items.filter(item => item.ownerName === this.filterOwner);
       }
 
-      // Sort by stock code
+      // 銘柄コードでソート
       return items.sort((a, b) => {
         return a.stockCode.localeCompare(b.stockCode);
       });
@@ -42,23 +42,23 @@ export default {
 
       let items = this.realizedData;
 
-      // Filter by owner
+      // 所有者でフィルタリング
       if (this.filterOwner) {
         items = items.filter(item => item.ownerName === this.filterOwner);
       }
 
-      // Sort by stock code and sell transaction date
+      // 銘柄コードと売却日でソート
       return items.sort((a, b) => {
         const codeCompare = a.stockCode.localeCompare(b.stockCode);
         if (codeCompare !== 0) return codeCompare;
         
-        // If same stock code, sort by sell date
+        // 同じ銘柄コードの場合、売却日でソート
         const dateA = a.sellTransactionDate || '';
         const dateB = b.sellTransactionDate || '';
-        return dateB.localeCompare(dateA); // Most recent first
+        return dateB.localeCompare(dateA); // 最新の日付を先に
       });
     },
-    // Keep for backward compatibility
+    // 後方互換性のため
     filteredItems() {
       return this.filteredUnrealizedItems;
     },
@@ -66,8 +66,9 @@ export default {
       const unrealizedOwners = (this.unrealizedData || []).map(item => item.ownerName).filter(Boolean);
       const realizedOwners = (this.realizedData || []).map(item => item.ownerName).filter(Boolean);
       const allOwners = [...unrealizedOwners, ...realizedOwners];
-      return [...new Set(allOwners)].sort();
+      return [...new Set(allOwners)].sort(); // 重複を削除してソート
     },
+    // 含み損益集計
     unrealizedSummary() {
       if (!this.unrealizedData || this.unrealizedData.length === 0) {
         return {
@@ -77,20 +78,22 @@ export default {
           totalProfitLoss: 0
         };
       }
-
+      // 各項目の合計を計算
+      // 配当金合計
       const totalIncoming = this.unrealizedData.reduce((sum, item) => {
         const incomingAmount = item.totalIncoming * item.currentUnit * item.minimalUnit;
         return sum + (incomingAmount || 0);
       }, 0);
+      // 売却益合計s
       const totalBenefit = this.unrealizedData.reduce((sum, item) => {
         const benefitAmount = item.totalBenefit * item.currentUnit * item.minimalUnit;
         return sum + (benefitAmount || 0);
       }, 0);
-
+      // 含み損益合計
       const totalEvaluation = this.unrealizedData.reduce((sum, item) => {
         return sum + (item.evaluationProfitloss || 0);
       }, 0);
-      
+      // 総合計
       const totalProfitLoss = totalIncoming + totalBenefit + totalEvaluation;
 
       return {
@@ -100,6 +103,8 @@ export default {
         totalProfitLoss
       };
     },
+
+    // 確定損益集計
     realizedSummary() {
       if (!this.realizedData || this.realizedData.length === 0) {
         return {
@@ -110,16 +115,18 @@ export default {
         };
       }
 
+      // 各項目の合計を計算
+      // 配当金合計 
       const totalIncoming = this.realizedData.reduce((sum, item) => {
         const incomingAmount = (item.totalIncoming || 0) * (item.sellUnit || 0) * (item.minimalUnit || 1);
         return sum + incomingAmount;
       }, 0);
-
+      // 売却益合計
       const totalBenefit = this.realizedData.reduce((sum, item) => {
         const benefitAmount = (item.totalBenefit || 0) * (item.sellUnit || 0) * (item.minimalUnit || 1);
         return sum + benefitAmount;
       }, 0);
-
+      // 損益合計
       const totalProfitLoss = this.realizedData.reduce((sum, item) => {
         return sum + (Number(item.profitLoss) || 0);
       }, 0);
@@ -131,7 +138,7 @@ export default {
         count: this.realizedData.length
       };
     },
-    // Keep for backward compatibility
+    // 後方互換性のため
     summary() {
       return this.unrealizedSummary;
     }
@@ -139,38 +146,46 @@ export default {
   methods: {
     async fetchProfitLoss() {
       try {
-        // Fetch unrealized profit/loss (含み損益)
+        // 含み損益データを取得するAPI呼び出し
+        // Unrealized profit/loss (未実現損益) のデータをバックエンドから取得
         const unrealizedResponse = await axios.get('/api/profitloss');
-        this.unrealizedData = unrealizedResponse.data;
+        this.unrealizedData = unrealizedResponse.data; // 取得したデータを `unrealizedData` に格納
 
-        // Fetch realized profit/loss (確定損益)
+        // 確定損益データを取得するAPI呼び出し
+        // Realized profit/loss (確定損益) のデータをバックエンドから取得
         const realizedResponse = await axios.get('/api/profitloss/realized', {
           params: {
-            ownerId: this.filterOwner || null
+            ownerId: this.filterOwner || null // フィルタリング条件としてオーナーIDを渡す (未指定の場合は null)
           }
         });
-        this.realizedData = realizedResponse.data;
+        this.realizedData = realizedResponse.data; // 取得したデータを `realizedData` に格納
       } catch (error) {
-        console.error('Error fetching profit/loss data:', error);
+        // API呼び出し中にエラーが発生した場合のログ出力
+        console.error('Error fetching profit/loss data:', error); // エラー内容をコンソールに出力
       }
     },
     fmt(value) {
+      // 数値をローカライズされた形式でフォーマットするヘルパー関数
+      // 例: 1234.56 -> "1,234.56"
       const n = Number(value) || 0;
       return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     },
     calculateEvaluation(item) {
-      // Use evaluationProfitloss from backend if available (includes tax adjustment for non-NISA)
+      // 含み損益の計算を行う
+      // backendから提供されるevaluationProfitlossを優先的に使用
       if (item.evaluationProfitloss !== null && item.evaluationProfitloss !== undefined) {
-        return Number(item.evaluationProfitloss);
+        return Number(item.evaluationProfitloss); // backendからの値をそのまま使用
       }
-      // Fallback to calculation (for backward compatibility)
+      // Fallbackとして、現在価格と購入価格を使用して計算
       if (item.currentPrice && item.currentUnit && item.minimalUnit) {
         const evaluation = (item.currentPrice - item.purchasePrice) * item.currentUnit * item.minimalUnit;
-        return evaluation;
+        return evaluation; // 計算結果を返す
       }
-      return 0;
+      return 0; // データが不足している場合は0を返す
     },
     setActiveTab(tab) {
+      // タブの切り替え処理
+      // ユーザーが選択したタブ ('unrealized' または 'realized') を設定
       this.activeTab = tab;
     }
   },
