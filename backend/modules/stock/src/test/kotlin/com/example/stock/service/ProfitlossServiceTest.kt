@@ -80,10 +80,8 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(2)).thenReturn(listOf(buyTransaction2))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(emptyList())
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(2)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1, 2))).thenReturn(listOf(buyTransaction1, buyTransaction2))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1, 2))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -112,7 +110,7 @@ class ProfitlossServiceTest {
         val stockLot = StockLot(id = 1, owner = owner, stock = stock, currentUnit = 10)
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -141,8 +139,8 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findByOwnerId(1)).thenReturn(stockLotsForOwner1)
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction1))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss(1)
@@ -185,8 +183,8 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(stockLots)
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction1))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1, 2))).thenReturn(listOf(buyTransaction1))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -222,8 +220,10 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -278,9 +278,11 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1))
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1)))
             .thenReturn(listOf(sellTransaction1, sellTransaction2))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionIdIn(listOf(1, 2))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionIdIn(listOf(1, 2))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -360,10 +362,10 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
-        mockitoWhen(incomingHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(incomingHistory1, incomingHistory2))
-        mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(benefitHistory))
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(listOf(incomingHistory1, incomingHistory2))
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(listOf(benefitHistory))
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -412,10 +414,10 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
-        mockitoWhen(incomingHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
-        mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(emptyList())
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
@@ -461,10 +463,10 @@ class ProfitlossServiceTest {
         )
 
         mockitoWhen(stockLotService.findAll()).thenReturn(listOf(stockLot))
-        mockitoWhen(buyTransactionRepository.findByStockLotId(1)).thenReturn(listOf(buyTransaction))
-        mockitoWhen(sellTransactionRepository.findByBuyTransactionId(1)).thenReturn(listOf(sellTransaction))
-        mockitoWhen(incomingHistoryRepository.findBySellTransactionId(1)).thenReturn(listOf(incomingHistory))
-        mockitoWhen(benefitHistoryRepository.findBySellTransactionId(1)).thenReturn(emptyList())
+        mockitoWhen(buyTransactionRepository.findByStockLotIdIn(listOf(1))).thenReturn(listOf(buyTransaction))
+        mockitoWhen(sellTransactionRepository.findByBuyTransactionIdIn(listOf(1))).thenReturn(listOf(sellTransaction))
+        mockitoWhen(incomingHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(listOf(incomingHistory))
+        mockitoWhen(benefitHistoryRepository.findBySellTransactionIdIn(listOf(1))).thenReturn(emptyList())
 
         // when
         val result = profitlossService.getSellTransactionProfitloss()
