@@ -122,7 +122,7 @@ export default {
         const incomingAmount = (item.totalIncoming || 0) * (item.sellUnit || 0) * (item.minimalUnit || 1);
         return sum + incomingAmount;
       }, 0);
-      // 売却益合計
+      // 優待金合計
       const totalBenefit = this.realizedData.reduce((sum, item) => {
         const benefitAmount = (item.totalBenefit || 0) * (item.sellUnit || 0) * (item.minimalUnit || 1);
         return sum + benefitAmount;
