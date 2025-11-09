@@ -11,6 +11,12 @@ export default {
       realizedData: [],    // 確定損益データ (getProfitLoss)
       filterOwner: '', // 所有者でフィルタリングするための変数
       activeTab: 'unrealized', // 現在のタブ ('unrealized' または 'realized')
+      // Sorting state for unrealized table
+      unrealizedSortBy: 'stockCode', // デフォルトは銘柄コードでソート
+      unrealizedSortOrder: 'asc', // 'asc' or 'desc'
+      // Sorting state for realized table
+      realizedSortBy: 'stockCode', // デフォルトは銘柄コードでソート
+      realizedSortOrder: 'asc', // 'asc' or 'desc'
     };
   },
   computed: {
@@ -30,9 +36,65 @@ export default {
         items = items.filter(item => item.ownerName === this.filterOwner);
       }
 
-      // 銘柄コードでソート
+      // ソート処理
       return items.sort((a, b) => {
-        return a.stockCode.localeCompare(b.stockCode);
+        let aValue, bValue;
+
+        switch(this.unrealizedSortBy) {
+          case 'stockCode':
+            aValue = a.stockCode || '';
+            bValue = b.stockCode || '';
+            return this.unrealizedSortOrder === 'asc' 
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'stockName':
+            aValue = a.stockName || '';
+            bValue = b.stockName || '';
+            return this.unrealizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'buyTransactionDate':
+            aValue = a.buyTransactionDate || '';
+            bValue = b.buyTransactionDate || '';
+            return this.unrealizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'purchasePrice':
+            aValue = Number(a.purchasePrice) || 0;
+            bValue = Number(b.purchasePrice) || 0;
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'currentPrice':
+            aValue = Number(a.currentPrice) || 0;
+            bValue = Number(b.currentPrice) || 0;
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'currentUnit':
+            aValue = Number(a.currentUnit) || 0;
+            bValue = Number(b.currentUnit) || 0;
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'totalIncoming':
+            aValue = (a.totalIncoming * a.currentUnit * a.minimalUnit) || 0;
+            bValue = (b.totalIncoming * b.currentUnit * b.minimalUnit) || 0;
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'totalBenefit':
+            aValue = (a.totalBenefit * a.currentUnit * a.minimalUnit) || 0;
+            bValue = (b.totalBenefit * b.currentUnit * b.minimalUnit) || 0;
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'evaluationProfitloss':
+            aValue = this.calculateEvaluation(a);
+            bValue = this.calculateEvaluation(b);
+            return this.unrealizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          default:
+            return a.stockCode.localeCompare(b.stockCode);
+        }
       });
     },
     filteredRealizedItems() {
@@ -47,15 +109,77 @@ export default {
         items = items.filter(item => item.ownerName === this.filterOwner);
       }
 
-      // 銘柄コードと売却日でソート
+      // ソート処理
       return items.sort((a, b) => {
-        const codeCompare = a.stockCode.localeCompare(b.stockCode);
-        if (codeCompare !== 0) return codeCompare;
-        
-        // 同じ銘柄コードの場合、売却日でソート
-        const dateA = a.sellTransactionDate || '';
-        const dateB = b.sellTransactionDate || '';
-        return dateB.localeCompare(dateA); // 最新の日付を先に
+        let aValue, bValue;
+
+        switch(this.realizedSortBy) {
+          case 'stockCode':
+            aValue = a.stockCode || '';
+            bValue = b.stockCode || '';
+            return this.realizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'stockName':
+            aValue = a.stockName || '';
+            bValue = b.stockName || '';
+            return this.realizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'buyTransactionDate':
+            aValue = a.buyTransactionDate || '';
+            bValue = b.buyTransactionDate || '';
+            return this.realizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'purchasePrice':
+            aValue = Number(a.purchasePrice) || 0;
+            bValue = Number(b.purchasePrice) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'sellTransactionDate':
+            aValue = a.sellTransactionDate || '';
+            bValue = b.sellTransactionDate || '';
+            return this.realizedSortOrder === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          
+          case 'sellPrice':
+            aValue = Number(a.sellPrice) || 0;
+            bValue = Number(b.sellPrice) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'sellUnit':
+            aValue = Number(a.sellUnit) || 0;
+            bValue = Number(b.sellUnit) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'profitLoss':
+            aValue = Number(a.profitLoss) || 0;
+            bValue = Number(b.profitLoss) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'totalIncoming':
+            aValue = (a.totalIncoming * a.sellUnit * a.minimalUnit) || 0;
+            bValue = (b.totalIncoming * b.sellUnit * b.minimalUnit) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'totalBenefit':
+            aValue = (a.totalBenefit * a.sellUnit * a.minimalUnit) || 0;
+            bValue = (b.totalBenefit * b.sellUnit * b.minimalUnit) || 0;
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          case 'totalProfitLoss':
+            aValue = (Number(a.profitLoss) || 0) + (a.totalIncoming * a.sellUnit * a.minimalUnit || 0) + (a.totalBenefit * a.sellUnit * a.minimalUnit || 0);
+            bValue = (Number(b.profitLoss) || 0) + (b.totalIncoming * b.sellUnit * b.minimalUnit || 0) + (b.totalBenefit * b.sellUnit * b.minimalUnit || 0);
+            return this.realizedSortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          
+          default:
+            return a.stockCode.localeCompare(b.stockCode);
+        }
       });
     },
     // 後方互換性のため
@@ -192,6 +316,26 @@ export default {
       // タブの切り替え処理
       // ユーザーが選択したタブ ('unrealized' または 'realized') を設定
       this.activeTab = tab;
+    },
+    sortUnrealizedBy(column) {
+      // 同じカラムをクリックした場合は昇順/降順を切り替え
+      if (this.unrealizedSortBy === column) {
+        this.unrealizedSortOrder = this.unrealizedSortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        // 新しいカラムの場合は昇順から開始
+        this.unrealizedSortBy = column;
+        this.unrealizedSortOrder = 'asc';
+      }
+    },
+    sortRealizedBy(column) {
+      // 同じカラムをクリックした場合は昇順/降順を切り替え
+      if (this.realizedSortBy === column) {
+        this.realizedSortOrder = this.realizedSortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        // 新しいカラムの場合は昇順から開始
+        this.realizedSortBy = column;
+        this.realizedSortOrder = 'asc';
+      }
     }
   },
   mounted() {
@@ -374,5 +518,29 @@ export default {
 
 .nisa-row td {
   background-color: #c8f7c5 !important;
+}
+
+/* Sortable header styles */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 20px;
+}
+
+.sortable-header:hover {
+  background-color: #e9ecef;
+}
+
+.sort-indicator {
+  position: absolute;
+  right: 5px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.sort-indicator.active {
+  color: #007bff;
+  font-weight: bold;
 }
 </style>
