@@ -73,12 +73,9 @@ class ProfitlossService(
         // 全ての株式ロットに対して配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                incomingHistoryRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
-//            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
-//                .groupBy { it.stockLot.id }
+            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .filter { it.stockLot != null } // stockLot が null でないものをフィルタリング
+                .groupBy({ it.stockLot!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -100,8 +97,6 @@ class ProfitlossService(
                 benefitHistoryRepository.findByStockLotId(stockLotId)
                     .map { stockLotId to it }
             }.groupBy({ it.first }, { it.second })
-//            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
-//                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
