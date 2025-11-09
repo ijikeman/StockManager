@@ -208,12 +208,9 @@ class ProfitlossService(
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
         // Map<BuyTransactionId, List<SellTransaction>>の形でグループ化
         val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
-            buyTransactionIds.flatMap { buyTransactionId ->
-                sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
-                    .map { buyTransactionId to it }
-            }.groupBy({ it.first }, { it.second })
-//            sellTransactionRepository.findByBuyTransactionIdIn(buyTransactionIds)
-//                .groupBy { it.buyTransactionId }
+               sellTransactionRepository.findByBuyTransactionIdIn(buyTransactionIds)
+                    .filter { it.buyTransaction != null } // buyTransaction が null でないものをフィルタリング
+                    .groupBy { it.buyTransaction!!.id } // 非nullアサーション (!!)
         } else {
             emptyMap()
         }
