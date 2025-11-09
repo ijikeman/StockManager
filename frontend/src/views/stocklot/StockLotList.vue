@@ -45,10 +45,10 @@ export default {
       const minUnit = Number(lot.stock && (lot.stock.minimalUnit ?? lot.stock.minimal_unit ?? lot.stock.minimumUnit ?? lot.stock.minimum_unit)) || 1;
       return unit * minUnit * (current - avg);
     },
-    // Format a number as localized currency/number with 2 decimals.
+    // Format a number as localized currency/number rounded to integer.
     fmt(value) {
       const n = Number(value) || 0;
-      return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return Math.round(n).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     },
     goToAddStock() {
       this.$router.push('/stocklot/add');
@@ -59,27 +59,27 @@ export default {
     /**
      * 購入株価配当利回りを計算
      * @param {Object} lot - ストックロットオブジェクト
-     * @returns {string} - フォーマットされた配当利回り
+     * @returns {string} - フォーマットされた配当利回り（整数）
      */
     purchasePriceDividendYield(lot) {
       const purchasePrice = lot.averagePrice ?? lot.price;
       if (!purchasePrice || !lot.incoming || purchasePrice <= 0) {
-        return '0.00';
+        return '0';
       }
       const yieldRate = (lot.incoming / purchasePrice) * 100;
-      return yieldRate.toFixed(2);
+      return Math.round(yieldRate).toString();
     },
     /**
      * 現在株価配当利回りを計算
      * @param {Object} lot - ストックロットオブジェクト
-     * @returns {string} - フォーマットされた配当利回り
+     * @returns {string} - フォーマットされた配当利回り（整数）
      */
     currentPriceDividendYield(lot) {
       if (!lot.stock?.currentPrice || !lot.incoming || lot.stock.currentPrice <= 0) {
-        return '0.00';
+        return '0';
       }
       const yieldRate = (lot.incoming / lot.stock.currentPrice) * 100;
-      return yieldRate.toFixed(2);
+      return Math.round(yieldRate).toString();
     },
   },
   watch: {

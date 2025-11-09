@@ -25,8 +25,14 @@ export default {
       name: { label: '名前' },
       currentPrice: { label: '現在の株価' },
       previousPrice: { label: '前日終値' },
-      priceChange: { label: '前日比', formatter: (value, stock) => this.calculatePriceChange(stock) },
-      priceChangeRate: { label: '前日比率(%)', formatter: (value, stock) => this.calculatePriceChangeRate(stock) },
+      priceChange: { label: '前日比', formatter: (value, stock) => {
+        const change = this.calculatePriceChange(stock);
+        return change !== null ? Math.round(change) : null;
+      }},
+      priceChangeRate: { label: '前日比率(%)', formatter: (value, stock) => {
+        const rate = this.calculatePriceChangeRate(stock);
+        return rate !== null ? Math.round(rate) : null;
+      }},
       incoming: { label: '配当金' },
       earningsDate: { 
         label: '業績発表日',
@@ -73,7 +79,7 @@ export default {
       }
       return null;
     },
-    // 前日比のフォーマット
+    // 前日比のフォーマット（整数表示）
     formatPriceChange(stock) {
       const change = this.calculatePriceChange(stock);
       const rate = this.calculatePriceChangeRate(stock);
@@ -84,7 +90,7 @@ export default {
       
       const sign = change >= 0 ? '+' : '';
       const arrow = change >= 0 ? '↑' : '↓';
-      return `${arrow} ${sign}${change.toFixed(1)} (${sign}${rate.toFixed(2)}%)`;
+      return `${arrow} ${sign}${Math.round(change)} (${sign}${Math.round(rate)}%)`;
     },
     // 前日比の色を取得
     getPriceChangeClass(stock) {

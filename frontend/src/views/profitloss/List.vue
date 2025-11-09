@@ -295,9 +295,9 @@ export default {
     },
     fmt(value) {
       // 数値をローカライズされた形式でフォーマットするヘルパー関数
-      // 例: 1234.56 -> "1,234.56"
+      // 例: 1234.56 -> "1,235" (四捨五入して整数表示)
       const n = Number(value) || 0;
-      return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return Math.round(n).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
     },
     calculateEvaluation(item) {
       // 含み損益の計算を行う
