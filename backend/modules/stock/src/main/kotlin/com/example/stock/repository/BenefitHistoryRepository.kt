@@ -11,4 +11,10 @@ interface BenefitHistoryRepository : JpaRepository<BenefitHistory, Int> {
 
     /* 売り取引IDから優待利益履歴を検索 */
     fun findBySellTransactionId(sellTransactionId: Int): List<BenefitHistory>
+    
+    /* 複数の株式ロットIDから優待利益履歴を一括検索（N+1問題回避） */
+    fun findByStockLotIdIn(stockLotIds: List<Int>): List<BenefitHistory>
+    
+    /* 複数の売り取引IDから優待利益履歴を一括検索（N+1問題回避） */
+    fun findBySellTransactionIdIn(sellTransactionIds: List<Int>): List<BenefitHistory>
 }

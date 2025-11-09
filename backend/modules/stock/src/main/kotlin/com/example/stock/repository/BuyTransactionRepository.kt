@@ -15,4 +15,7 @@ interface BuyTransactionRepository : JpaRepository<BuyTransaction, Int> {
 
     /* 株式ロットから最も古い買い取引を検索 */
     fun findFirstByStockLotOrderByTransactionDateAsc(stockLot: StockLot): BuyTransaction?
+    
+    /* 複数の株式ロットIDから買い取引を一括検索（N+1問題回避） */
+    fun findByStockLotIdIn(stockLotIds: List<Int>): List<BuyTransaction>
 }

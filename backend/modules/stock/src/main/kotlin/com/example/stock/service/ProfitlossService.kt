@@ -43,24 +43,23 @@ class ProfitlossService(
      * @return 損益情報のリスト
      */
     fun getProfitStockLotLoss(ownerId: Int? = null): List<ProfitlossStockLotDto> {
-        // 対象となる株式ロットを取得（指定された所有者のみまたは全て）
-        // 現在保有単元数が0より大きい株式ロットのみを対象とする
+        // 対象となる株式ロットを取得
         val stockLots = if (ownerId != null) {
+            // 指定された所有者のみ
             stockLotService.findByOwnerId(ownerId)
         } else {
+            // 全ての所有者
             stockLotService.findAll()
         }.filter { it.currentUnit > 0 } // 現在の単元数が0より大きい株式ロットのみ対象
         
-        // パフォーマンス最適化：N+1クエリ問題を回避するため、一括取得を行う
+        // パフォーマンス最適化：N+1クエリ問題を完全に回避するため、IN句による一括取得を実施
         val stockLotIds = stockLots.map { it.id }
         
-        // 全ての株式ロットIDに対して購入取引を一括取得し、Map形式で格納
+        // 全ての株式ロットIDに対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                buyTransactionRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
@@ -68,13 +67,11 @@ class ProfitlossService(
         // 配当金履歴の一括取得と合計計算
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
 
-        // 全ての株式ロットに対して配当金履歴を一括取得
+        // 全ての株式ロットに対して配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                incomingHistoryRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLotId }
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -88,13 +85,11 @@ class ProfitlossService(
         }
 
         // 株主優待履歴の一括取得と合計計算
-        // 全ての株式ロットに対して株主優待履歴を一括取得
+        // 全ての株式ロットに対して株主優待履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                benefitHistoryRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
@@ -112,15 +107,13 @@ class ProfitlossService(
             // 該当する株式ロットの購入取引を取得
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
             
-            // 株式ロット全体の配当金額を集計（各購入取引の配当金を合計）
-            var totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
-                acc + (incomingTotalsMap[bt.id] ?: BigDecimal.ZERO)
-            }
+            // 株式ロット全体の配当金額を集計
+            // 事前に一括取得した配当金履歴から該当する株式ロットの合計を算出
+            var totalIncoming = incomingTotalsMap[stockLot.id] ?: BigDecimal.ZERO
             
-            // 株式ロット全体の株主優待金額を集計（各購入取引の優待金を合計）
-            val totalBenefit = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
-                acc + (benefitTotalsMap[bt.id] ?: BigDecimal.ZERO)
-            }
+            // 株式ロット全体の株主優待金額を集計  
+            // 事前に一括取得した優待履歴から該当する株式ロットの合計を算出
+            val totalBenefit = benefitTotalsMap[stockLot.id] ?: BigDecimal.ZERO
             
             // 最初の購入取引（最も古い取引日）を基準価格として使用
             val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
@@ -189,29 +182,25 @@ class ProfitlossService(
             stockLotService.findAll()
         }
         
-        // パフォーマンス最適化：N+1クエリ問題を回避するため、一括取得を行う
+        // パフォーマンス最適化：N+1クエリ問題を完全に回避するため、IN句による一括取得を実施
         val stockLotIds = stockLots.map { it.id }
         
-        // 全ての株式ロットIDに対して購入取引を一括取得し、Map形式で格納
+        // 全ての株式ロットIDに対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                buyTransactionRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
+            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
+                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
         
         // 売却取引の一括取得
-        // 全ての購入取引IDに対して売却取引を一括取得し、Map形式で格納
+        // 全ての購入取引IDに対して売却取引を一括取得（1回のクエリで全て取得）
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
         // Map<BuyTransactionId, List<SellTransaction>>の形でグループ化
         val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
-            buyTransactionIds.flatMap { buyTransactionId ->
-                sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
-                    .map { buyTransactionId to it }
-            }.groupBy({ it.first }, { it.second })
+            sellTransactionRepository.findByBuyTransactionIdIn(buyTransactionIds)
+                .groupBy { it.buyTransactionId }
         } else {
             emptyMap()
         }
@@ -219,13 +208,11 @@ class ProfitlossService(
         // 売却取引に関連する配当金履歴の一括取得
         val sellTransactionIds = sellTransactionsMap.values.flatten().mapNotNull { it.id }
 
-        // 売却取引に関連する配当金履歴を一括取得
+        // 売却取引に関連する配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
-            sellTransactionIds.flatMap { sellTransactionId ->
-                incomingHistoryRepository.findBySellTransactionId(sellTransactionId)
-                    .map { sellTransactionId to it }
-            }.groupBy({ it.first }, { it.second })
+            incomingHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
+                .groupBy { it.sellTransactionId }
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -238,13 +225,11 @@ class ProfitlossService(
             }
         }
 
-        // 売却取引に関連する株主優待履歴の一括取得
+        // 売却取引に関連する株主優待履歴の一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
-            sellTransactionIds.flatMap { sellTransactionId ->
-                benefitHistoryRepository.findBySellTransactionId(sellTransactionId)
-                    .map { sellTransactionId to it }
-            }.groupBy({ it.first }, { it.second })
+            benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
+                .groupBy { it.sellTransactionId }
         } else {
             emptyMap()
         }
