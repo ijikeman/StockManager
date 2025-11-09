@@ -140,9 +140,13 @@ export default {
         // Fetch unrealized profit/loss (含み損益)
         const unrealizedResponse = await axios.get('/api/profitloss');
         this.unrealizedData = unrealizedResponse.data;
-        
+
         // Fetch realized profit/loss (確定損益)
-        const realizedResponse = await axios.get('/api/profitloss/realized');
+        const realizedResponse = await axios.get('/api/profitloss/realized', {
+          params: {
+            ownerId: this.filterOwner || null
+          }
+        });
         this.realizedData = realizedResponse.data;
       } catch (error) {
         console.error('Error fetching profit/loss data:', error);
