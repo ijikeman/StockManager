@@ -69,15 +69,60 @@
     <table class="common-table profit-loss-table" v-if="filteredUnrealizedItems.length > 0">
       <thead>
         <tr>
-          <th>銘柄コード</th>
-          <th>銘柄名</th>
-          <th>購入日</th>
-          <th>購入単価</th>
-          <th>現在価格</th>
-          <th>保有単元数</th>
-          <th>総配当金</th>
-          <th>総優待金</th>
-          <th>株式損益</th>
+          <th class="sortable-header" @click="sortUnrealizedBy('stockCode')">
+            銘柄コード
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'stockCode' }">
+              {{ unrealizedSortBy === 'stockCode' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('stockName')">
+            銘柄名
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'stockName' }">
+              {{ unrealizedSortBy === 'stockName' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('buyTransactionDate')">
+            購入日
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'buyTransactionDate' }">
+              {{ unrealizedSortBy === 'buyTransactionDate' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('purchasePrice')">
+            購入単価
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'purchasePrice' }">
+              {{ unrealizedSortBy === 'purchasePrice' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('currentPrice')">
+            現在価格
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'currentPrice' }">
+              {{ unrealizedSortBy === 'currentPrice' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('currentUnit')">
+            保有単元数
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'currentUnit' }">
+              {{ unrealizedSortBy === 'currentUnit' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('totalIncoming')">
+            総配当金
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'totalIncoming' }">
+              {{ unrealizedSortBy === 'totalIncoming' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('totalBenefit')">
+            総優待金
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'totalBenefit' }">
+              {{ unrealizedSortBy === 'totalBenefit' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortUnrealizedBy('evaluationProfitloss')">
+            株式損益
+            <span class="sort-indicator" :class="{ active: unrealizedSortBy === 'evaluationProfitloss' }">
+              {{ unrealizedSortBy === 'evaluationProfitloss' ? (unrealizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -153,17 +198,72 @@
     <table class="common-table profit-loss-table" v-if="filteredRealizedItems.length > 0">
       <thead>
         <tr>
-          <th>銘柄コード</th>
-          <th>銘柄名</th>
-          <th>購入日</th>
-          <th>購入単価</th>
-          <th>売却日</th>
-          <th>売却単価</th>
-          <th>売却単元数</th>
-          <th>株式損益</th>
-          <th>総配当金</th>
-          <th>総優待金</th>
-          <th>確定損益</th>
+          <th class="sortable-header" @click="sortRealizedBy('stockCode')">
+            銘柄コード
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'stockCode' }">
+              {{ realizedSortBy === 'stockCode' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('stockName')">
+            銘柄名
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'stockName' }">
+              {{ realizedSortBy === 'stockName' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('buyTransactionDate')">
+            購入日
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'buyTransactionDate' }">
+              {{ realizedSortBy === 'buyTransactionDate' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('purchasePrice')">
+            購入単価
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'purchasePrice' }">
+              {{ realizedSortBy === 'purchasePrice' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('sellTransactionDate')">
+            売却日
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'sellTransactionDate' }">
+              {{ realizedSortBy === 'sellTransactionDate' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('sellPrice')">
+            売却単価
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'sellPrice' }">
+              {{ realizedSortBy === 'sellPrice' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('sellUnit')">
+            売却単元数
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'sellUnit' }">
+              {{ realizedSortBy === 'sellUnit' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('profitLoss')">
+            株式損益
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'profitLoss' }">
+              {{ realizedSortBy === 'profitLoss' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('totalIncoming')">
+            総配当金
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'totalIncoming' }">
+              {{ realizedSortBy === 'totalIncoming' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('totalBenefit')">
+            総優待金
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'totalBenefit' }">
+              {{ realizedSortBy === 'totalBenefit' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
+          <th class="sortable-header" @click="sortRealizedBy('totalProfitLoss')">
+            確定損益
+            <span class="sort-indicator" :class="{ active: realizedSortBy === 'totalProfitLoss' }">
+              {{ realizedSortBy === 'totalProfitLoss' ? (realizedSortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+            </span>
+          </th>
         </tr>
       </thead>
       <tbody>
