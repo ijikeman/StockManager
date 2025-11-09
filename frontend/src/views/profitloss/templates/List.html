@@ -37,7 +37,7 @@
             <span class="summary-value positive">{{ fmt(unrealizedSummary.totalBenefit) }}</span>
           </div>
           <div class="summary-item">
-            <span class="summary-label">含み損益合計:</span>
+            <span class="summary-label">株式損益合計:</span>
             <span class="summary-value" :class="unrealizedSummary.totalEvaluation >= 0 ? 'positive' : 'negative'">
               {{ fmt(unrealizedSummary.totalEvaluation) }}
             </span>
@@ -77,7 +77,7 @@
           <th>保有単元数</th>
           <th>総配当金</th>
           <th>総優待金</th>
-          <th>含み損益</th>
+          <th>株式損益</th>
         </tr>
       </thead>
       <tbody>
