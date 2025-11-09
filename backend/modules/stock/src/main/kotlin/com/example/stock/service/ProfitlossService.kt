@@ -43,15 +43,19 @@ class ProfitlossService(
      * @return 損益情報のリスト
      */
     fun getProfitStockLotLoss(ownerId: Int? = null): List<ProfitlossStockLotDto> {
+        // 対象となる株式ロットを取得（指定された所有者のみまたは全て）
+        // 現在保有単元数が0より大きい株式ロットのみを対象とする
         val stockLots = if (ownerId != null) {
             stockLotService.findByOwnerId(ownerId)
         } else {
             stockLotService.findAll()
         }.filter { it.currentUnit > 0 } // 現在の単元数が0より大きい株式ロットのみ対象
         
-        // N+1クエリ問題を回避: 
+        // パフォーマンス最適化：N+1クエリ問題を回避するため、一括取得を行う
         val stockLotIds = stockLots.map { it.id }
-        // すべての株式ロットIDに対して購入取引を一括取得
+        
+        // 全ての株式ロットIDに対して購入取引を一括取得し、Map形式で格納
+        // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
                 buyTransactionRepository.findByStockLotId(stockLotId)
@@ -61,10 +65,11 @@ class ProfitlossService(
             emptyMap()
         }
         
-        // すべての購入取引IDに対して配当金履歴の一括取得し総配当金額をDtoに格納
+        // 配当金履歴の一括取得と合計計算
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
 
-        // 一括取得: buyTransactionId -> List<IncomingHistory>
+        // 全ての株式ロットに対して配当金履歴を一括取得
+        // Map<StockLotId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
                 incomingHistoryRepository.findByStockLotId(stockLotId)
@@ -74,15 +79,17 @@ class ProfitlossService(
             emptyMap<Int, List<IncomingHistory>>()
         }
 
-        // 購入取引ごとの総配当金額 (BigDecimal) を算出
+        // 株式ロットごとの総配当金額を計算
+        // nullの場合は0として扱い、安全に合計を算出
         val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
             incomes.fold(BigDecimal.ZERO) { acc, d ->
             acc + (d.incoming ?: BigDecimal.ZERO)
             }
         }
-        // Dtoへの格納は後続処理で incomingTotalsMap を参照して行う
 
-        // すべての購入取引IDに対して優待履歴の一括取得
+        // 株主優待履歴の一括取得と合計計算
+        // 全ての株式ロットに対して株主優待履歴を一括取得
+        // Map<StockLotId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
                 benefitHistoryRepository.findByStockLotId(stockLotId)
@@ -92,42 +99,53 @@ class ProfitlossService(
             emptyMap()
         }
 
-        // 購入取引ごとの総優待金額を算出
+        // 株式ロットごとの総株主優待金額を計算
+        // nullの場合は0として扱い、安全に合計を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { acc, b ->
                 acc + (b.benefit ?: BigDecimal.ZERO)
             }
         }
 
-        // DTOのリストを作成
+        // 損益情報DTOのリストを作成
         return stockLots.map { stockLot ->
+            // 該当する株式ロットの購入取引を取得
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
-            // 各購入取引の配当金額と優待金額を合計
+            
+            // 株式ロット全体の配当金額を集計（各購入取引の配当金を合計）
             var totalIncoming = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
                 acc + (incomingTotalsMap[bt.id] ?: BigDecimal.ZERO)
             }
+            
+            // 株式ロット全体の株主優待金額を集計（各購入取引の優待金を合計）
             val totalBenefit = buyTransactions.fold(BigDecimal.ZERO) { acc, bt ->
                 acc + (benefitTotalsMap[bt.id] ?: BigDecimal.ZERO)
             }
-            // 最初の購入取引日を取得
+            
+            // 最初の購入取引（最も古い取引日）を基準価格として使用
             val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
             
-            // すべての購入取引がNISAの場合のみisNisa=trueとする
+            // NISA判定：全ての購入取引がNISA口座での取引の場合のみisNisa=trueとする
             val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
             
-            // NISAでない場合は配当金に税金を適用
+            // 税金処理：NISA口座でない場合は配当金に税金（20.315%）を適用
             if (!isNisa) {
                 totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
             }
             
-            // 評価損益を計算（NISAでない場合は税金を適用）
+            // 評価損益の計算（含み損益）
+            // 現在価格と保有単元数が存在する場合のみ計算
             val evaluationProfitloss = if (stockLot.stock.currentPrice != null && stockLot.currentUnit != null) {
+                // 基準となる購入価格（初回購入価格）
                 val purchasePrice = firstBuyTransaction?.price ?: BigDecimal.ZERO
                 val currentPriceBD = BigDecimal.valueOf(stockLot.stock.currentPrice)
+                
+                // 損益 = (現在価格 - 購入価格) × 保有単元数 × 最小単元数
                 val profitloss = (currentPriceBD - purchasePrice)
                     .multiply(BigDecimal.valueOf(stockLot.currentUnit.toLong()))
                     .multiply(BigDecimal.valueOf(stockLot.stock.minimalUnit.toLong()))
                 
+                // NISA口座でない場合は株式譲渡益税（20.315%）を適用
                 if (!isNisa) {
                     profitloss.multiply(AFTER_TAX_RATIO)
                 } else {
@@ -137,19 +155,20 @@ class ProfitlossService(
                 null
             }
 
+            // 損益情報DTOを作成して返却
             ProfitlossStockLotDto(
-                stockCode = stockLot.stock.code,
-                stockName = stockLot.stock.name,
-                minimalUnit = stockLot.stock.minimalUnit,
-                purchasePrice = firstBuyTransaction?.price?.toDouble() ?: 0.0,
-                currentPrice = stockLot.stock.currentPrice,
-                currentUnit = stockLot.currentUnit,
-                totalIncoming = totalIncoming,
-                totalBenefit = totalBenefit,
-                evaluationProfitloss = evaluationProfitloss,
-                buyTransactionDate = firstBuyTransaction?.transactionDate,
-                ownerName = stockLot.owner.name,
-                isNisa = isNisa
+                stockCode = stockLot.stock.code,                        // 株式コード
+                stockName = stockLot.stock.name,                        // 株式名
+                minimalUnit = stockLot.stock.minimalUnit,               // 最小単元数
+                purchasePrice = firstBuyTransaction?.price?.toDouble() ?: 0.0, // 購入価格（初回購入価格）
+                currentPrice = stockLot.stock.currentPrice,             // 現在価格
+                currentUnit = stockLot.currentUnit,                     // 現在保有単元数
+                totalIncoming = totalIncoming,                          // 総配当金（税引き後）
+                totalBenefit = totalBenefit,                           // 総株主優待金
+                evaluationProfitloss = evaluationProfitloss,           // 評価損益（含み損益、税引き後）
+                buyTransactionDate = firstBuyTransaction?.transactionDate, // 初回購入日
+                ownerName = stockLot.owner.name,                       // 所有者名
+                isNisa = isNisa                                        // NISA口座フラグ
             )
         }
     }
@@ -162,14 +181,19 @@ class ProfitlossService(
      * @return 損益情報のリスト
      */
     fun getSellTransactionProfitloss(ownerId: Int? = null): List<ProfitlossDto> {
+        // 対象となる株式ロットを取得（指定された所有者のみまたは全て）
+        // 売却取引が存在する場合も、保有数が0のロットも含めて取得
         val stockLots = if (ownerId != null) {
             stockLotService.findByOwnerId(ownerId)
         } else {
             stockLotService.findAll()
         }
         
-        // N+1クエリ問題を回避: すべての株式ロットIDに対して購入取引を一括取得
+        // パフォーマンス最適化：N+1クエリ問題を回避するため、一括取得を行う
         val stockLotIds = stockLots.map { it.id }
+        
+        // 全ての株式ロットIDに対して購入取引を一括取得し、Map形式で格納
+        // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
             stockLotIds.flatMap { stockLotId ->
                 buyTransactionRepository.findByStockLotId(stockLotId)
@@ -179,8 +203,10 @@ class ProfitlossService(
             emptyMap()
         }
         
-        // すべての購入取引IDに対して売却取引を一括取得
+        // 売却取引の一括取得
+        // 全ての購入取引IDに対して売却取引を一括取得し、Map形式で格納
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
+        // Map<BuyTransactionId, List<SellTransaction>>の形でグループ化
         val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
             buyTransactionIds.flatMap { buyTransactionId ->
                 sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
@@ -190,10 +216,11 @@ class ProfitlossService(
             emptyMap()
         }
 
-        // すべての売却取引IDに対して配当金履歴の一括取得し総配当金額をDtoに格納
+        // 売却取引に関連する配当金履歴の一括取得
         val sellTransactionIds = sellTransactionsMap.values.flatten().mapNotNull { it.id }
 
-        // 一括取得: sellTransactionId -> List<IncomingHistory>
+        // 売却取引に関連する配当金履歴を一括取得
+        // Map<SellTransactionId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
             sellTransactionIds.flatMap { sellTransactionId ->
                 incomingHistoryRepository.findBySellTransactionId(sellTransactionId)
@@ -202,15 +229,17 @@ class ProfitlossService(
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
-        // 購入取引ごとの総配当金額 (BigDecimal) を算出
+        
+        // 売却取引ごとの総配当金額を計算
+        // nullの場合は0として扱い、安全に合計を算出
         val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
             incomes.fold(BigDecimal.ZERO) { acc, d ->
             acc + (d.incoming ?: BigDecimal.ZERO)
             }
         }
-        // Dtoへの格納は後続処理で incomingTotalsMap を参照して行う
 
-        // すべての売却取引IDに対して優待履歴の一括取得
+        // 売却取引に関連する株主優待履歴の一括取得
+        // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
             sellTransactionIds.flatMap { sellTransactionId ->
                 benefitHistoryRepository.findBySellTransactionId(sellTransactionId)
@@ -219,61 +248,70 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
-        // 売却取引ごとの総優待金額を算出
+        
+        // 売却取引ごとの総株主優待金額を計算
+        // nullの場合は0として扱い、安全に合計を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { acc, b ->
                 acc + (b.benefit ?: BigDecimal.ZERO)
             }
         }
 
-        // DTOのリストを作成 - 各売却取引ごとに1つのDTOを作成
+        // 売却損益情報DTOのリストを作成
+        // 各売却取引ごとに1つのDTOを作成（入れ子ループで処理）
         val result = mutableListOf<ProfitlossDto>()
         
+        // 株式ロットごとに処理
         stockLots.forEach { stockLot ->
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
             
+            // 購入取引ごとに処理
             buyTransactions.forEach { buyTransaction ->
                 val sellTransactions = sellTransactionsMap[buyTransaction.id] ?: emptyList()
                 
                 // 売却取引がある場合のみ、各売却取引ごとにDTOを作成
                 sellTransactions.forEach { sellTransaction ->
-                    // 損益計算: (売却価格 - 購入価格) * 単元数 * 最小単元数
+                    // 基本損益計算：(売却価格 - 購入価格) × 売却単元数 × 最小単元数
                     var profitLoss = ((sellTransaction.price - buyTransaction.price) * 
                                     sellTransaction.unit.toBigDecimal() * 
                                     stockLot.stock.minimalUnit.toBigDecimal())
                     
-                    // 売却取引に対応する配当金と優待金を取得
+                    // 売却取引に対応する配当金と株主優待金を取得
                     var totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
                     val totalBenefit = benefitTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
                     
-                    // NISAでない場合は配当金と株価差益に税金を適用
+                    // 税金処理：NISA口座でない場合は配当金と株価差益に税金を適用
                     if (!buyTransaction.isNisa) {
+                        // 配当金に税金（20.315%）を適用
                         totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
-                        // 売却益に対する税金を適用(マイナスなら適用しない)
+                        
+                        // 売却益にのみ税金を適用（売却損の場合は税金の恩恵なし）
                         if (profitLoss > BigDecimal.ZERO) {
                             profitLoss = profitLoss.multiply(AFTER_TAX_RATIO)
                         }
                     }
                     
+                    // 売却損益DTOを作成してリストに追加
                     result.add(ProfitlossDto(
-                        stockCode = stockLot.stock.code,
-                        stockName = stockLot.stock.name,
-                        minimalUnit = stockLot.stock.minimalUnit,
-                        purchasePrice = buyTransaction.price.toDouble(),
-                        sellPrice = sellTransaction.price.toDouble(),
-                        sellUnit = sellTransaction.unit,
-                        totalIncoming = totalIncoming.toDouble(),
-                        totalBenefit = totalBenefit.toDouble(),
-                        profitLoss = profitLoss  - buyTransaction.fee - sellTransaction.fee, // 手数料を差し引く
-                        buyTransactionDate = buyTransaction.transactionDate,
-                        sellTransactionDate = sellTransaction.transactionDate,
-                        ownerName = stockLot.owner.name,
-                        isNisa = buyTransaction.isNisa
+                        stockCode = stockLot.stock.code,                    // 株式コード
+                        stockName = stockLot.stock.name,                    // 株式名
+                        minimalUnit = stockLot.stock.minimalUnit,           // 最小単元数
+                        purchasePrice = buyTransaction.price.toDouble(),    // 購入価格
+                        sellPrice = sellTransaction.price.toDouble(),       // 売却価格
+                        sellUnit = sellTransaction.unit,                    // 売却単元数
+                        totalIncoming = totalIncoming.toDouble(),           // 総配当金（税引き後）
+                        totalBenefit = totalBenefit.toDouble(),            // 総株主優待金
+                        profitLoss = profitLoss - buyTransaction.fee - sellTransaction.fee, // 最終損益（手数料控除後）
+                        buyTransactionDate = buyTransaction.transactionDate, // 購入日
+                        sellTransactionDate = sellTransaction.transactionDate, // 売却日
+                        ownerName = stockLot.owner.name,                   // 所有者名
+                        isNisa = buyTransaction.isNisa                     // NISA口座フラグ
                     ))
                 }
             }
         }
         
+        // 作成した売却損益DTOのリストを返却
         return result
     }
 }
