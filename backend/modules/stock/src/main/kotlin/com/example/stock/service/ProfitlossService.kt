@@ -225,7 +225,7 @@ class ProfitlossService(
 
         // 売却取引に関連する配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<IncomingHistory>>の形でグループ化
-        val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
+        val incomingHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
             incomingHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
                 .filter { it.stockLot != null } // stockLot が null でないものをフィルタリング
                 .groupBy({ it.stockLot!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
@@ -242,16 +242,13 @@ class ProfitlossService(
         }
         // --- end: 配当金履歴の合計計算 --- //
 
-        // --- start: 株主優待履歴の合計計算 --- //
-        // 売却取引に関連する株主優待履歴の一括取得（1回のクエリで全て取得）
+        // --- start: 株主優待履歴の一括取得と合計計算 --- //
+        // 全ての売却取引に対して株主優待履歴を一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
-            sellTransactionIds.flatMap { sellTransactionId ->
-                benefitHistoryRepository.findBySellTransactionId(sellTransactionId)
-                    .map { sellTransactionId to it }
-            }.groupBy({ it.first }, { it.second })
-//            benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
-//                .groupBy { it.sellTransactionId }
+            benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
+                .filter { it.stockLot != null } // stockLot が null でないものをフィルタリング
+                .groupBy({ it.stockLot!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
         } else {
             emptyMap<Int, List<BenefitHistory>>()
         }
@@ -260,10 +257,10 @@ class ProfitlossService(
         // nullの場合は0として扱い、安全に合計を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
             benefits.fold(BigDecimal.ZERO) { total, benefitHistory ->
-                total + (benefitHistory.benefit ?: BigDecimal.ZERO)
+                total + (benefitHistory.benefit ?: BigDecimal.ZERO) // nullの場合は0として扱う
             }
         }
-        // --- end: 株主優待履歴の合計計算 --- //
+        // --- end: 株主優待履歴の一括取得と合計計算 --- //
 
         // --- start: 売却損益情報DTOのリストを作成 --- //
         // 各売却取引ごとに1つのDTOを作成（入れ子ループで処理）
