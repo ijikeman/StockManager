@@ -109,28 +109,27 @@ class ProfitlossService(
 
         // --- start: 損益情報DTOのリストを作成 --- //
         return stockLots.map { stockLot ->
+            // NISA判定：全ての購入取引がNISA口座での取引の場合のみisNisa=trueとする(stockLot=buyTransactionは1:1の関係のため、すべてのbuyTransactionは同じisNisa値を持つ)
+            val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
+
             // 該当する株式ロットの購入取引を取得
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
             
             // 株式ロット全体の配当金額を集計
             // 事前に一括取得した配当金履歴から該当する株式ロットの合計を算出
             var totalIncoming = incomingTotalsMap[stockLot.id] ?: BigDecimal.ZERO
-            
-            // 株式ロット全体の株主優待金額を集計  
-            // 事前に一括取得した優待履歴から該当する株式ロットの合計を算出
-            val totalBenefit = benefitTotalsMap[stockLot.id] ?: BigDecimal.ZERO
-            
-            // 最初の購入取引（最も古い取引日）を基準価格として使用
-            val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
-            
-            // NISA判定：全ての購入取引がNISA口座での取引の場合のみisNisa=trueとする
-            val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
-            
             // 税金処理：NISA口座でない場合は配当金に税金（20.315%）を適用
             if (!isNisa) {
                 totalIncoming = totalIncoming.multiply(AFTER_TAX_RATIO)
             }
-            
+
+            // 株式ロット全体の株主優待金額を集計  
+            // 事前に一括取得した優待履歴から該当する株式ロットの合計を算出
+            val totalBenefit = benefitTotalsMap[stockLot.id] ?: BigDecimal.ZERO
+
+            // 最初の購入取引（最も古い取引日）を基準価格として使用
+            val firstBuyTransaction = buyTransactions.minByOrNull { it.transactionDate }
+
             // 評価損益の計算（含み損益）
             // 現在価格と保有単元数が存在する場合のみ計算
             val evaluationProfitloss = if (stockLot.stock.currentPrice != null && stockLot.currentUnit != null) {
@@ -138,7 +137,7 @@ class ProfitlossService(
                 val purchasePrice = firstBuyTransaction?.price ?: BigDecimal.ZERO
                 val currentPriceBD = BigDecimal.valueOf(stockLot.stock.currentPrice)
                 
-                // 損益 = (現在価格 - 購入価格) × 保有単元数 × 最小単元数
+                // 損益 = (現在価格 - 購入価格) × 保有単元数 × 最小単元(.multiplyはBigDecimalにおける乗算)
                 val profitloss = (currentPriceBD - purchasePrice)
                     .multiply(BigDecimal.valueOf(stockLot.currentUnit.toLong()))
                     .multiply(BigDecimal.valueOf(stockLot.stock.minimalUnit.toLong()))
@@ -186,7 +185,8 @@ class ProfitlossService(
         } else {
             stockLotService.findAll()
         }
-        
+
+        // --- start: 購入取引を一括取得 --- //
         // パフォーマンス最適化：N+1クエリ問題を完全に回避するため、IN句による一括取得を実施
         val stockLotIds = stockLots.map { it.id }
         
@@ -198,8 +198,9 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
-        
-        // 売却取引の一括取得
+        // --- end: 購入取引を一括取得 --- //
+
+        // --- start: 売却取引の一括取得 --- //
         // 全ての購入取引IDに対して売却取引を一括取得（1回のクエリで全て取得）
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
         // Map<BuyTransactionId, List<SellTransaction>>の形でグループ化
@@ -209,7 +210,9 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
+        // --- end: 売却取引の一括取得 --- //
 
+        // --- start: 配当金履歴の合計計算 --- //
         // 売却取引に関連する配当金履歴の一括取得
         val sellTransactionIds = sellTransactionsMap.values.flatten().mapNotNull { it.id }
 
@@ -222,14 +225,15 @@ class ProfitlossService(
             emptyMap<Int, List<IncomingHistory>>()
         }
         
-        // 売却取引ごとの総配当金額を計算
         // nullの場合は0として扱い、安全に合計を算出
         val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
-            incomes.fold(BigDecimal.ZERO) { acc, d ->
-            acc + (d.incoming ?: BigDecimal.ZERO)
+            incomes.fold(BigDecimal.ZERO) { total, incomingHistory ->
+                total + (incomingHistory.incoming ?: BigDecimal.ZERO)
             }
         }
+        // --- end: 配当金履歴の合計計算 --- //
 
+        // --- start: 株主優待履歴の合計計算 --- //
         // 売却取引に関連する株主優待履歴の一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
@@ -242,12 +246,13 @@ class ProfitlossService(
         // 売却取引ごとの総株主優待金額を計算
         // nullの場合は0として扱い、安全に合計を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
-            benefits.fold(BigDecimal.ZERO) { acc, b ->
-                acc + (b.benefit ?: BigDecimal.ZERO)
+            benefits.fold(BigDecimal.ZERO) { total, benefitHistory ->
+                total + (benefitHistory.benefit ?: BigDecimal.ZERO)
             }
         }
+        // --- end: 株主優待履歴の合計計算 --- //
 
-        // 売却損益情報DTOのリストを作成
+        // --- start: 売却損益情報DTOのリストを作成 --- //
         // 各売却取引ごとに1つのDTOを作成（入れ子ループで処理）
         val result = mutableListOf<ProfitlossDto>()
         
