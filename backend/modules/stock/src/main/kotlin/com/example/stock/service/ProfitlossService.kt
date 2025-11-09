@@ -59,8 +59,12 @@ class ProfitlossService(
          // 全ての株式ロットID(StockLotIds)に対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
-            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
-                .groupBy { it.stockLotId }
+            stockLotIds.flatMap { stockLotId ->
+                buyTransactionRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+//            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
+//                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
@@ -73,8 +77,12 @@ class ProfitlossService(
         // 全ての株式ロットに対して配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (stockLotIds.isNotEmpty()) {
-            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
-                .groupBy { it.stockLotId }
+            stockLotIds.flatMap { stockLotId ->
+                incomingHistoryRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+//            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
+//                .groupBy { it.stockLotId }
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -92,8 +100,12 @@ class ProfitlossService(
         // 全ての株式ロットに対して株主優待履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
-            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
-                .groupBy { it.stockLotId }
+            stockLotIds.flatMap { stockLotId ->
+                benefitHistoryRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+//            benefitHistoryRepository.findByStockLotIdIn(stockLotIds)
+//                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
@@ -109,12 +121,12 @@ class ProfitlossService(
 
         // --- start: 損益情報DTOのリストを作成 --- //
         return stockLots.map { stockLot ->
+            // 該当する株式ロットの購入取引を取得
+            val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
+
             // NISA判定：全ての購入取引がNISA口座での取引の場合のみisNisa=trueとする(stockLot=buyTransactionは1:1の関係のため、すべてのbuyTransactionは同じisNisa値を持つ)
             val isNisa = buyTransactions.isNotEmpty() && buyTransactions.all { it.isNisa }
 
-            // 該当する株式ロットの購入取引を取得
-            val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
-            
             // 株式ロット全体の配当金額を集計
             // 事前に一括取得した配当金履歴から該当する株式ロットの合計を算出
             var totalIncoming = incomingTotalsMap[stockLot.id] ?: BigDecimal.ZERO
@@ -193,8 +205,12 @@ class ProfitlossService(
         // 全ての株式ロットIDに対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
-            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
-                .groupBy { it.stockLotId }
+            stockLotIds.flatMap { stockLotId ->
+                buyTransactionRepository.findByStockLotId(stockLotId)
+                    .map { stockLotId to it }
+            }.groupBy({ it.first }, { it.second })
+//            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
+//                .groupBy { it.stockLotId }
         } else {
             emptyMap()
         }
@@ -205,8 +221,12 @@ class ProfitlossService(
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
         // Map<BuyTransactionId, List<SellTransaction>>の形でグループ化
         val sellTransactionsMap = if (buyTransactionIds.isNotEmpty()) {
-            sellTransactionRepository.findByBuyTransactionIdIn(buyTransactionIds)
-                .groupBy { it.buyTransactionId }
+            buyTransactionIds.flatMap { buyTransactionId ->
+                sellTransactionRepository.findByBuyTransactionId(buyTransactionId)
+                    .map { buyTransactionId to it }
+            }.groupBy({ it.first }, { it.second })
+//            sellTransactionRepository.findByBuyTransactionIdIn(buyTransactionIds)
+//                .groupBy { it.buyTransactionId }
         } else {
             emptyMap()
         }
@@ -219,8 +239,12 @@ class ProfitlossService(
         // 売却取引に関連する配当金履歴を一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
-            incomingHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
-                .groupBy { it.sellTransactionId }
+            sellTransactionIds.flatMap { sellTransactionId ->
+                incomingHistoryRepository.findBySellTransactionId(sellTransactionId)
+                    .map { sellTransactionId to it }
+            }.groupBy({ it.first }, { it.second })
+//            incomingHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
+//                .groupBy { it.sellTransactionId }
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -237,8 +261,12 @@ class ProfitlossService(
         // 売却取引に関連する株主優待履歴の一括取得（1回のクエリで全て取得）
         // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
-            benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
-                .groupBy { it.sellTransactionId }
+            sellTransactionIds.flatMap { sellTransactionId ->
+                benefitHistoryRepository.findBySellTransactionId(sellTransactionId)
+                    .map { sellTransactionId to it }
+            }.groupBy({ it.first }, { it.second })
+//            benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
+//                .groupBy { it.sellTransactionId }
         } else {
             emptyMap()
         }
