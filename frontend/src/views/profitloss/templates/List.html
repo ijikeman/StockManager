@@ -120,6 +120,12 @@
             <span class="summary-label">優待金合計:</span>
             <span class="summary-value positive">{{ fmt(realizedSummary.totalBenefit) }}</span>
           </div>
+          <div class="summary-item">
+            <span class="summary-label">株式損益合計:</span>
+            <span class="summary-value" :class="realizedSummary.totalEvaluation >= 0 ? 'positive' : 'negative'">
+              {{ fmt(unrealizedSummary.totalEvaluation) }}
+            </span>
+          </div>
           <div class="summary-item total">
             <span class="summary-label">総確定損益:</span>
             <span class="summary-value" :class="realizedSummary.totalProfitLoss >= 0 ? 'positive' : 'negative'">

@@ -110,6 +110,7 @@ export default {
         return {
           totalIncoming: 0,
           totalBenefit: 0,
+          totalEvaluation: 0,
           totalProfitLoss: 0,
           count: 0
         };
@@ -126,14 +127,18 @@ export default {
         const benefitAmount = (item.totalBenefit || 0) * (item.sellUnit || 0) * (item.minimalUnit || 1);
         return sum + benefitAmount;
       }, 0);
-      // 損益合計
-      const totalProfitLoss = this.realizedData.reduce((sum, item) => {
+      // 株式損益合計
+      const totalEvaluation = this.realizedData.reduce((sum, item) => {
         return sum + (Number(item.profitLoss) || 0);
       }, 0);
+
+      // 総合計
+      const totalProfitLoss = totalIncoming + totalBenefit + totalEvaluation;
 
       return {
         totalIncoming,
         totalBenefit,
+        totalEvaluation,
         totalProfitLoss,
         count: this.realizedData.length
       };
