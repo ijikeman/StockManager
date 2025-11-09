@@ -51,11 +51,12 @@ class ProfitlossService(
             // 全ての所有者
             stockLotService.findAll()
         }.filter { it.currentUnit > 0 } // 現在の単元数が0より大きい株式ロットのみ対象
-        
-        // パフォーマンス最適化：N+1クエリ問題を完全に回避するため、IN句による一括取得を実施
+
+        // --- start: 購入取引を一括取得 --- //
+        // パフォーマンス最適化：N+1クエリ問題を完全に回避(IN句による一括取得を実施する)為、StockLotIdを一覧化
         val stockLotIds = stockLots.map { it.id }
         
-        // 全ての株式ロットIDに対して購入取引を一括取得（1回のクエリで全て取得）
+         // 全ての株式ロットID(StockLotIds)に対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
             buyTransactionRepository.findByStockLotIdIn(stockLotIds)
@@ -63,8 +64,10 @@ class ProfitlossService(
         } else {
             emptyMap()
         }
-        
-        // 配当金履歴の一括取得と合計計算
+        // --- end: 購入取引を一括取得 --- //
+
+        // --- start: 配当金履歴の一括取得と合計計算 --- //
+        // 配当金履歴の一括取得と合計計算する為、buyTransaction.IdをbuyTransactionIdsとして一覧化
         val buyTransactionIds = buyTransactionsMap.values.flatten().mapNotNull { it.id }
 
         // 全ての株式ロットに対して配当金履歴を一括取得（1回のクエリで全て取得）
@@ -79,12 +82,13 @@ class ProfitlossService(
         // 株式ロットごとの総配当金額を計算
         // nullの場合は0として扱い、安全に合計を算出
         val incomingTotalsMap: Map<Int, BigDecimal> = incomingHistoriesMap.mapValues { (_, incomes) ->
-            incomes.fold(BigDecimal.ZERO) { acc, d ->
-            acc + (d.incoming ?: BigDecimal.ZERO)
+            incomes.fold(BigDecimal.ZERO) { total, incomingHistory ->
+            total + (incomingHistory.incoming ?: BigDecimal.ZERO) // nullの場合は0として扱う
             }
         }
+        // --- end: 配当金履歴の一括取得と合計計算 --- //
 
-        // 株主優待履歴の一括取得と合計計算
+        // --- start: 株主優待履歴の一括取得と合計計算 --- //
         // 全ての株式ロットに対して株主優待履歴を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (stockLotIds.isNotEmpty()) {
@@ -97,12 +101,13 @@ class ProfitlossService(
         // 株式ロットごとの総株主優待金額を計算
         // nullの場合は0として扱い、安全に合計を算出
         val benefitTotalsMap: Map<Int, BigDecimal> = benefitHistoriesMap.mapValues { (_, benefits) ->
-            benefits.fold(BigDecimal.ZERO) { acc, b ->
-                acc + (b.benefit ?: BigDecimal.ZERO)
+            benefits.fold(BigDecimal.ZERO) { total, benefitHistory ->
+                total + (benefitHistory.benefit ?: BigDecimal.ZERO) // nullの場合は0として扱う
             }
         }
+        // --- end: 株主優待履歴の一括取得と合計計算 --- //
 
-        // 損益情報DTOのリストを作成
+        // --- start: 損益情報DTOのリストを作成 --- //
         return stockLots.map { stockLot ->
             // 該当する株式ロットの購入取引を取得
             val buyTransactions = buyTransactionsMap[stockLot.id] ?: emptyList()
