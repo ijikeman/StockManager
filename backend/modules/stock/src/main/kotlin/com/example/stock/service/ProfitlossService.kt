@@ -224,8 +224,8 @@ class ProfitlossService(
         // Map<SellTransactionId, List<IncomingHistory>>の形でグループ化
         val incomingHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
             incomingHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
-                .filter { it.stockLot != null } // stockLot が null でないものをフィルタリング
-                .groupBy({ it.stockLot!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
+                .filter { it.sellTransaction != null } // sellTransaction が null でないものをフィルタリング
+                .groupBy({ it.sellTransaction!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
@@ -244,8 +244,8 @@ class ProfitlossService(
         // Map<SellTransactionId, List<BenefitHistory>>の形でグループ化
         val benefitHistoriesMap = if (sellTransactionIds.isNotEmpty()) {
             benefitHistoryRepository.findBySellTransactionIdIn(sellTransactionIds)
-                .filter { it.stockLot != null } // stockLot が null でないものをフィルタリング
-                .groupBy({ it.stockLot!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
+                .filter { it.sellTransaction != null } // sellTransaction が null でないものをフィルタリング
+                .groupBy({ it.sellTransaction!!.id }, { it }) // 非nullアサーション (!!) を使用して id を取得
         } else {
             emptyMap<Int, List<BenefitHistory>>()
         }
@@ -273,10 +273,11 @@ class ProfitlossService(
                 
                 // 売却取引がある場合のみ、各売却取引ごとにDTOを作成
                 sellTransactions.forEach { sellTransaction ->
-                    // 基本損益計算：(売却価格 - 購入価格) × 売却単元数 × 最小単元数
+                    // 基本損益計算：(売却価格 - 購入価格) × 売却単元数 × 最小単元数 - 手数料
                     var profitLoss = ((sellTransaction.price - buyTransaction.price) * 
                                     sellTransaction.unit.toBigDecimal() * 
-                                    stockLot.stock.minimalUnit.toBigDecimal())
+                                    stockLot.stock.minimalUnit.toBigDecimal()) - 
+                                    buyTransaction.fee - sellTransaction.fee
                     
                     // 売却取引に対応する配当金と株主優待金を取得
                     var totalIncoming = incomingTotalsMap[sellTransaction.id] ?: BigDecimal.ZERO
@@ -303,7 +304,7 @@ class ProfitlossService(
                         sellUnit = sellTransaction.unit,                    // 売却単元数
                         totalIncoming = totalIncoming.toDouble(),           // 総配当金（税引き後）
                         totalBenefit = totalBenefit.toDouble(),            // 総株主優待金
-                        profitLoss = profitLoss - buyTransaction.fee - sellTransaction.fee, // 最終損益（手数料控除後）
+                        profitLoss = profitLoss,                            // 最終損益（手数料控除後、税引き後）
                         buyTransactionDate = buyTransaction.transactionDate, // 購入日
                         sellTransactionDate = sellTransaction.transactionDate, // 売却日
                         ownerName = stockLot.owner.name,                   // 所有者名
