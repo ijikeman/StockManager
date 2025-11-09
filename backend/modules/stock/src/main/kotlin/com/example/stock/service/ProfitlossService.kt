@@ -59,12 +59,8 @@ class ProfitlossService(
          // 全ての株式ロットID(StockLotIds)に対して購入取引を一括取得（1回のクエリで全て取得）
         // Map<StockLotId, List<BuyTransaction>>の形でグループ化
         val buyTransactionsMap = if (stockLotIds.isNotEmpty()) {
-            stockLotIds.flatMap { stockLotId ->
-                buyTransactionRepository.findByStockLotId(stockLotId)
-                    .map { stockLotId to it }
-            }.groupBy({ it.first }, { it.second })
-//            buyTransactionRepository.findByStockLotIdIn(stockLotIds)
-//                .groupBy { it.stockLotId }
+           buyTransactionRepository.findByStockLotIdIn(stockLotIds)
+               .groupBy { it.stockLot.id }
         } else {
             emptyMap()
         }
@@ -82,7 +78,7 @@ class ProfitlossService(
                     .map { stockLotId to it }
             }.groupBy({ it.first }, { it.second })
 //            incomingHistoryRepository.findByStockLotIdIn(stockLotIds)
-//                .groupBy { it.stockLotId }
+//                .groupBy { it.stockLot.id }
         } else {
             emptyMap<Int, List<IncomingHistory>>()
         }
