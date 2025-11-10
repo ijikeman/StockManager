@@ -38,7 +38,7 @@ export default {
       }
 
       // ソート処理
-      return items.sort((a, b) => {
+      return [...items].sort((a, b) => {
         let aValue, bValue;
 
         switch(this.unrealizedSortBy) {
@@ -111,7 +111,7 @@ export default {
       }
 
       // ソート処理
-      return items.sort((a, b) => {
+      return [...items].sort((a, b) => {
         let aValue, bValue;
 
         switch(this.realizedSortBy) {
