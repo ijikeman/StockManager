@@ -51,10 +51,10 @@
         <td><input type="checkbox" :value="stock.code" v-model="selectedStocks"></td>
         <td>{{ stock.code }}</td>
         <td>{{ stock.name }}</td>
-        <td>{{ stock.previousPrice }}</td>
-        <td>{{ stock.currentPrice }}</td>
+        <td>{{ fmtPrice(stock.previousPrice) }}</td>
+        <td>{{ fmtPrice(stock.currentPrice) }}</td>
         <td :class="getPriceChangeClass(stock)">{{ formatPriceChange(stock) }}</td>
-        <td>{{ stock.incoming }}</td>
+        <td>{{ fmtIncoming(stock.incoming) }}</td>
         <td :class="getEarningDateClass(stock.earningsDate)">{{ formatEarningsDate(stock.earningsDate) }}</td>
         <td>
           <a v-if="stock.latestDisclosureDate && getDisclosureUrl(stock)" 

@@ -2,6 +2,7 @@
 
 <script>
 import axios from 'axios';
+import { formatDecimal, formatNumber } from '@/utils/formatters';
 
 export default {
   name: 'StockLotList',
@@ -45,10 +46,17 @@ export default {
       const minUnit = Number(lot.stock && (lot.stock.minimalUnit ?? lot.stock.minimal_unit ?? lot.stock.minimumUnit ?? lot.stock.minimum_unit)) || 1;
       return unit * minUnit * (current - avg);
     },
-    // Format a number as localized currency/number with 2 decimals.
+    // Format stock prices and dividend amounts with 2 decimal places
+    fmtPrice(value) {
+      return formatDecimal(value);
+    },
+    // Format incoming (dividend) amounts with 2 decimal places
+    fmtIncoming(value) {
+      return formatDecimal(value);
+    },
+    // Format evaluation (profit/loss) as integer
     fmt(value) {
-      const n = Number(value) || 0;
-      return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return formatNumber(value);
     },
     goToAddStock() {
       this.$router.push('/stocklot/add');

@@ -30,7 +30,7 @@
         <div class="summary-grid">
           <div class="summary-item">
             <span class="summary-label">配当金合計:</span>
-            <span class="summary-value positive">{{ fmt(unrealizedSummary.totalIncoming) }}</span>
+            <span class="summary-value positive">{{ fmtIncoming(unrealizedSummary.totalIncoming) }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">優待金合計:</span>
@@ -130,10 +130,10 @@
           <td>{{ item.stockCode }}</td>
           <td>{{ item.stockName }}</td>
           <td>{{ item.buyTransactionDate || '-' }}</td>
-          <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
-          <td class="price-cell">{{ item.currentPrice ? fmt(item.currentPrice) : '-' }}</td>
+          <td class="price-cell">{{ fmtPrice(item.purchasePrice) }}</td>
+          <td class="price-cell">{{ item.currentPrice ? fmtPrice(item.currentPrice) : '-' }}</td>
           <td class="text-center">{{ item.currentUnit || 0 }}</td>
-          <td class="price-cell positive">{{ fmt((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
+          <td class="price-cell positive">{{ fmtIncoming((item.totalIncoming * item.currentUnit * item.minimalUnit) || 0) }}</td>
           <td class="price-cell positive">{{ fmt(item.totalBenefit * item.currentUnit * item.minimalUnit || 0) }}</td>
           <td class="price-cell" :class="calculateEvaluation(item) >= 0 ? 'positive' : 'negative'">
             {{ fmt(calculateEvaluation(item)) }}
@@ -159,7 +159,7 @@
           </div>
           <div class="summary-item">
             <span class="summary-label">配当金合計:</span>
-            <span class="summary-value positive">{{ fmt(realizedSummary.totalIncoming) }}</span>
+            <span class="summary-value positive">{{ fmtIncoming(realizedSummary.totalIncoming) }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">優待金合計:</span>
@@ -271,14 +271,14 @@
           <td>{{ item.stockCode }}</td>
           <td>{{ item.stockName }}</td>
           <td>{{ item.buyTransactionDate || '-' }}</td>
-          <td class="price-cell">{{ fmt(item.purchasePrice) }}</td>
+          <td class="price-cell">{{ fmtPrice(item.purchasePrice) }}</td>
           <td>{{ item.sellTransactionDate || '-' }}</td>
-          <td class="price-cell">{{ item.sellPrice ? fmt(item.sellPrice) : '-' }}</td>
+          <td class="price-cell">{{ item.sellPrice ? fmtPrice(item.sellPrice) : '-' }}</td>
           <td class="text-center">{{ item.sellUnit || '-' }}</td>
           <td class="price-cell" :class="(item.profitLoss || 0) >= 0 ? 'positive' : 'negative'">
             {{ item.profitLoss ? fmt(item.profitLoss) : '-' }}
           </td>
-          <td class="price-cell positive">{{ fmt((item.totalIncoming * item.sellUnit * item.minimalUnit) || 0) }}</td>
+          <td class="price-cell positive">{{ fmtIncoming((item.totalIncoming * item.sellUnit * item.minimalUnit) || 0) }}</td>
           <td class="price-cell positive">{{ fmt((item.totalBenefit * item.sellUnit * item.minimalUnit) || 0) }}</td>
           <td class="price-cell" :class="((item.profitLoss || 0) + (item.totalIncoming * item.sellUnit * item.minimalUnit || 0) + (item.totalBenefit * item.sellUnit * item.minimalUnit || 0)) >= 0 ? 'positive' : 'negative'">
             {{ fmt((item.profitLoss || 0) + (item.totalIncoming * item.sellUnit * item.minimalUnit || 0) + (item.totalBenefit * item.sellUnit * item.minimalUnit || 0)) }}

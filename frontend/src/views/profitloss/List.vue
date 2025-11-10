@@ -2,6 +2,7 @@
 
 <script>
 import axios from 'axios'; // HTTPリクエストを行うためのライブラリをインポート
+import { formatDecimal, formatNumber } from '@/utils/formatters';
 
 export default {
   name: 'ProfitLossList', // コンポーネント名を定義
@@ -293,11 +294,17 @@ export default {
         console.error('Error fetching profit/loss data:', error); // エラー内容をコンソールに出力
       }
     },
+    // Format stock prices with 2 decimal places
+    fmtPrice(value) {
+      return formatDecimal(value);
+    },
+    // Format dividend amounts with 2 decimal places
+    fmtIncoming(value) {
+      return formatDecimal(value);
+    },
+    // Format evaluation (profit/loss) and benefit amounts as integers
     fmt(value) {
-      // 数値をローカライズされた形式でフォーマットするヘルパー関数
-      // 例: 1234.56 -> "1,234.56"
-      const n = Number(value) || 0;
-      return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return formatNumber(value);
     },
     calculateEvaluation(item) {
       // 含み損益の計算を行う

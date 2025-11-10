@@ -36,12 +36,12 @@
         <td>{{ lot.stock.name }}</td>
         <td>{{ lot.purchaseDate }}</td>
         <td>{{ lot.currentUnit }}</td>
-        <td>{{ fmt(lot.averagePrice ?? lot.price) }}</td>
-        <td>{{ fmt(lot.stock && lot.stock.currentPrice) }}</td>
+        <td>{{ fmtPrice(lot.averagePrice ?? lot.price) }}</td>
+        <td>{{ fmtPrice(lot.stock && lot.stock.currentPrice) }}</td>
         <td :class="{'positive': evaluation(lot) > 0, 'negative': evaluation(lot) < 0}">
           {{ fmt(evaluation(lot)) }}
         </td>
-        <td>{{ fmt(lot.incoming) }}</td>
+        <td>{{ fmtIncoming(lot.incoming) }}</td>
         <td>{{ purchasePriceDividendYield(lot) }}%</td>
         <td>{{ currentPriceDividendYield(lot) }}%</td>
         <td>
