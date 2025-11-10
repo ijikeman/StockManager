@@ -14,7 +14,7 @@
 
 <script>
 import axios from 'axios';
-import { formatNumber } from '@/utils/formatters';
+import { formatNumber, formatDecimal } from '@/utils/formatters';
 
 export default {
   // コンポーネント名を'StockList'に設定
@@ -80,9 +80,13 @@ export default {
       }
       return null;
     },
-    // 数値を整数でフォーマット
-    fmt(value) {
-      return formatNumber(value);
+    // Format stock prices with 2 decimal places
+    fmtPrice(value) {
+      return formatDecimal(value);
+    },
+    // Format dividend amounts with 2 decimal places
+    fmtIncoming(value) {
+      return formatDecimal(value);
     },
     // 前日比のフォーマット（整数表示）
     formatPriceChange(stock) {

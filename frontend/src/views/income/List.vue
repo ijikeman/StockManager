@@ -2,7 +2,7 @@
 
 <script>
 import axios from 'axios';
-import { formatNumber } from '@/utils/formatters';
+import { formatDecimal } from '@/utils/formatters';
 
 export default {
   name: 'IncomeList',
@@ -12,8 +12,9 @@ export default {
     };
   },
   methods: {
+    // Format dividend amounts with 2 decimal places
     fmt(value) {
-      return formatNumber(value);
+      return formatDecimal(value);
     },
     async fetchIncomes() {
       try {
