@@ -28,11 +28,11 @@ export default {
       previousPrice: { label: '前日終値' },
       priceChange: { label: '前日比', formatter: (value, stock) => {
         const change = this.calculatePriceChange(stock);
-        return change !== null ? Math.round(change) : null;
+        return change !== null ? change.toFixed(1) : null;
       }},
       priceChangeRate: { label: '前日比率(%)', formatter: (value, stock) => {
         const rate = this.calculatePriceChangeRate(stock);
-        return rate !== null ? Math.round(rate) : null;
+        return rate !== null ? rate.toFixed(1) : null;
       }},
       incoming: { label: '配当金' },
       earningsDate: { 
@@ -99,7 +99,7 @@ export default {
       
       const sign = change >= 0 ? '+' : '';
       const arrow = change >= 0 ? '↑' : '↓';
-      return `${arrow} ${sign}${Math.round(change)} (${sign}${Math.round(rate)}%)`;
+      return `${arrow} ${sign}${change.toFixed(1)} (${sign}${rate.toFixed(1)}%)`;
     },
     // 前日比の色を取得
     getPriceChangeClass(stock) {
