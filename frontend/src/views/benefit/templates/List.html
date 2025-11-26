@@ -9,14 +9,20 @@
   <table class="common-table" v-if="benefits.length > 0">
     <thead>
       <tr>
-        <th>日付</th>
+        <th @click="sortBy('paymentDate')" class="sortable">
+          日付
+          <span v-if="sortKey === 'paymentDate'">
+            <span v-if="sortOrders['paymentDate'] > 0">▲</span>
+            <span v-else>▼</span>
+          </span>
+        </th>
         <th>銘柄名</th>
         <th>優待金</th>
         <th>アクション</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="benefit in benefits" :key="benefit.id">
+      <tr v-for="benefit in sortedBenefits" :key="benefit.id">
         <td>{{ benefit.paymentDate }}</td>
         <td>
           <span v-if="benefit.stockLot">{{ benefit.stockLot.stock?.name }}</span>
