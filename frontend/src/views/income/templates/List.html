@@ -9,14 +9,20 @@
   <table class="common-table" v-if="incomes.length > 0">
     <thead>
       <tr>
-        <th>日付</th>
+        <th @click="sortBy('paymentDate')" class="sortable">
+          日付
+          <span v-if="sortKey === 'paymentDate'">
+            <span v-if="sortOrders['paymentDate'] > 0">▲</span>
+            <span v-else>▼</span>
+          </span>
+        </th>
         <th>銘柄名</th>
         <th>配当金</th>
         <th>アクション</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="income in incomes" :key="income.id">
+      <tr v-for="income in sortedIncomes" :key="income.id">
         <td>{{ income.paymentDate }}</td>
         <td>
           <span v-if="income.stockLot">{{ income.stockLot.stock?.name }}</span>
