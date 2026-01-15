@@ -160,7 +160,12 @@ class YahooFinanceProvider(
                         val parts = mmddText.split("/")
                         val month = parts[0].toInt()
                         val day = parts[1].toInt()
-                        LocalDate.of(LocalDate.now().year, month, day)
+                        val today = LocalDate.now()
+                        var date = LocalDate.of(today.year, month, day)
+                        if (date.isAfter(today)) {
+                            date = date.minusYears(1)
+                        }
+                        date
                     } catch (e: Exception) {
                         null
                     }
