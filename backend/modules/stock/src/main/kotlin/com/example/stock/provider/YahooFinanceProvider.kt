@@ -4,6 +4,7 @@ import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.regex.Pattern
 
 @Component
@@ -149,7 +150,7 @@ class YahooFinanceProvider(
                         mmddText = t
                     // 時間の場合(例: 16:31),当日のMM/DDを設定する
                     } else if (Regex("""^\d{1,2}:\d{2}$""").matches(t)) {
-                        val today = LocalDate.now()
+                        val today = LocalDate.now(ZoneId.of("Asia/Tokyo"))
                         mmddText = "${today.monthValue}/${today.dayOfMonth}"
                     }
                 }
@@ -160,7 +161,7 @@ class YahooFinanceProvider(
                         val parts = mmddText.split("/")
                         val month = parts[0].toInt()
                         val day = parts[1].toInt()
-                        val today = LocalDate.now()
+                        val today = LocalDate.now(ZoneId.of("Asia/Tokyo"))
                         var date = LocalDate.of(today.year, month, day)
                         if (date.isAfter(today)) {
                             date = date.minusYears(1)
@@ -224,7 +225,7 @@ class YahooFinanceProvider(
             if (matcher3.find()) {
                 val month = matcher3.group(1).toInt()
                 val day = matcher3.group(2).toInt()
-                val currentYear = LocalDate.now().year
+                val currentYear = LocalDate.now(ZoneId.of("Asia/Tokyo")).year
                 return LocalDate.of(currentYear, month, day)
             }
             

@@ -11,6 +11,7 @@ import org.mockito.MockedStatic
 import org.mockito.Mockito.*
 import java.io.File
 import java.time.LocalDate
+import java.time.ZoneId
 
 class YahooFinanceProviderTest {
 
@@ -42,7 +43,7 @@ class YahooFinanceProviderTest {
         // Mock LocalDate.now()
         val fixedDate = LocalDate.of(2026, 1, 16)
         mockedLocalDate = mockStatic(LocalDate::class.java, CALLS_REAL_METHODS)
-        `when`(LocalDate.now()).thenReturn(fixedDate)
+        `when`(LocalDate.now(ZoneId.of("Asia/Tokyo"))).thenReturn(fixedDate)
     }
 
     @AfterEach
@@ -87,16 +88,9 @@ class YahooFinanceProviderTest {
 
     @Test
     fun `fetchLatestDisclosure should return current year date when disclosure date is before today`() {
-        // Create new mock document with a date before 2026/01/16
-        val pastDateHtml = """
-            <!DOCTYPE html><html><body>
-            <div class="disclosureList_list"><div class="disclosureList_item">
-            <ul class="DisclosureItem__supplements__1NHJ"><li class="DisclosureItem__supplement__2U1S"><time>1/15</time></li></ul>
-            </div></div>
-            </body></html>
-        """
-        val pastDateDoc = Jsoup.parse(pastDateHtml)
-        `when`(disclosureConnection.get()).thenReturn(pastDateDoc)
+        // Modify the existing document object that is already being returned by the mock
+        val timeElement = disclosureDoc.selectFirst("time")
+        timeElement?.text("1/15")
 
         val stockInfo = provider.fetchStockInfo("dummy")
         // The year should be 2026

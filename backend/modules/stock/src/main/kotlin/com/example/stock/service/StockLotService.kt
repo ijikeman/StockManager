@@ -257,90 +257,59 @@ class StockLotService(
         val stockLot = stockLotRepository.findById(stockLotId)
             .orElseThrow { IllegalArgumentException("StockLot not found with id: $stockLotId") }
 
-        // 売却単元数が現在の保有単元数を超えていないか確認
         if (sellDto.unit > stockLot.currentUnit) {
             throw IllegalArgumentException("Sell unit cannot be greater than current unit.")
         }
 
-        // buyTransactionsは通常は1件しかないはずなので、1件目を取得
-        val buyTransactions = buyTransactionRepository.findByStockLotId(stockLotId)
-        val buyTransaction = buyTransactions.firstOrNull()
-            ?: throw IllegalArgumentException("No BuyTransaction found for StockLot id: $stockLotId")
+        var remainingUnitsToSell = sellDto.unit
+        val buyTransactions = buyTransactionRepository.findByStockLotIdOrderByTransactionDateAsc(stockLotId)
+        val isFullSaleOfLot = (stockLot.currentUnit - sellDto.unit) == 0
+        val createdSellTransactions = mutableListOf<SellTransaction>()
 
-        // 超えていない場合はstockLotの売却処理を行う
-        val sellTransaction = SellTransaction(
-            buyTransaction = buyTransaction,
-            unit = sellDto.unit,
-            price = sellDto.price,
-            fee = sellDto.fee,
-            transactionDate = sellDto.transactionDate
-        )
-        val savedSellTransaction = sellTransactionService.create(sellTransaction)
+        for (buyTransaction in buyTransactions) {
+            if (remainingUnitsToSell == 0) break
 
-        // IncomingHistoryとBenefitHistoryのレコードを取得
-        val incomingHistories = incomingHistoryRepository.findByStockLotId(stockLotId)
-        val benefitHistories = benefitHistoryRepository.findByStockLotId(stockLotId)
+            val sellableUnits = buyTransaction.unit - (sellTransactionRepository.findByBuyTransactionId(buyTransaction.id).sumOf { it.unit })
+            if (sellableUnits <= 0) continue
 
-        /*
-          currentUnitと売却Unitが同じ場合
-          → IncomingHistoryとBenefitHistoryのレコードのstockLotIdをnullに設定し、sellTransactionIdを設定する
-        */
-        if (stockLot.currentUnit - sellDto.unit == 0) {
-            // stockLotのcurrentUnitを更新
-            val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
-            stockLotRepository.save(updatedStockLot)
+            val unitsForThisTransaction = minOf(remainingUnitsToSell, sellableUnits)
 
-            // incomingHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-            if (incomingHistories.isNotEmpty()) {
+            val sellTransaction = SellTransaction(
+                buyTransaction = buyTransaction,
+                unit = unitsForThisTransaction,
+                price = sellDto.price,
+                fee = sellDto.fee,
+                transactionDate = sellDto.transactionDate
+            )
+            createdSellTransactions.add(sellTransactionRepository.save(sellTransaction))
+            remainingUnitsToSell -= unitsForThisTransaction
+        }
+
+        val incomingHistories = incomingHistoryRepository.findByStockLotId(stockLot.id)
+        val benefitHistories = benefitHistoryRepository.findByStockLotId(stockLot.id)
+
+        if (isFullSaleOfLot) {
+            val primarySellTransaction = createdSellTransactions.firstOrNull()
+            if (primarySellTransaction != null) {
                 incomingHistories.forEach { history ->
-                    history.stockLot = null
-                    history.sellTransaction = savedSellTransaction
-                    incomingHistoryRepository.save(history)
+                    incomingHistoryRepository.save(history.copy(stockLot = null, sellTransaction = primarySellTransaction))
                 }
-            }
-            // benefitHistoriesレコードのstockLotIdをnull、sellTransactionIdを設定する
-            if (benefitHistories.isNotEmpty()) {
                 benefitHistories.forEach { history ->
-                    history.stockLot = null
-                    history.sellTransaction = savedSellTransaction
-                    benefitHistoryRepository.save(history)
+                    benefitHistoryRepository.save(history.copy(stockLot = null, sellTransaction = primarySellTransaction))
                 }
             }
-        // 利用可能な単元数がある場合に売却処理を行う
         } else {
-            // stockLotのcurrentUnitを減少させる
-            val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
-            stockLotRepository.save(updatedStockLot)
-
-            // IncomingHistoryが存在しない場合は複製処理をスキップ
-            if (incomingHistories.isNotEmpty()) {
-                // IncomingHistoryレコードを複製し、sellTransactionIdを設定
+            createdSellTransactions.forEach { sellTransaction ->
                 incomingHistories.forEach { history ->
-                    val duplicatedHistory = IncomingHistory(
-                        id = 0, // 新規レコードとして作成
-                        stockLot = null,
-                        sellTransaction = savedSellTransaction,
-                        incoming = history.incoming,
-                        paymentDate = history.paymentDate
-                    )
-                    incomingHistoryRepository.save(duplicatedHistory)
+                    incomingHistoryRepository.save(history.copy(id = 0, stockLot = null, sellTransaction = sellTransaction))
                 }
-            }
-
-            // BenefitHistoryが存在しない場合は複製処理をスキップ
-            if (benefitHistories.isNotEmpty()) {
-                // BenefitHistoryレコードを複製し、sellTransactionIdを設定
                 benefitHistories.forEach { history ->
-                    val duplicatedHistory = BenefitHistory(
-                        id = 0, // 新規レコードとして作成
-                        stockLot = null,
-                        sellTransaction = savedSellTransaction,
-                        benefit = history.benefit,
-                        paymentDate = history.paymentDate
-                    )
-                    benefitHistoryRepository.save(duplicatedHistory)
+                    benefitHistoryRepository.save(history.copy(id = 0, stockLot = null, sellTransaction = sellTransaction))
                 }
             }
         }
+
+        val updatedStockLot = stockLot.copy(currentUnit = stockLot.currentUnit - sellDto.unit)
+        stockLotRepository.save(updatedStockLot)
     }
 }

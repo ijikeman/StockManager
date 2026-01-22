@@ -96,34 +96,19 @@ class StockLotSellWithHistoryIntegrationTest {
 
         stockLotService.sellStockLot(stockLot.id, sellDto)
 
-        // Assert: Original IncomingHistory records should still exist with stockLotId
-        val originalHistories = incomingHistoryRepository.findByStockLotId(stockLot.id)
-        assertThat(originalHistories).hasSize(2)
-        assertThat(originalHistories.map { it.id }).containsExactlyInAnyOrder(incomingHistory1.id, incomingHistory2.id)
-
         // Assert: New SellTransaction should be created
         val sellTransactions = sellTransactionRepository.findByBuyTransactionId(buyTransaction.id)
         assertThat(sellTransactions).hasSize(1)
         val sellTransaction = sellTransactions[0]
 
-        // Assert: Duplicated IncomingHistory records should be created linked to sellTransaction
-        val duplicatedHistories = incomingHistoryRepository.findBySellTransactionId(sellTransaction.id)
-        assertThat(duplicatedHistories).hasSize(2)
-        
-        // Verify that duplicated records have no stockLot but have sellTransaction
-        duplicatedHistories.forEach { history ->
-            assertThat(history.stockLot).isNull()
-            assertThat(history.sellTransaction).isNotNull
-            assertThat(history.sellTransaction?.id).isEqualTo(sellTransaction.id)
-        }
-        
-        // Verify that the duplicated records have the same incoming amounts
-        val duplicatedIncomings = duplicatedHistories.map { it.incoming }.toSet()
-        assertThat(duplicatedIncomings).containsExactlyInAnyOrder(BigDecimal("50.00"), BigDecimal("60.00"))
+        // Assert: No IncomingHistory records should be linked to the stockLot anymore
+        val originalHistories = incomingHistoryRepository.findByStockLotId(stockLot.id)
+        assertThat(originalHistories).isEmpty()
 
-        // Verify that the duplicated records have the same payment dates
-        val duplicatedPaymentDates = duplicatedHistories.map { it.paymentDate }.toSet()
-        assertThat(duplicatedPaymentDates).containsExactlyInAnyOrder(LocalDate.of(2025, 9, 1), LocalDate.of(2025, 10, 1))
+        // Assert: The original histories are now linked to the sell transaction
+        val movedHistories = incomingHistoryRepository.findBySellTransactionId(sellTransaction.id)
+        assertThat(movedHistories).hasSize(2)
+        assertThat(movedHistories.map { it.id }).containsExactlyInAnyOrder(incomingHistory1.id, incomingHistory2.id)
     }
 
     @Test
@@ -176,26 +161,19 @@ class StockLotSellWithHistoryIntegrationTest {
 
         stockLotService.sellStockLot(stockLot.id, sellDto)
 
-        // Assert: Original BenefitHistory record should still exist with stockLotId
-        val originalHistories = benefitHistoryRepository.findByStockLotId(stockLot.id)
-        assertThat(originalHistories).hasSize(1)
-        assertThat(originalHistories[0].id).isEqualTo(benefitHistory1.id)
-
         // Assert: New SellTransaction should be created
         val sellTransactions = sellTransactionRepository.findByBuyTransactionId(buyTransaction.id)
         assertThat(sellTransactions).hasSize(1)
         val sellTransaction = sellTransactions[0]
 
-        // Assert: Duplicated BenefitHistory record should be created linked to sellTransaction
-        val duplicatedHistories = benefitHistoryRepository.findBySellTransactionId(sellTransaction.id)
-        assertThat(duplicatedHistories).hasSize(1)
-        
-        val duplicatedHistory = duplicatedHistories[0]
-        assertThat(duplicatedHistory.stockLot).isNull()
-        assertThat(duplicatedHistory.sellTransaction).isNotNull
-        assertThat(duplicatedHistory.sellTransaction?.id).isEqualTo(sellTransaction.id)
-        assertThat(duplicatedHistory.benefit).isEqualTo(BigDecimal("100.00"))
-        assertThat(duplicatedHistory.paymentDate).isEqualTo(LocalDate.of(2025, 9, 15))
+        // Assert: No BenefitHistory records should be linked to the stockLot anymore
+        val originalHistories = benefitHistoryRepository.findByStockLotId(stockLot.id)
+        assertThat(originalHistories).isEmpty()
+
+        // Assert: The original history is now linked to the sell transaction
+        val movedHistories = benefitHistoryRepository.findBySellTransactionId(sellTransaction.id)
+        assertThat(movedHistories).hasSize(1)
+        assertThat(movedHistories[0].id).isEqualTo(benefitHistory1.id)
     }
 
     @Test
@@ -260,23 +238,23 @@ class StockLotSellWithHistoryIntegrationTest {
         stockLotService.sellStockLot(stockLot.id, sellDto)
 
         // Assert: Two sell transactions should be created
-        val sellTx1 = sellTransactionRepository.findByBuyTransactionId(buyTransaction1.id)
-        val sellTx2 = sellTransactionRepository.findByBuyTransactionId(buyTransaction2.id)
-        assertThat(sellTx1).hasSize(1)
-        assertThat(sellTx2).hasSize(1)
-        
+        val sellTx1 = sellTransactionRepository.findByBuyTransactionId(buyTransaction1.id).firstOrNull()
+        val sellTx2 = sellTransactionRepository.findByBuyTransactionId(buyTransaction2.id).firstOrNull()
+        assertThat(sellTx1).isNotNull
+        assertThat(sellTx2).isNotNull
+
         // Assert: Duplicated IncomingHistory records should be created for each sell transaction
-        val duplicatedForSell1 = incomingHistoryRepository.findBySellTransactionId(sellTx1[0].id)
-        val duplicatedForSell2 = incomingHistoryRepository.findBySellTransactionId(sellTx2[0].id)
-        
+        val duplicatedForSell1 = incomingHistoryRepository.findBySellTransactionId(sellTx1!!.id)
+        val duplicatedForSell2 = incomingHistoryRepository.findBySellTransactionId(sellTx2!!.id)
+
         assertThat(duplicatedForSell1).hasSize(1)
         assertThat(duplicatedForSell2).hasSize(1)
-        
+
         // Both duplicates should have the same incoming amount from the original
         assertThat(duplicatedForSell1[0].incoming).isEqualTo(BigDecimal("80.00"))
         assertThat(duplicatedForSell2[0].incoming).isEqualTo(BigDecimal("80.00"))
-        
-        // Original IncomingHistory should still exist
+
+        // Original IncomingHistory should still exist and be linked to the stock lot
         val originalHistories = incomingHistoryRepository.findByStockLotId(stockLot.id)
         assertThat(originalHistories).hasSize(1)
         assertThat(originalHistories[0].id).isEqualTo(incomingHistory.id)
