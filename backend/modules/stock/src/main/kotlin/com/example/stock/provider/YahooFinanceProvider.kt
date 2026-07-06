@@ -1,6 +1,7 @@
 package com.example.stock.provider
 
 import org.jsoup.Jsoup
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -16,6 +17,48 @@ class YahooFinanceProvider(
         private const val BASE_URL = "https://finance.yahoo.co.jp/quote"
         private val PREVIOUS_PRICE_PATTERN = Pattern.compile("\"previousPrice\":\"([0-9,]+(?:\\.[0-9]+)?)\"")
         private const val DISCLOSURE_PATH = "/disclosure"
+        private val LOGGER = LoggerFactory.getLogger(YahooFinanceProvider::class.java)
+    }
+
+    private fun connectWithRetries(url: String, maxAttempts: Int = 3, timeoutMillis: Int = 10000): org.jsoup.nodes.Document? {
+        val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
+        var attempt = 0
+        while (attempt < maxAttempts) {
+            attempt++
+            try {
+                val response = Jsoup.connect(url)
+                    .userAgent(userAgent)
+                    .referrer("https://www.google.com")
+                    .timeout(timeoutMillis)
+                    .followRedirects(true)
+                    .execute()
+
+                val status = response.statusCode()
+                if (status == 200) {
+                    return response.parse()
+                } else {
+                    LOGGER.warn("HTTP {} when fetching {} (attempt {}/{})", status, url, attempt, maxAttempts)
+                    if (status >= 500 && attempt < maxAttempts) {
+                        Thread.sleep(1000L * attempt)
+                        continue
+                    }
+                    return null
+                }
+            } catch (e: Exception) {
+                LOGGER.warn("Exception fetching {} on attempt {}/{}: {}", url, attempt, maxAttempts, e.toString())
+                if (attempt >= maxAttempts) {
+                    LOGGER.error("Failed to fetch {} after {} attempts", url, maxAttempts)
+                    return null
+                }
+                try {
+                    Thread.sleep(500L * attempt)
+                } catch (ie: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                    return null
+                }
+            }
+        }
+        return null
     }
 
     override fun fetchStockInfo(code: String): StockInfo? {
@@ -24,7 +67,7 @@ class YahooFinanceProvider(
 
         return try {
             val url = "$BASE_URL/$code.T"
-            val doc = Jsoup.connect(url).get() // URLリクエストを行いデータを取得
+            val doc = connectWithRetries(url) ?: return null // URLリクエストを行いデータを取得
 
             // docから各データを取得
             val price = extractPrice(doc)
@@ -49,7 +92,7 @@ class YahooFinanceProvider(
 
         return try {
             val url = "$BASE_URL/$code.T"
-            val doc = Jsoup.connect(url).get()
+            val doc = connectWithRetries(url) ?: return null
             extractName(doc)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -127,7 +170,7 @@ class YahooFinanceProvider(
 
         return try {
             val disclosureUrl = "$BASE_URL/$code.T$DISCLOSURE_PATH"
-            val doc = Jsoup.connect(disclosureUrl).get()
+            val doc = connectWithRetries(disclosureUrl) ?: return null
 
             /*
 例:
