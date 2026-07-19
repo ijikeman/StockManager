@@ -103,7 +103,7 @@ export default [
       if (stock) {
         // 株価、配当、業績発表日をランダムに更新
         stock.currentPrice = Mock.Random.float(100, 1000, 2, 2);
-        stock.dividend = Mock.Random.float(0, 10, 2, 2);
+        stock.incoming = Mock.Random.float(0, 10, 2, 2);
         stock.earningsDate = Mock.mock('@date("yyyy-MM-dd")');
         return stock;
       }
