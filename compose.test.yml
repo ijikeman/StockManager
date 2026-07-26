@@ -1,0 +1,13 @@
+services:
+  backend:
+    ports: []
+    volumes:
+      # カレントディレクトリの backend をコンテナの /app にマウント
+      - ./StockManager/backend:/app
+      - gradle-cache:/root/.gradle
+    working_dir: /app
+    entrypoint: []
+
+volumes:
+  gradle-cache:
+

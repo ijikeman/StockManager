@@ -14,27 +14,19 @@ import java.time.LocalDate
 
 class YahooFinanceProviderTest {
 
-    private lateinit var provider: YahooFinanceProvider
-    private lateinit var doc: Document
-    private lateinit var disclosureDoc: Document
-    private lateinit var mockedJsoup: MockedStatic<Jsoup>
-    private lateinit var mockedLocalDate: MockedStatic<LocalDate>
+    private val provider = YahooFinanceProvider(0) // requestDelayMillis = 0
 
-    // Use RETURNS_SELF to mock Jsoup's fluent API chain cleanly
-    private val connection: Connection = mock(Connection::class.java, RETURNS_SELF)
-    private val disclosureConnection: Connection = mock(Connection::class.java, RETURNS_SELF)
-    private val response: Connection.Response = mock(Connection.Response::class.java)
-    private val disclosureResponse: Connection.Response = mock(Connection.Response::class.java)
-
-    @BeforeEach
-    fun setUp() {
-        provider = YahooFinanceProvider(0) // requestDelayMillis = 0
-        val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
-        doc = Jsoup.parse(htmlFile, "UTF-8", "")
+    private fun setupMockConnection(block: (Connection, Connection) -> Unit) {
+val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
+        val doc = Jsoup.parse(htmlFile, "UTF-8", "")
         val disclosureHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-disclosure.html")
-        disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
+        val disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
 
-        // Mock Jsoup.connect and its fluent methods
+        val connection = mock(Connection::class.java, RETURNS_SELF)
+        val disclosureConnection = mock(Connection::class.java, RETURNS_SELF)
+        val response = mock(Connection.Response::class.java)
+        val disclosureResponse = mock(Connection.Response::class.java)
+
         `when`(connection.execute()).thenReturn(response)
         `when`(response.statusCode()).thenReturn(200)
         `when`(response.parse()).thenReturn(doc)
@@ -43,21 +35,26 @@ class YahooFinanceProviderTest {
         `when`(disclosureResponse.statusCode()).thenReturn(200)
         `when`(disclosureResponse.parse()).thenReturn(disclosureDoc)
 
-        // Mock Jsoup class statically, but allow other static methods like Jsoup.parse() to run real methods
-        mockedJsoup = mockStatic(Jsoup::class.java, CALLS_REAL_METHODS)
-        mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { it.endsWith("/disclosure") }) }.thenReturn(disclosureConnection)
-        mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { !it.endsWith("/disclosure") }) }.thenReturn(connection)
+        mockStatic(Jsoup::class.java, CALLS_REAL_METHODS).use { mockedJsoup ->
+            mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { it.endsWith("/disclosure") }) }.thenReturn(disclosureConnection)
+            mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { !it.endsWith("/disclosure") }) }.thenReturn(connection)
 
-        // Mock LocalDate.now()
-        val fixedDate = LocalDate.of(2026, 1, 16)
-        mockedLocalDate = mockStatic(LocalDate::class.java, CALLS_REAL_METHODS)
-        `when`(LocalDate.now()).thenReturn(fixedDate)
+            mockStatic(LocalDate::class.java, CALLS_REAL_METHODS).use { mockedLocalDate ->
+                val fixedDate = LocalDate.of(2026, 1, 16)
+                `when`(LocalDate.now()).thenReturn(fixedDate)
+
+                block(connection, disclosureConnection)
+            }
+        }
     }
 
-    @AfterEach
-    fun tearDown() {
-        mockedJsoup.close()
-        mockedLocalDate.close()
+    @Test
+    fun `fetchLatestDisclosure should return correct date when disclosure date is before or after today`() {
+        setupMockConnection { _, _ ->
+            val stockInfo = provider.fetchStockInfo("dummy")
+            assertNotNull(stockInfo)
+            assertEquals(LocalDate.of(2025, 11, 12), stockInfo?.latestDisclosureDate)
+        }
     }
 
     @Test
