@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import org.mockito.MockedStatic
+import org.mockito.Mockito.*
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
