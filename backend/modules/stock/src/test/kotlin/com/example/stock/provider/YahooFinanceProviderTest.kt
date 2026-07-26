@@ -1,12 +1,11 @@
 package com.example.stock.provider
 
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -19,6 +18,7 @@ class YahooFinanceProviderTest {
     private lateinit var disclosureConnection: Connection
     private lateinit var response: Connection.Response
     private lateinit var disclosureResponse: Connection.Response
+
     @BeforeEach
     fun initMocks() {
         val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
@@ -26,18 +26,20 @@ class YahooFinanceProviderTest {
         val disclosureHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-disclosure.html")
         val disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
 
-        connection = mock(Connection::class.java, RETURNS_SELF)
-        disclosureConnection = mock(Connection::class.java, RETURNS_SELF)
-        response = mock(Connection.Response::class.java)
-        disclosureResponse = mock(Connection.Response::class.java)
-
-        `when`(connection.execute()).thenReturn(response)
-        `when`(response.statusCode()).thenReturn(200)
-        `when`(response.parse()).thenReturn(doc)
-
-        `when`(disclosureConnection.execute()).thenReturn(disclosureResponse)
-        `when`(disclosureResponse.statusCode()).thenReturn(200)
-        `when`(disclosureResponse.parse()).thenReturn(disclosureDoc)
+        connection = mock {
+            on { execute() } doReturn response
+        }
+        disclosureConnection = mock {
+            on { execute() } doReturn disclosureResponse
+        }
+        response = mock {
+            on { statusCode() } doReturn 200
+            on { parse() } doReturn doc
+        }
+        disclosureResponse = mock {
+            on { statusCode() } doReturn 200
+            on { parse() } doReturn disclosureDoc
+        }
 
         provider = object : YahooFinanceProvider(0) {
             override fun connect(url: String): Connection {
