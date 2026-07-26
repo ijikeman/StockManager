@@ -26,12 +26,6 @@ class YahooFinanceProviderTest {
         val disclosureHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-disclosure.html")
         val disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
 
-        connection = mock {
-            on { execute() } doReturn response
-        }
-        disclosureConnection = mock {
-            on { execute() } doReturn disclosureResponse
-        }
         response = mock {
             on { statusCode() } doReturn 200
             on { parse() } doReturn doc
@@ -39,6 +33,12 @@ class YahooFinanceProviderTest {
         disclosureResponse = mock {
             on { statusCode() } doReturn 200
             on { parse() } doReturn disclosureDoc
+        }
+        connection = mock {
+            on { execute() } doReturn response
+        }
+        disclosureConnection = mock {
+            on { execute() } doReturn disclosureResponse
         }
 
         provider = object : YahooFinanceProvider(0) {
