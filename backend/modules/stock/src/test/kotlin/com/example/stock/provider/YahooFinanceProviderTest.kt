@@ -99,7 +99,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val pastDateDoc = Jsoup.parse(pastDateHtml)
-        val tempResponse = mock(Connection.Response::class.java)
+        val tempResponse: Connection.Response = mock()
         whenever(tempResponse.statusCode()).thenReturn(200)
         whenever(tempResponse.parse()).thenReturn(pastDateDoc)
         whenever(disclosureConnection.execute()).thenReturn(tempResponse)
@@ -120,7 +120,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val timeDoc = Jsoup.parse(timeHtml)
-        val tempResponse = mock(Connection.Response::class.java)
+        val tempResponse: Connection.Response = mock()
         whenever(tempResponse.statusCode()).thenReturn(200)
         whenever(tempResponse.parse()).thenReturn(timeDoc)
         whenever(disclosureConnection.execute()).thenReturn(tempResponse)
@@ -141,7 +141,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val doc1 = Jsoup.parse(datePattern1Html)
-        val tempResponse1 = mock(Connection.Response::class.java)
+        val tempResponse1: Connection.Response = mock()
         whenever(tempResponse1.statusCode()).thenReturn(200)
         whenever(tempResponse1.parse()).thenReturn(doc1)
         whenever(disclosureConnection.execute()).thenReturn(tempResponse1)
@@ -158,7 +158,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val doc2 = Jsoup.parse(datePattern2Html)
-        val tempResponse2 = mock(Connection.Response::class.java)
+        val tempResponse2: Connection.Response = mock()
         whenever(tempResponse2.statusCode()).thenReturn(200)
         whenever(tempResponse2.parse()).thenReturn(doc2)
         whenever(disclosureConnection.execute()).thenReturn(tempResponse2)
@@ -175,7 +175,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val doc3 = Jsoup.parse(datePattern3Html)
-        val tempResponse3 = mock(Connection.Response::class.java)
+        val tempResponse3: Connection.Response = mock()
         whenever(tempResponse3.statusCode()).thenReturn(200)
         whenever(tempResponse3.parse()).thenReturn(doc3)
         whenever(disclosureConnection.execute()).thenReturn(tempResponse3)
@@ -194,7 +194,7 @@ class YahooFinanceProviderTest {
 
     @Test
     fun `fetchStockInfo should retry on transient HTTP 500 error and succeed`() {
-        val badResponse = mock(Connection.Response::class.java)
+        val badResponse: Connection.Response = mock()
         whenever(badResponse.statusCode()).thenReturn(500)
 
         // Return HTTP 500 first, then HTTP 200
@@ -230,7 +230,7 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val scriptDoc = Jsoup.parse(scriptHtml)
-        val tempResponse = mock(Connection.Response::class.java)
+        val tempResponse: Connection.Response = mock()
         whenever(tempResponse.statusCode()).thenReturn(200)
         whenever(tempResponse.parse()).thenReturn(scriptDoc)
         whenever(connection.execute()).thenReturn(tempResponse)
@@ -245,7 +245,7 @@ class YahooFinanceProviderTest {
         val noDivHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-with-no-dividend.html")
         val noDivDoc = Jsoup.parse(noDivHtmlFile, "UTF-8", "")
 
-        val tempResponse = mock(Connection.Response::class.java)
+        val tempResponse: Connection.Response = mock()
         whenever(tempResponse.statusCode()).thenReturn(200)
         whenever(tempResponse.parse()).thenReturn(noDivDoc)
         whenever(connection.execute()).thenReturn(tempResponse)
