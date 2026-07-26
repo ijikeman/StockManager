@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import org.mockito.MockedStatic
-import org.mockito.Mockito.*
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -102,9 +100,9 @@ class YahooFinanceProviderTest {
         """
         val pastDateDoc = Jsoup.parse(pastDateHtml)
         val tempResponse = mock(Connection.Response::class.java)
-        `when`(tempResponse.statusCode()).thenReturn(200)
-        `when`(tempResponse.parse()).thenReturn(pastDateDoc)
-        `when`(disclosureConnection.execute()).thenReturn(tempResponse)
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(pastDateDoc)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse)
 
         val stockInfo = provider.fetchStockInfo("dummy")
         // The year should be 2026
@@ -123,9 +121,9 @@ class YahooFinanceProviderTest {
         """
         val timeDoc = Jsoup.parse(timeHtml)
         val tempResponse = mock(Connection.Response::class.java)
-        `when`(tempResponse.statusCode()).thenReturn(200)
-        `when`(tempResponse.parse()).thenReturn(timeDoc)
-        `when`(disclosureConnection.execute()).thenReturn(tempResponse)
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(timeDoc)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse)
 
         val stockInfo = provider.fetchStockInfo("dummy")
         // Today is 2026/01/16, so the parsed date should be 2026/01/16
@@ -144,9 +142,9 @@ class YahooFinanceProviderTest {
         """
         val doc1 = Jsoup.parse(datePattern1Html)
         val tempResponse1 = mock(Connection.Response::class.java)
-        `when`(tempResponse1.statusCode()).thenReturn(200)
-        `when`(tempResponse1.parse()).thenReturn(doc1)
-        `when`(disclosureConnection.execute()).thenReturn(tempResponse1)
+        whenever(tempResponse1.statusCode()).thenReturn(200)
+        whenever(tempResponse1.parse()).thenReturn(doc1)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse1)
 
         var stockInfo = provider.fetchStockInfo("dummy")
         assertEquals(LocalDate.of(2025, 10, 28), stockInfo?.latestDisclosureDate)
@@ -161,9 +159,9 @@ class YahooFinanceProviderTest {
         """
         val doc2 = Jsoup.parse(datePattern2Html)
         val tempResponse2 = mock(Connection.Response::class.java)
-        `when`(tempResponse2.statusCode()).thenReturn(200)
-        `when`(tempResponse2.parse()).thenReturn(doc2)
-        `when`(disclosureConnection.execute()).thenReturn(tempResponse2)
+        whenever(tempResponse2.statusCode()).thenReturn(200)
+        whenever(tempResponse2.parse()).thenReturn(doc2)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse2)
 
         stockInfo = provider.fetchStockInfo("dummy")
         assertEquals(LocalDate.of(2024, 5, 15), stockInfo?.latestDisclosureDate)
@@ -178,9 +176,9 @@ class YahooFinanceProviderTest {
         """
         val doc3 = Jsoup.parse(datePattern3Html)
         val tempResponse3 = mock(Connection.Response::class.java)
-        `when`(tempResponse3.statusCode()).thenReturn(200)
-        `when`(tempResponse3.parse()).thenReturn(doc3)
-        `when`(disclosureConnection.execute()).thenReturn(tempResponse3)
+        whenever(tempResponse3.statusCode()).thenReturn(200)
+        whenever(tempResponse3.parse()).thenReturn(doc3)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse3)
 
         stockInfo = provider.fetchStockInfo("dummy")
         // Year defaults to current year (2026)
@@ -189,7 +187,7 @@ class YahooFinanceProviderTest {
 
     @Test
     fun `fetchStockInfo should return null when connection fails completely`() {
-        `when`(connection.execute()).thenThrow(RuntimeException("Network error"))
+        whenever(connection.execute()).thenThrow(RuntimeException("Network error"))
         val stockInfo = provider.fetchStockInfo("dummy")
         assertNull(stockInfo)
     }
@@ -197,10 +195,10 @@ class YahooFinanceProviderTest {
     @Test
     fun `fetchStockInfo should retry on transient HTTP 500 error and succeed`() {
         val badResponse = mock(Connection.Response::class.java)
-        `when`(badResponse.statusCode()).thenReturn(500)
+        whenever(badResponse.statusCode()).thenReturn(500)
 
         // Return HTTP 500 first, then HTTP 200
-        `when`(connection.execute())
+        whenever(connection.execute())
             .thenReturn(badResponse)
             .thenReturn(response)
 
@@ -233,9 +231,9 @@ class YahooFinanceProviderTest {
         """
         val scriptDoc = Jsoup.parse(scriptHtml)
         val tempResponse = mock(Connection.Response::class.java)
-        `when`(tempResponse.statusCode()).thenReturn(200)
-        `when`(tempResponse.parse()).thenReturn(scriptDoc)
-        `when`(connection.execute()).thenReturn(tempResponse)
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(scriptDoc)
+        whenever(connection.execute()).thenReturn(tempResponse)
 
         val stockInfo = provider.fetchStockInfo("dummy")
         assertNotNull(stockInfo)
@@ -248,9 +246,9 @@ class YahooFinanceProviderTest {
         val noDivDoc = Jsoup.parse(noDivHtmlFile, "UTF-8", "")
 
         val tempResponse = mock(Connection.Response::class.java)
-        `when`(tempResponse.statusCode()).thenReturn(200)
-        `when`(tempResponse.parse()).thenReturn(noDivDoc)
-        `when`(connection.execute()).thenReturn(tempResponse)
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(noDivDoc)
+        whenever(connection.execute()).thenReturn(tempResponse)
 
         val stockInfo = provider.fetchStockInfo("dummy")
         assertNotNull(stockInfo)
