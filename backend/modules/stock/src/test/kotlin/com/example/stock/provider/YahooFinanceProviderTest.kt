@@ -7,25 +7,29 @@ import org.junit.jupiter.api.Test
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.MockedStatic
-import org.mockito.Mockito.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.File
 import java.time.LocalDate
 
 class YahooFinanceProviderTest {
 
-    private val provider = YahooFinanceProvider(0) // requestDelayMillis = 0
-
-    private fun setupMockConnection(block: (Connection, Connection) -> Unit) {
-val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
+    private lateinit var provider: YahooFinanceProvider
+    private lateinit var connection: Connection
+    private lateinit var disclosureConnection: Connection
+    private lateinit var response: Connection.Response
+    private lateinit var disclosureResponse: Connection.Response
+    @BeforeEach
+    fun initMocks() {
+        val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
         val doc = Jsoup.parse(htmlFile, "UTF-8", "")
         val disclosureHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-disclosure.html")
         val disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
 
-        val connection = mock(Connection::class.java, RETURNS_SELF)
-        val disclosureConnection = mock(Connection::class.java, RETURNS_SELF)
-        val response = mock(Connection.Response::class.java)
-        val disclosureResponse = mock(Connection.Response::class.java)
+        connection = mock(Connection::class.java, RETURNS_SELF)
+        disclosureConnection = mock(Connection::class.java, RETURNS_SELF)
+        response = mock(Connection.Response::class.java)
+        disclosureResponse = mock(Connection.Response::class.java)
 
         `when`(connection.execute()).thenReturn(response)
         `when`(response.statusCode()).thenReturn(200)
@@ -35,26 +39,20 @@ val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-f
         `when`(disclosureResponse.statusCode()).thenReturn(200)
         `when`(disclosureResponse.parse()).thenReturn(disclosureDoc)
 
-        mockStatic(Jsoup::class.java, CALLS_REAL_METHODS).use { mockedJsoup ->
-            mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { it.endsWith("/disclosure") }) }.thenReturn(disclosureConnection)
-            mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { !it.endsWith("/disclosure") }) }.thenReturn(connection)
-
-            mockStatic(LocalDate::class.java, CALLS_REAL_METHODS).use { mockedLocalDate ->
-                val fixedDate = LocalDate.of(2026, 1, 16)
-                `when`(LocalDate.now()).thenReturn(fixedDate)
-
-                block(connection, disclosureConnection)
+        provider = object : YahooFinanceProvider(0) {
+            override fun connect(url: String): Connection {
+                return if (url.endsWith("/disclosure")) disclosureConnection else connection
             }
+
+            override fun currentDate(): LocalDate = LocalDate.of(2026, 1, 16)
         }
     }
 
     @Test
     fun `fetchLatestDisclosure should return correct date when disclosure date is before or after today`() {
-        setupMockConnection { _, _ ->
-            val stockInfo = provider.fetchStockInfo("dummy")
-            assertNotNull(stockInfo)
-            assertEquals(LocalDate.of(2025, 11, 12), stockInfo?.latestDisclosureDate)
-        }
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNotNull(stockInfo)
+        assertEquals(LocalDate.of(2025, 11, 12), stockInfo?.latestDisclosureDate)
     }
 
     @Test

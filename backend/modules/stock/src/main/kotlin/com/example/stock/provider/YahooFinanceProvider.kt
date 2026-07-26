@@ -1,5 +1,6 @@
 package com.example.stock.provider
 
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -8,7 +9,7 @@ import java.time.LocalDate
 import java.util.regex.Pattern
 
 @Component
-class YahooFinanceProvider(
+open class YahooFinanceProvider(
     @Value("\${yahoo.finance.request.delay.millis:1000}")
     private val requestDelayMillis: Long
 ) : FinanceProvider {
@@ -20,13 +21,16 @@ class YahooFinanceProvider(
         private val LOGGER = LoggerFactory.getLogger(YahooFinanceProvider::class.java)
     }
 
+    protected open fun connect(url: String): Connection = Jsoup.connect(url)
+    protected open fun currentDate(): LocalDate = LocalDate.now()
+
     private fun connectWithRetries(url: String, maxAttempts: Int = 3, timeoutMillis: Int = 10000): org.jsoup.nodes.Document? {
         val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
         var attempt = 0
         while (attempt < maxAttempts) {
             attempt++
             try {
-                val response = Jsoup.connect(url)
+                val response = connect(url)
                     .userAgent(userAgent)
                     .referrer("https://www.google.com")
                     .timeout(timeoutMillis)
@@ -203,7 +207,7 @@ class YahooFinanceProvider(
                         val parts = mmddText.split("/")
                         val month = parts[0].toInt()
                         val day = parts[1].toInt()
-                        val today = LocalDate.now()
+                        val today = currentDate()
                         var date = LocalDate.of(today.year, month, day)
                         if (date.isAfter(today)) {
                             date = date.minusYears(1)
@@ -267,7 +271,7 @@ class YahooFinanceProvider(
             if (matcher3.find()) {
                 val month = matcher3.group(1).toInt()
                 val day = matcher3.group(2).toInt()
-                val currentYear = LocalDate.now().year
+                val currentYear = currentDate().year
                 return LocalDate.of(currentYear, month, day)
             }
             
