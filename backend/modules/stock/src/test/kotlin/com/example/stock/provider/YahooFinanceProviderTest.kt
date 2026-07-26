@@ -1,54 +1,60 @@
 package com.example.stock.provider
 
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.mockito.MockedStatic
-import org.mockito.Mockito.*
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.File
 import java.time.LocalDate
 
 class YahooFinanceProviderTest {
 
     private lateinit var provider: YahooFinanceProvider
-    private lateinit var doc: Document
-    private lateinit var disclosureDoc: Document
-    private lateinit var mockedJsoup: MockedStatic<Jsoup>
-    private lateinit var mockedLocalDate: MockedStatic<LocalDate>
-    private val connection: Connection = mock(Connection::class.java)
-    private val disclosureConnection: Connection = mock(Connection::class.java)
+    private lateinit var connection: Connection
+    private lateinit var disclosureConnection: Connection
+    private lateinit var response: Connection.Response
+    private lateinit var disclosureResponse: Connection.Response
 
     @BeforeEach
-    fun setUp() {
-        provider = YahooFinanceProvider(0) // requestDelayMillis = 0
+    fun initMocks() {
         val htmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance.html")
-        doc = Jsoup.parse(htmlFile, "UTF-8", "")
+        val doc = Jsoup.parse(htmlFile, "UTF-8", "")
         val disclosureHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-disclosure.html")
-        disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
+        val disclosureDoc = Jsoup.parse(disclosureHtmlFile, "UTF-8", "")
 
+        response = mock {
+            on { statusCode() } doReturn 200
+            on { parse() } doReturn doc
+        }
+        disclosureResponse = mock {
+            on { statusCode() } doReturn 200
+            on { parse() } doReturn disclosureDoc
+        }
+        connection = mock {
+            on { execute() } doReturn response
+        }
+        disclosureConnection = mock {
+            on { execute() } doReturn disclosureResponse
+        }
 
-        // Mock Jsoup.connect to avoid actual network calls
-        `when`(connection.get()).thenReturn(doc)
-        `when`(disclosureConnection.get()).thenReturn(disclosureDoc)
-        mockedJsoup = mockStatic(Jsoup::class.java)
-        mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { it.endsWith("/disclosure") }) }.thenReturn(disclosureConnection)
-        mockedJsoup.`when`<Connection> { Jsoup.connect(argThat { !it.endsWith("/disclosure") }) }.thenReturn(connection)
+        provider = object : YahooFinanceProvider(0) {
+            override fun connect(url: String): Connection {
+                return if (url.endsWith("/disclosure")) disclosureConnection else connection
+            }
 
-
-        // Mock LocalDate.now()
-        val fixedDate = LocalDate.of(2026, 1, 16)
-        mockedLocalDate = mockStatic(LocalDate::class.java, CALLS_REAL_METHODS)
-        `when`(LocalDate.now()).thenReturn(fixedDate)
+            override fun currentDate(): LocalDate = LocalDate.of(2026, 1, 16)
+        }
     }
 
-    @AfterEach
-    fun tearDown() {
-        mockedJsoup.close()
-        mockedLocalDate.close()
+    @Test
+    fun `fetchLatestDisclosure should return correct date when disclosure date is before or after today`() {
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNotNull(stockInfo)
+        assertEquals(LocalDate.of(2025, 11, 12), stockInfo?.latestDisclosureDate)
     }
 
     @Test
@@ -58,7 +64,7 @@ class YahooFinanceProviderTest {
         assertEquals(1234.5, stockInfo?.price)
         assertEquals(50.0, stockInfo?.incoming)
         assertEquals(LocalDate.of(2025, 10, 31), stockInfo?.earningsDate)
-        // Note: latestDisclosureDate is now tested in dedicated tests
+        assertEquals(LocalDate.of(2025, 11, 12), stockInfo?.latestDisclosureDate)
     }
 
     @Test
@@ -69,11 +75,8 @@ class YahooFinanceProviderTest {
 
     @Test
     fun `toDoubleOrNull should return null when text is ---`() {
-        // Test that the "---" string correctly converts to null
         val text = "---"
         val result = text.toDoubleOrNull()
-        
-        // Verify that "---" is correctly parsed as null
         assertNull(result, "The text '---' should convert to null")
     }
 
@@ -96,10 +99,159 @@ class YahooFinanceProviderTest {
             </body></html>
         """
         val pastDateDoc = Jsoup.parse(pastDateHtml)
-        `when`(disclosureConnection.get()).thenReturn(pastDateDoc)
+        val tempResponse: Connection.Response = mock()
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(pastDateDoc)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse)
 
         val stockInfo = provider.fetchStockInfo("dummy")
         // The year should be 2026
         assertEquals(LocalDate.of(2026, 1, 15), stockInfo?.latestDisclosureDate)
+    }
+
+    @Test
+    fun `fetchLatestDisclosure should handle time-based disclosure format`() {
+        // A time-based format like "16:31" should use today's MM/DD
+        val timeHtml = """
+            <!DOCTYPE html><html><body>
+            <div class="disclosureList_list"><div class="disclosureList_item">
+            <ul class="DisclosureItem__supplements__1NHJ"><li class="DisclosureItem__supplement__2U1S"><time>16:31</time></li></ul>
+            </div></div>
+            </body></html>
+        """
+        val timeDoc = Jsoup.parse(timeHtml)
+        val tempResponse: Connection.Response = mock()
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(timeDoc)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse)
+
+        val stockInfo = provider.fetchStockInfo("dummy")
+        // Today is 2026/01/16, so the parsed date should be 2026/01/16
+        assertEquals(LocalDate.of(2026, 1, 16), stockInfo?.latestDisclosureDate)
+    }
+
+    @Test
+    fun `fetchLatestDisclosure should handle other Japanese date formats`() {
+        // Pattern 1: YYYY年MM月DD日
+        val datePattern1Html = """
+            <!DOCTYPE html><html><body>
+            <div class="disclosureList_list"><div class="disclosureList_item">
+            <time>2025年10月28日</time>
+            </div></div>
+            </body></html>
+        """
+        val doc1 = Jsoup.parse(datePattern1Html)
+        val tempResponse1: Connection.Response = mock()
+        whenever(tempResponse1.statusCode()).thenReturn(200)
+        whenever(tempResponse1.parse()).thenReturn(doc1)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse1)
+
+        var stockInfo = provider.fetchStockInfo("dummy")
+        assertEquals(LocalDate.of(2025, 10, 28), stockInfo?.latestDisclosureDate)
+
+        // Pattern 2: YYYY/MM/DD
+        val datePattern2Html = """
+            <!DOCTYPE html><html><body>
+            <div class="disclosureList_list"><div class="disclosureList_item">
+            <time>2024/05/15</time>
+            </div></div>
+            </body></html>
+        """
+        val doc2 = Jsoup.parse(datePattern2Html)
+        val tempResponse2: Connection.Response = mock()
+        whenever(tempResponse2.statusCode()).thenReturn(200)
+        whenever(tempResponse2.parse()).thenReturn(doc2)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse2)
+
+        stockInfo = provider.fetchStockInfo("dummy")
+        assertEquals(LocalDate.of(2024, 5, 15), stockInfo?.latestDisclosureDate)
+
+        // Pattern 3: MM月DD日
+        val datePattern3Html = """
+            <!DOCTYPE html><html><body>
+            <div class="disclosureList_list"><div class="disclosureList_item">
+            <time>11月10日</time>
+            </div></div>
+            </body></html>
+        """
+        val doc3 = Jsoup.parse(datePattern3Html)
+        val tempResponse3: Connection.Response = mock()
+        whenever(tempResponse3.statusCode()).thenReturn(200)
+        whenever(tempResponse3.parse()).thenReturn(doc3)
+        whenever(disclosureConnection.execute()).thenReturn(tempResponse3)
+
+        stockInfo = provider.fetchStockInfo("dummy")
+        // Year defaults to current year (2026)
+        assertEquals(LocalDate.of(2026, 11, 10), stockInfo?.latestDisclosureDate)
+    }
+
+    @Test
+    fun `fetchStockInfo should return null when connection fails completely`() {
+        whenever(connection.execute()).thenThrow(RuntimeException("Network error"))
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNull(stockInfo)
+    }
+
+    @Test
+    fun `fetchStockInfo should retry on transient HTTP 500 error and succeed`() {
+        val badResponse: Connection.Response = mock()
+        whenever(badResponse.statusCode()).thenReturn(500)
+
+        // Return HTTP 500 first, then HTTP 200
+        whenever(connection.execute())
+            .thenReturn(badResponse)
+            .thenReturn(response)
+
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNotNull(stockInfo)
+        assertEquals(1234.5, stockInfo?.price)
+    }
+
+    @Test
+    fun `fetchStockInfo should correctly extract previousPrice from script tag`() {
+        val scriptHtml = """
+            <!DOCTYPE html><html><head>
+            <title>テスト株式会社【DUMMY】：ダミー情報 - Yahoo!ファイナンス</title>
+            <script>
+            window.__PRELOADED_STATE__ = {
+                "context": {
+                    "dispatcher": {
+                        "stores": {
+                            "QuoteStore": {
+                                "previousPrice":"1200.5"
+                            }
+                        }
+                    }
+                }
+            };
+            </script>
+            </head><body>
+            <span class="PriceBoard__price">1,234.5</span>
+            </body></html>
+        """
+        val scriptDoc = Jsoup.parse(scriptHtml)
+        val tempResponse: Connection.Response = mock()
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(scriptDoc)
+        whenever(connection.execute()).thenReturn(tempResponse)
+
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNotNull(stockInfo)
+        assertEquals(1200.5, stockInfo?.previousPrice)
+    }
+
+    @Test
+    fun `fetchStockInfo should handle missing or empty dividend gracefully`() {
+        val noDivHtmlFile = File("src/test/resources/com/example/stock/provider/dummy-yahoo-finance-with-no-dividend.html")
+        val noDivDoc = Jsoup.parse(noDivHtmlFile, "UTF-8", "")
+
+        val tempResponse: Connection.Response = mock()
+        whenever(tempResponse.statusCode()).thenReturn(200)
+        whenever(tempResponse.parse()).thenReturn(noDivDoc)
+        whenever(connection.execute()).thenReturn(tempResponse)
+
+        val stockInfo = provider.fetchStockInfo("dummy")
+        assertNotNull(stockInfo)
+        assertNull(stockInfo?.incoming, "Dividend/incoming should be null when it is represented as '---'")
     }
 }

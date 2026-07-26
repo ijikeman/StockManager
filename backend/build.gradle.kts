@@ -29,4 +29,10 @@ subprojects {
             dependency("io.mockk:mockk:1.13.8")
         }
     }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+        // 静的モック（MockedStatic）を有効にするための設定
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+    }
 }
